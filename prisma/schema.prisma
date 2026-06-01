@@ -1,0 +1,451 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── T1D ────────────────────────────────────────────────────────────
+
+model GlucoseReading {
+  id        String   @id @default(uuid())
+  timestamp DateTime
+  value     Float
+  unit      String   @default("mg/dL") // mg/dL or mmol/L
+  source    String   @default("manual") // manual, nightscout, dexcom, libre
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([timestamp])
+}
+
+model InsulinDose {
+  id        String   @id @default(uuid())
+  timestamp DateTime
+  type      String   // rapid, long, mixed, correction
+  brand     String?  // novorapid, lantus, tresiba, etc.
+  units     Float
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([timestamp])
+}
+
+model BasalRate {
+  id        String   @id @default(uuid())
+  rate      Float    // units per hour
+  startTime String   // HH:mm format
+  endTime   String   // HH:mm format
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Activity ──────────────────────────────────────────────────────
+
+model Activity {
+  id             String   @id @default(uuid())
+  type           String   // run, swim, bike, walk, hike, other
+  startTime      DateTime
+  endTime        DateTime?
+  distance       Float?   // meters
+  elevationGain  Float?   // meters
+  heartRateAvg   Int?
+  heartRateMax   Int?
+  calories       Int?
+  notes          String?
+  source         String   @default("manual") // manual, strava, apple_health
+  externalId     String?  // Strava activity ID
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  splits         ActivitySplit[]
+
+  @@index([startTime])
+  @@index([type])
+}
+
+model ActivitySplit {
+  id          String   @id @default(uuid())
+  activityId  String
+  splitNumber Int
+  distance    Float    // meters
+  duration    Int      // seconds
+  pace        Float?   // seconds per km
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([activityId])
+}
+
+model GymWorkout {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  name      String
+  notes     String?
+  duration  Int?     // minutes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sets      GymSet[]
+
+  @@index([date])
+}
+
+model GymSet {
+  id          String     @id @default(uuid())
+  workoutId   String
+  exerciseId  String
+  setNumber   Int
+  weight      Float?     // kg
+  reps        Int?
+  rpe         Float?     // 1-10
+  notes       String?
+  workout     GymWorkout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise    Exercise   @relation(fields: [exerciseId], references: [id])
+
+  @@index([workoutId])
+  @@index([exerciseId])
+}
+
+model Exercise {
+  id               String   @id @default(uuid())
+  name             String
+  muscleGroup      String
+  equipment        String?
+  instructions     String?
+  gifUrl           String?
+  secondaryMuscles String?
+  seededAt         DateTime @default(now())
+  gymSets          GymSet[]
+
+  @@unique([name])
+}
+
+// ─── Sleep ────────────────────────────────────────────────────────
+
+model SleepSession {
+  id        String   @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  quality   Int?     // 1-5
+  notes     String?
+  source    String   @default("manual") // manual, apple_health, oura
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  stages    SleepStage[]
+
+  @@index([startTime])
+}
+
+model SleepStage {
+  id        String   @id @default(uuid())
+  sessionId String
+  type      String   // deep, rem, light, awake
+  startTime DateTime
+  endTime   DateTime
+  session   SleepSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}
+
+// ─── Body Metrics ─────────────────────────────────────────────────
+
+model BodyMeasurement {
+  id         String   @id @default(uuid())
+  date       DateTime @default(now())
+  weight     Float?   // kg
+  bodyFatPct Float?
+  waist      Float?   // cm
+  chest      Float?
+  bicepLeft  Float?
+  bicepRight Float?
+  thighLeft  Float?
+  thighRight Float?
+  neck       Float?
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  @@index([date])
+}
+
+model LabResult {
+  id              String   @id @default(uuid())
+  date            DateTime
+  testName        String
+  value           Float
+  unit            String
+  refRangeLow     Float?
+  refRangeHigh    Float?
+  labName         String?
+  notes           String?
+  attachmentPath  String?  // local file path
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+  @@index([testName])
+}
+
+model Supplement {
+  id           String          @id @default(uuid())
+  name         String
+  brand        String?
+  servingSize  Float
+  servingUnit  String          @default("capsule") // capsule, tablet, ml, scoop, drop
+  nutrients    String?         // JSON: [{name, amount, unit}]
+  notes        String?
+  createdAt    DateTime        @default(now())
+  logs         SupplementLog[]
+
+  @@unique([name, brand])
+}
+
+model SupplementLog {
+  id           String     @id @default(uuid())
+  date         DateTime   @default(now())
+  supplementId String
+  dosage       Float      // number of servings
+  dosageUnit   String     @default("serving")
+  timeOfDay    String?    // morning, afternoon, evening, night
+  notes        String?
+  supplement   Supplement @relation(fields: [supplementId], references: [id])
+
+  @@index([date])
+  @@index([supplementId])
+}
+
+// ─── Nutrition ────────────────────────────────────────────────────
+
+model FoodItem {
+  id                 String            @id @default(uuid())
+  name               String
+  brand              String?
+  barcode            String?
+  servingSize        Float?
+  servingUnit        String?           // g, ml, oz, cup, piece
+  calories           Float?            // per serving
+  protein            Float?            // g
+  carbs              Float?            // g
+  fat                Float?            // g
+  fiber              Float?            // g
+  sugars             Float?            // g
+  saturatedFat       Float?
+  transFat           Float?
+  cholesterol        Float?            // mg
+  sodium             Float?            // mg
+  potassium          Float?            // mg
+  calcium            Float?            // mg
+  iron               Float?            // mg
+  vitaminA           Float?            // IU
+  vitaminC           Float?            // mg
+  vitaminD           Float?            // IU
+  isSeeded           Boolean           @default(false)
+  createdAt          DateTime          @default(now())
+  diaryEntries       FoodDiaryEntry[]
+
+  @@index([name])
+  @@index([barcode])
+}
+
+model FoodDiaryEntry {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  mealType  String   @default("snack") // breakfast, lunch, dinner, snack
+  foodId    String
+  servings  Float    @default(1)
+  grams     Float?   // override: actual grams consumed
+  createdAt DateTime @default(now())
+  food      FoodItem @relation(fields: [foodId], references: [id])
+
+  @@index([date])
+  @@index([foodId])
+}
+
+model NutritionGoal {
+  id       String @id @default(uuid())
+  calories Float?
+  protein  Float?  // g
+  carbs    Float?  // g
+  fat      Float?  // g
+  fiber    Float?  // g
+  waterMl  Float?
+  updatedAt DateTime @updatedAt
+}
+
+model WaterLog {
+  id       String   @id @default(uuid())
+  date     DateTime @default(now())
+  amountMl Int
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
+
+model MealPhoto {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  imagePath String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
+
+// ─── Finance ──────────────────────────────────────────────────────
+
+model Account {
+  id             String   @id @default(uuid())
+  name           String
+  currency       String   @default("USD")
+  type           String   // checking, savings, cash, credit, investment, crypto
+  initialBalance Float    @default(0)
+  notes          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  transactions   Transaction[] @relation("TransactionAccount")
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  parentId     String?
+  type         String        // income, expense, transfer
+  color        String?
+  icon         String?
+  parent       Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     Category[]    @relation("CategoryHierarchy")
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([type])
+}
+
+model Transaction {
+  id                String   @id @default(uuid())
+  date              DateTime @default(now())
+  accountId         String
+  categoryId        String?
+  amount            Float
+  currency          String   @default("USD")
+  description       String?
+  notes             String?
+  type              String   // income, expense, transfer
+  isTransfer        Boolean  @default(false)
+  transferAccountId String?
+  account           Account  @relation("TransactionAccount", fields: [accountId], references: [id])
+  category          Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([date])
+  @@index([accountId])
+  @@index([categoryId])
+}
+
+model Budget {
+  id         String   @id @default(uuid())
+  categoryId String
+  month      DateTime // first day of month
+  amount     Float
+  currency   String   @default("USD")
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([categoryId, month])
+}
+
+model ExchangeRate {
+  id           String   @id @default(uuid())
+  fromCurrency String
+  toCurrency   String
+  rate         Float
+  date         DateTime @default(now())
+
+  @@unique([fromCurrency, toCurrency, date])
+  @@index([fromCurrency, toCurrency])
+}
+
+// ─── Productivity ─────────────────────────────────────────────────
+
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  priority    String   @default("medium") // low, medium, high, urgent
+  status      String   @default("todo") // todo, in_progress, done, cancelled
+  projectId   String?
+  tags        String?  // comma-separated
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project? @relation(fields: [projectId], references: [id])
+
+  @@index([status])
+  @@index([dueDate])
+  @@index([projectId])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      String   @default("active") // active, completed, archived
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tasks       Task[]
+}
+
+model Habit {
+  id             String   @id @default(uuid())
+  name           String
+  frequency      String   @default("daily") // daily, weekly, monthly
+  frequencyCount Int      @default(1) // how many times per period
+  timeOfDay      String?  // morning, afternoon, evening, anytime
+  category       String?
+  color          String?
+  createdAt      DateTime @default(now())
+  logs           HabitLog[]
+
+  @@index([frequency])
+}
+
+model HabitLog {
+  id        String   @id @default(uuid())
+  habitId   String
+  date      DateTime @default(now())
+  completed Boolean  @default(true)
+  notes     String?
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId])
+  @@index([date])
+}
+
+model JournalEntry {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  content   String   // markdown
+  mood      String?  // great, good, okay, bad, terrible
+  tags      String?  // comma-separated
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([date])
+}
+
+model CalendarEvent {
+  id          String   @id @default(uuid())
+  externalId  String?  // CalDAV UID
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  source      String   @default("manual") // manual, caldav
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([startTime])
+  @@index([externalId])
+}
