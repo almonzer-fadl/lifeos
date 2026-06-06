@@ -4,7 +4,7 @@ import { format } from "date-fns";
 export const dynamic = "force-dynamic";
 
 export default async function BodyPage() {
-  const [measurements, labResults, supplements, supplementLogs] = await Promise.all([
+  const [measurements, labResults, , supplementLogs] = await Promise.all([
     db.bodyMeasurement.findMany({ orderBy: { date: "desc" }, take: 12 }),
     db.labResult.findMany({ orderBy: { date: "desc" }, take: 50 }),
     db.supplement.findMany({ orderBy: { name: "asc" } }),

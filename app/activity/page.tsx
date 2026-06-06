@@ -54,18 +54,6 @@ export default async function ActivityPage() {
   }, 0);
   const totalWorkouts = workouts.length;
 
-  // Group gym sets by workout
-  const gymActivities = workouts.flatMap((w) =>
-    w.sets.map((s) => ({
-      id: s.id,
-      workout: w,
-      exercise: s.exercise,
-      weight: s.weight,
-      reps: s.reps,
-      rpe: s.rpe,
-    }))
-  );
-
   return (
     <div className="p-4 lg:p-8 space-y-6">
       <div>

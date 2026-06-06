@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import debounce from "lodash.debounce";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 type Exercise = {
   id: string;
@@ -19,23 +18,32 @@ export function ExerciseSearch({
   const [results, setResults] = useState<Exercise[]>([]);
   const [open, setOpen] = useState(false);
 
-  const search = useCallback(
-    debounce(async (q: string) => {
-      if (q.length < 1) {
-        setResults([]);
-        return;
-      }
-      const res = await fetch(`/api/health/exercises?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      setResults(data);
-    }, 200),
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function search(q: string) {
+    if (q.length < 1) {
+      setResults([]);
+      return;
+    }
+    fetch(`/api/health/exercises?q=${encodeURIComponent(q)}`)
+      .then((res) => res.json())
+      .then(setResults);
+  }
+
+  const debouncedSearch = useMemo(
+    () => (q: string) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => search(q), 200);
+    },
     []
   );
 
   useEffect(() => {
-    search(query);
-    return () => search.cancel();
-  }, [query, search]);
+    debouncedSearch(query);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [query, debouncedSearch]);
 
   return (
     <div className="relative">
