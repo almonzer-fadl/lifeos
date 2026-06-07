@@ -21,15 +21,11 @@ export default async function T1DPage() {
         take: 288,
       }),
       db.glucoseReading.findMany({
-        where: {
-          timestamp: { gte: todayStart, lte: todayEnd },
-        },
+        where: { timestamp: { gte: todayStart, lte: todayEnd } },
         orderBy: { timestamp: "desc" },
       }),
       db.insulinDose.findMany({
-        where: {
-          timestamp: { gte: todayStart, lte: todayEnd },
-        },
+        where: { timestamp: { gte: todayStart, lte: todayEnd } },
       }),
       db.glucoseReading.findMany({
         where: { timestamp: { gte: ninetyDaysAgo } },
@@ -41,28 +37,16 @@ export default async function T1DPage() {
   const latestGlucose = todayReadings[0]?.value ?? null;
 
   return (
-    <div className="p-4 lg:p-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Type 1 Diabetes</h1>
-        <p className="text-zinc-500 text-sm mt-1">
-          Glucose tracking, insulin log, and h1bc estimation
-        </p>
-      </div>
+    <div className="p-5 lg:p-8 space-y-5">
+      <PageHeader title="Type 1 Diabetes" subtitle="Glucose, insulin, and h1bc" />
 
-      {/* Stats bar */}
       <T1DStats
         readings={ninetyDayReadings.map((r) => r.value)}
         latestGlucose={latestGlucose}
         totalInsulin={todayInsulinTotal}
       />
 
-      {/* Glucose chart */}
-      <section className="rounded-xl bg-zinc-900 border border-zinc-800 p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
-            Glucose (7 days)
-          </h2>
-        </div>
+      <Section title="Glucose (7 days)">
         <GlucoseChart
           readings={recentReadings.map((r) => ({
             id: r.id,
@@ -70,78 +54,45 @@ export default async function T1DPage() {
             value: r.value,
           }))}
         />
-        {/* Range legend */}
-        <div className="flex items-center gap-4 mt-3 text-xs text-zinc-500">
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-0.5 bg-red-400 inline-block" /> Low (&lt;70)
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-0.5 bg-yellow-400 inline-block" /> High
-            (&gt;180)
-          </span>
-          <span className="flex items-center gap-1">Target: 70-180 mg/dL</span>
+      </Section>
+
+      <Section title="Quick Add">
+        <div className="space-y-5">
+          <GlucoseForm />
+          <div className="border-t border-[var(--border-light)]" />
+          <InsulinForm />
         </div>
-      </section>
+      </Section>
 
-      {/* Quick add */}
-      <section className="rounded-xl bg-zinc-900 border border-zinc-800 p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
-          Quick Add
-        </h2>
-        <GlucoseForm />
-        <div className="border-t border-zinc-800" />
-        <InsulinForm />
-      </section>
-
-      {/* Recent readings table */}
-      <section className="rounded-xl bg-zinc-900 border border-zinc-800 p-4">
-        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
-          Recent Readings
-        </h2>
+      {/* Recent readings */}
+      <Section title={`Today's Readings${todayReadings.length ? ` (${todayReadings.length})` : ""}`}>
         {todayReadings.length === 0 ? (
-          <p className="text-zinc-600 text-sm py-4 text-center">
-            No readings today. Log your first glucose reading above.
-          </p>
+          <EmptyState message="No readings today. Log your first glucose reading above." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-zinc-500 text-xs uppercase tracking-wider border-b border-zinc-800">
-                  <th className="text-left py-2 pr-4">Time</th>
-                  <th className="text-right py-2 pr-4">Glucose</th>
-                  <th className="text-right py-2 pr-4">Source</th>
-                  <th className="text-left py-2">Notes</th>
+                <tr className="text-stone-400 text-xs uppercase tracking-wider border-b border-[var(--border-light)]">
+                  <th className="text-left py-2.5 pr-4 font-medium">Time</th>
+                  <th className="text-right py-2.5 pr-4 font-medium">Glucose</th>
+                  <th className="text-right py-2.5 pr-4 font-medium">Source</th>
+                  <th className="text-left py-2.5 font-medium">Notes</th>
                 </tr>
               </thead>
               <tbody>
                 {todayReadings.map((r) => {
                   const isLow = r.value < 70;
                   const isHigh = r.value > 180;
-                  const valueColor = isLow
-                    ? "text-red-400"
-                    : isHigh
-                      ? "text-yellow-400"
-                      : "text-green-400";
-
                   return (
-                    <tr
-                      key={r.id}
-                      className="border-b border-zinc-800/50 hover:bg-zinc-800/30"
-                    >
-                      <td className="py-2 pr-4 text-zinc-400">
+                    <tr key={r.id} className="border-b border-[var(--border-light)] hover:bg-stone-50/50 transition-colors">
+                      <td className="py-2.5 pr-4 text-stone-500 font-mono text-xs">
                         {format(new Date(r.timestamp), "HH:mm")}
                       </td>
-                      <td
-                        className={`py-2 pr-4 text-right font-semibold ${valueColor}`}
-                      >
+                      <td className={`py-2.5 pr-4 text-right font-semibold font-mono ${isLow ? "text-rose-600" : isHigh ? "text-amber-600" : "text-emerald-600"}`}>
                         {r.value}
                       </td>
-                      <td className="py-2 pr-4 text-right text-zinc-500 text-xs">
-                        {r.source}
-                      </td>
-                      <td className="py-2 text-zinc-500 text-xs">
-                        {r.notes || ""}
-                      </td>
+                      <td className="py-2.5 pr-4 text-right text-stone-400 text-xs">{r.source}</td>
+                      <td className="py-2.5 text-stone-400 text-xs">{r.notes || "—"}</td>
                     </tr>
                   );
                 })}
@@ -149,39 +100,51 @@ export default async function T1DPage() {
             </table>
           </div>
         )}
+      </Section>
 
-        {/* Recent insulin doses */}
-        {todayInsulin.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-zinc-800">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
-              Today&apos;s Insulin
-            </h3>
-            <div className="space-y-1">
-              {todayInsulin.map((d) => (
-                <div
-                  key={d.id}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-400">
-                      {format(new Date(d.timestamp), "HH:mm")}
-                    </span>
-                    <span className="text-zinc-500 text-xs capitalize">
-                      {d.type}
-                    </span>
-                    {d.brand && (
-                      <span className="text-zinc-600 text-xs">{d.brand}</span>
-                    )}
-                  </div>
-                  <span className="font-semibold text-purple-400">
-                    {d.units}u
-                  </span>
+      {/* Insulin log */}
+      {todayInsulin.length > 0 && (
+        <Section title="Today's Insulin">
+          <div className="space-y-1.5">
+            {todayInsulin.map((d) => (
+              <div key={d.id} className="flex items-center justify-between py-2 px-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-sm text-stone-500">{format(new Date(d.timestamp), "HH:mm")}</span>
+                  <span className="text-sm capitalize text-stone-700">{d.type}</span>
+                  {d.brand && <span className="text-xs text-stone-400">{d.brand}</span>}
                 </div>
-              ))}
-            </div>
+                <span className="font-semibold text-violet-600 font-mono">{d.units}u</span>
+              </div>
+            ))}
           </div>
-        )}
-      </section>
+        </Section>
+      )}
+    </div>
+  );
+}
+
+function PageHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="animate-fade-in">
+      <h1 className="text-2xl font-bold tracking-tight text-stone-900">{title}</h1>
+      <p className="text-sm text-stone-500 mt-0.5">{subtitle}</p>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)] p-5 animate-fade-in">
+      <h2 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="py-8 text-center">
+      <p className="text-sm text-stone-400">{message}</p>
     </div>
   );
 }
