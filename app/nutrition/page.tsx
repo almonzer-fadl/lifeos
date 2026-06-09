@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { NutritionForm } from "@/components/modules/nutrition/nutrition-form";
+import { WaterForm } from "@/components/modules/nutrition/water-form";
 import { startOfDay, endOfDay } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function NutritionPage() {
       </div>
 
       <Section title="Log Food"><NutritionForm /></Section>
+      <Section title="Water"><WaterForm /></Section>
 
       <Section title="Today's Diary">
         {todayEntries.length === 0 ? <Empty msg="Nothing logged today." /> : (

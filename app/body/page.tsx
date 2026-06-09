@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { BodyMeasurementForm, LabResultForm, SupplementForm } from "@/components/modules/body/body-forms";
 import { format } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,8 @@ export default async function BodyPage() {
         <p className="text-sm text-stone-500 mt-0.5">Weight, measurements, lab results, supplements</p>
       </div>
 
+      <Section title="Add Measurement"><BodyMeasurementForm /></Section>
+
       <Section title="Latest Measurements">
         {!latest ? <Empty msg="No measurements yet." /> : (
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -37,6 +40,8 @@ export default async function BodyPage() {
         )}
         {latest && <div className="text-xs text-stone-400 mt-3">{format(new Date(latest.date), "MMM d, yyyy")}{latest.notes && ` · ${latest.notes}`}</div>}
       </Section>
+
+      <Section title="Add Lab Result"><LabResultForm /></Section>
 
       {labResults.length > 0 && (
         <Section title="Lab Results">
@@ -63,6 +68,8 @@ export default async function BodyPage() {
           </div>
         </Section>
       )}
+
+      <Section title="Log Supplement"><SupplementForm /></Section>
 
       {supplementLogs.length > 0 && (
         <Section title="Supplements">
