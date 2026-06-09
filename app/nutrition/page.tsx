@@ -16,8 +16,8 @@ export default async function NutritionPage() {
     db.nutritionGoal.findFirst(),
   ]);
 
-  const water = waterToday.reduce((s, w) => s + w.amountMl, 0);
-  const macros = todayEntries.reduce((acc, e) => {
+  const water = waterToday.reduce((s: number, w: { amountMl: number }) => s + w.amountMl, 0);
+  const macros = todayEntries.reduce((acc: { cal: number; prot: number; carb: number; fat: number; fib: number }, e: { mealType: string; servings: number; grams: number | null; food: { name: string; brand: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null; fiber: number | null; servingSize: number | null; servingUnit: string | null } | null }) => {
     if (!e.food) return acc;
     const f = e.grams ? e.grams / (e.food.servingSize || 100) : e.servings;
     return {
@@ -58,7 +58,7 @@ export default async function NutritionPage() {
                 <div key={mt}>
                   <div className="text-xs font-semibold text-stone-400 uppercase mb-2 capitalize">{mt}</div>
                   <div className="space-y-1.5">
-                    {meals.map(e => {
+                    {meals.map((e: { id: string; servings: number; grams: number | null; food: { name: string; brand: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null; servingSize: number | null; servingUnit: string | null } | null }) => {
                       const food = e.food;
                       if (!food) return null;
                       const f = e.grams ? e.grams / (food.servingSize || 100) : e.servings;

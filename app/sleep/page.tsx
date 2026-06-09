@@ -10,13 +10,13 @@ export default async function SleepPage() {
   const sessions = await db.sleepSession.findMany({ where: { startTime: { gte: thirtyDaysAgo } }, orderBy: { startTime: "desc" }, take: 31 });
 
   const avgDur = sessions.length > 0
-    ? sessions.reduce((s, x) => s + differenceInMinutes(new Date(x.endTime), new Date(x.startTime)), 0) / sessions.length / 60 : null;
-  const avgQ = sessions.filter(s => s.quality).length > 0
-    ? sessions.reduce((s, x) => s + (x.quality || 0), 0) / sessions.filter(s => s.quality).length : null;
+    ? sessions.reduce((s: number, x: { endTime: Date; startTime: Date }) => s + differenceInMinutes(new Date(x.endTime), new Date(x.startTime)), 0) / sessions.length / 60 : null;
+  const avgQ = sessions.filter((s: { quality: number | null }) => s.quality).length > 0
+    ? sessions.reduce((s: number, x: { quality: number | null }) => s + (x.quality || 0), 0) / sessions.filter((s: { quality: number | null }) => s.quality).length : null;
   const debt = avgDur && avgDur < 7 ? (7 - avgDur).toFixed(1) : null;
-  const sorted = [...sessions].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  const sorted = [...sessions].sort((a: { startTime: Date }, b: { startTime: Date }) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   const consist = sessions.length >= 3 ? (() => {
-    const mins = sorted.map(s => new Date(s.startTime).getHours() * 60 + new Date(s.startTime).getMinutes());
+    const mins = sorted.map((s: { startTime: Date }) => new Date(s.startTime).getHours() * 60 + new Date(s.startTime).getMinutes());
     const avg = mins.reduce((a, b) => a + b, 0) / mins.length;
     const std = Math.sqrt(mins.reduce((s, v) => s + (v - avg) ** 2, 0) / mins.length);
     return std < 30 ? "Excellent" : std < 60 ? "Good" : "Irregular";
@@ -41,7 +41,7 @@ export default async function SleepPage() {
       <Section title="History">
         {sessions.length === 0 ? <Empty msg="No sleep data yet." /> : (
           <div className="space-y-2">
-            {sessions.map(s => {
+            {sessions.map((s: { id: string; startTime: Date; endTime: Date; quality: number | null; source: string; notes: string | null }) => {
               const hrs = differenceInMinutes(new Date(s.endTime), new Date(s.startTime)) / 60;
               return (
                 <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">

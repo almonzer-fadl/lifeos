@@ -12,18 +12,21 @@ export default async function FinancePage() {
     db.category.findMany({ orderBy: { name: "asc" } }),
   ]);
 
-  const balances = accounts.map(a => {
-    const txs = transactions.filter(t => t.accountId === a.id);
-    const bal = txs.reduce((s, t) => t.type === "income" ? s + t.amount : t.type === "expense" ? s - t.amount : s, a.initialBalance);
+  type TxLike = { id: string; accountId: string; type: string; amount: number; currency: string; date: Date; description: string | null; account: { name: string } | null; category: { name: string } | null };
+  type AcctLike = { id: string; name: string; currency: string; type: string; initialBalance: number; balance?: number };
+
+  const balances = accounts.map((a: AcctLike) => {
+    const txs = transactions.filter((t: TxLike) => t.accountId === a.id);
+    const bal = txs.reduce((s: number, t: TxLike) => t.type === "income" ? s + t.amount : t.type === "expense" ? s - t.amount : s, a.initialBalance);
     return { ...a, balance: bal };
   });
-  const netWorth = balances.reduce((s, a) => s + a.balance, 0);
-  const income = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const expenses = transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const netWorth = balances.reduce((s: number, a: { balance: number }) => s + a.balance, 0);
+  const income = transactions.filter((t: TxLike) => t.type === "income").reduce((s: number, t: TxLike) => s + t.amount, 0);
+  const expenses = transactions.filter((t: TxLike) => t.type === "expense").reduce((s: number, t: TxLike) => s + t.amount, 0);
   const byCat: Record<string, number> = {};
-  transactions.filter(t => t.type === "expense" && t.category).forEach(t => { byCat[t.category!.name] = (byCat[t.category!.name] || 0) + t.amount; });
-  const topCats = Object.entries(byCat).sort(([,a],[,b]) => b - a).slice(0, 5);
-  const currencies = [...new Set(accounts.map(a => a.currency))];
+  transactions.filter((t: TxLike) => t.type === "expense" && t.category).forEach((t: TxLike) => { byCat[t.category!.name] = (byCat[t.category!.name] || 0) + t.amount; });
+  const topCats = Object.entries(byCat).sort(([, a]: [string, number], [, b]: [string, number]) => b - a).slice(0, 5);
+  const currencies = [...new Set(accounts.map((a: AcctLike) => a.currency))];
 
   return (
     <div className="p-5 lg:p-8 space-y-5">
@@ -42,7 +45,7 @@ export default async function FinancePage() {
       {balances.length > 0 && (
         <Section title="Accounts">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {balances.map(a => (
+            {balances.map((a: { id: string; name: string; currency: string; type: string; balance: number }) => (
               <div key={a.id} className="p-4 rounded-xl bg-stone-50 border border-[var(--border-light)]">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-sm font-semibold text-stone-700">{a.name}</div>
@@ -77,7 +80,7 @@ export default async function FinancePage() {
       <Section title="Recent">
         {transactions.length === 0 ? <Empty msg="No transactions yet." /> : (
           <div className="space-y-1">
-            {transactions.slice(0, 30).map(t => (
+            {transactions.slice(0, 30).map((t: TxLike) => (
               <div key={t.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-stone-50 transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-stone-700 font-medium truncate">{t.description || t.category?.name || "Transaction"}</div>
