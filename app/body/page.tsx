@@ -92,7 +92,7 @@ export default async function BodyPage() {
                 <th className="text-left py-2.5 pr-3 font-medium">Date</th><th className="text-right py-2.5 pr-3 font-medium">Weight</th><th className="text-right py-2.5 pr-3 font-medium">BF%</th><th className="text-right py-2.5 pr-3 font-medium">Waist</th><th className="text-left py-2.5 font-medium">Notes</th>
               </tr></thead>
               <tbody>
-                {measurements.map(m => (
+                {measurements.map((m: { id: string; date: Date; weight: number | null; bodyFatPct: number | null; waist: number | null; notes: string | null }) => (
                   <tr key={m.id} className="border-b border-[var(--border-light)] hover:bg-stone-50/50 transition-colors">
                     <td className="py-2.5 pr-3 text-stone-400 text-xs font-mono">{format(new Date(m.date), "MMM d")}</td>
                     <td className="py-2.5 pr-3 text-right text-stone-700 font-mono">{m.weight ? `${m.weight} kg` : "—"}</td>
