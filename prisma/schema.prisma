@@ -294,29 +294,93 @@ model MealPhoto {
 // ─── Finance ──────────────────────────────────────────────────────
 
 model Account {
-  id             String   @id @default(uuid())
-  name           String
-  currency       String   @default("USD")
-  type           String   // checking, savings, cash, credit, investment, crypto
-  initialBalance Float    @default(0)
-  notes          String?
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  transactions   Transaction[] @relation("TransactionAccount")
+  id                   String                 @id @default(uuid())
+  name                 String
+  currency             String                 @default("USD")
+  type                 String                 // checking, savings, cash, credit, investment, crypto, loan, mortgage
+  initialBalance       Float                  @default(0)
+  isDebt               Boolean                @default(false)
+  interestRate         Float?                 // annual percentage, e.g. 5.5 for 5.5%
+  minimumPayment       Float?                 // minimum monthly payment
+  creditLimit          Float?                 // for credit cards
+  paymentDueDay        Int?                   // day of month payment is due (1-31)
+  payoffTarget         DateTime?              // target date to pay off the debt
+  notes                String?
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  transactions         Transaction[]           @relation("TransactionAccount")
+  recurringTransactions RecurringTransaction[]
+  financialGoals       FinancialGoal[]
+}
+
+model Asset {
+  id            String   @id @default(uuid())
+  name          String
+  type          String   // property, vehicle, investment, crypto, gold, collectible, other
+  purchaseValue Float    // original cost
+  currentValue  Float    // current estimated value
+  currency      String   @default("USD")
+  purchaseDate  DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([type])
+}
+
+model RecurringTransaction {
+  id              String    @id @default(uuid())
+  type            String    // income, expense
+  amount          Float
+  currency        String    @default("USD")
+  accountId       String
+  categoryId      String?
+  description     String
+  frequency       String    // daily, weekly, monthly, yearly
+  frequencyCount  Int       @default(1) // e.g. every 2 weeks
+  startDate       DateTime
+  endDate         DateTime?
+  nextDate        DateTime  // next occurrence
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  account         Account   @relation(fields: [accountId], references: [id])
+  category        Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([nextDate])
+  @@index([isActive])
+}
+
+model FinancialGoal {
+  id            String   @id @default(uuid())
+  name          String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  currency      String   @default("USD")
+  targetDate    DateTime?
+  accountId     String?
+  status        String   @default("active") // active, completed, cancelled
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  account       Account? @relation(fields: [accountId], references: [id])
+
+  @@index([status])
 }
 
 model Category {
-  id           String        @id @default(uuid())
-  name         String
-  parentId     String?
-  type         String        // income, expense, transfer
-  color        String?
-  icon         String?
-  parent       Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children     Category[]    @relation("CategoryHierarchy")
-  transactions Transaction[]
-  budgets      Budget[]
+  id                    String                  @id @default(uuid())
+  name                  String
+  parentId              String?
+  type                  String                  // income, expense, transfer
+  color                 String?
+  icon                  String?
+  parent                Category?               @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children              Category[]              @relation("CategoryHierarchy")
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
 
   @@index([type])
 }
