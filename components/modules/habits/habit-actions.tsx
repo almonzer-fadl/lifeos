@@ -35,21 +35,21 @@ export function CreateHabitForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="New habit..." className="flex-1" required />
-      <select value={frequency} onChange={e => setFrequency(e.target.value)} className="w-28">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
+      <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="New habit..." className="min-w-0" required />
+      <select value={frequency} onChange={e => setFrequency(e.target.value)} className="w-full sm:w-28">
         <option value="daily">Daily</option>
         <option value="weekly">Weekly</option>
         <option value="monthly">Monthly</option>
       </select>
-      <select value={timeOfDay} onChange={e => setTimeOfDay(e.target.value)} className="w-28">
+      <select value={timeOfDay} onChange={e => setTimeOfDay(e.target.value)} className="w-full sm:w-28">
         <option value="">Anytime</option>
         <option value="morning">Morning</option>
         <option value="afternoon">Afternoon</option>
         <option value="evening">Evening</option>
         <option value="night">Night</option>
       </select>
-      <button type="submit" disabled={saving || !name.trim()} className="px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm">
+      <button type="submit" disabled={saving || !name.trim()} className="rounded-lg border border-[rgba(220,193,122,0.34)] bg-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--accent)] transition-all hover:bg-[rgba(220,193,122,0.2)] disabled:opacity-40 active:scale-[0.97]">
         Add
       </button>
     </form>
@@ -100,19 +100,19 @@ export function HabitCard({ habit }: { habit: Habit }) {
   }
 
   return (
-    <div className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${isDone ? "bg-emerald-50/50 border-emerald-200" : "bg-white border-[var(--border)] shadow-[var(--shadow-card)]"} ${busy ? "opacity-50" : ""}`}>
-      <button onClick={toggle} disabled={busy} className={`h-7 w-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? "bg-emerald-500 border-emerald-500" : "border-stone-300 hover:border-emerald-400"}`}>
-        {isDone && <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+    <div className={`flex items-center gap-3 rounded-lg border p-4 transition-all ${isDone ? "border-[rgba(66,211,146,0.3)] bg-[var(--emerald-soft)]" : "border-[var(--border)] bg-[var(--surface-raised)] shadow-[var(--shadow-card)]"} ${busy ? "opacity-50" : ""}`}>
+      <button onClick={toggle} disabled={busy} className={`h-7 w-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? "bg-[var(--emerald)] border-[var(--emerald)]" : "border-[var(--border-strong)] hover:border-[var(--emerald)]"}`}>
+        {isDone && <svg className="h-4 w-4 text-[#020304]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </button>
       <div className="flex-1 min-w-0">
-        <div className={`text-sm font-semibold ${isDone ? "text-emerald-700" : "text-stone-700"}`}>{habit.name}</div>
-        <div className="text-xs text-stone-400">{habit.frequency === "daily" ? "Daily" : `${habit.frequencyCount}x ${habit.frequency}`}{habit.timeOfDay ? ` · ${habit.timeOfDay}` : ""}</div>
+        <div className={`text-sm font-semibold ${isDone ? "text-[var(--emerald)]" : "text-[var(--text)]"}`}>{habit.name}</div>
+        <div className="text-xs text-[var(--text-tertiary)]">{habit.frequency === "daily" ? "Daily" : `${habit.frequencyCount}x ${habit.frequency}`}{habit.timeOfDay ? ` · ${habit.timeOfDay}` : ""}</div>
       </div>
       <div className="text-right shrink-0">
-        <div className="text-lg font-bold text-stone-700 font-mono">{streak > 0 ? streak : "—"}</div>
-        <div className="text-[10px] text-stone-400 font-medium">streak</div>
+        <div className="text-lg font-bold text-[var(--text)] font-mono">{streak > 0 ? streak : "—"}</div>
+        <div className="text-[10px] text-[var(--text-tertiary)] font-medium">streak</div>
       </div>
-      <button onClick={deleteHabit} disabled={busy} className="text-stone-300 hover:text-rose-500 text-lg leading-none ml-1 transition-colors" title="Delete">×</button>
+      <button onClick={deleteHabit} disabled={busy} className="text-[var(--text-tertiary)] hover:text-[var(--rose)] text-lg leading-none ml-1 transition-colors" title="Delete">×</button>
     </div>
   );
 }

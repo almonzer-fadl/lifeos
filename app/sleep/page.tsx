@@ -23,17 +23,18 @@ export default async function SleepPage() {
   })() : null;
 
   return (
-    <div className="p-5 lg:p-8 space-y-5">
-      <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">Sleep</h1>
-        <p className="text-sm text-stone-500 mt-0.5">Duration, quality, and consistency</p>
+    <div className="premium-page">
+      <div className="premium-header animate-fade-in">
+        <div className="premium-kicker">Recovery Desk</div>
+        <h1 className="premium-title">Sleep Command</h1>
+        <p className="premium-subtitle">Duration, quality, debt, and consistency</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-stagger">
-        <Stat l="Avg Duration" v={avgDur ? `${avgDur.toFixed(1)}` : "--"} u="hours" c="text-indigo-600" />
-        <Stat l="Avg Quality" v={avgQ ? `${avgQ.toFixed(1)}/5` : "--"} u="" c="text-amber-600" />
-        <Stat l="Sleep Debt" v={debt ?? "--"} u={debt ? "hrs behind" : ""} c="text-rose-600" />
-        <Stat l="Consistency" v={consist ?? "--"} u="" c="text-emerald-600" />
+        <Stat l="Avg Duration" v={avgDur ? `${avgDur.toFixed(1)}` : "--"} u="hours" c="text-[var(--indigo)]" />
+        <Stat l="Avg Quality" v={avgQ ? `${avgQ.toFixed(1)}/5` : "--"} u="" c="text-[var(--amber)]" />
+        <Stat l="Sleep Debt" v={debt ?? "--"} u={debt ? "hrs behind" : ""} c="text-[var(--rose)]" />
+        <Stat l="Consistency" v={consist ?? "--"} u="" c="text-[var(--emerald)]" />
       </div>
 
       <Section title="Log Sleep"><SleepForm /></Section>
@@ -44,18 +45,18 @@ export default async function SleepPage() {
             {sessions.map((s: { id: string; startTime: Date; endTime: Date; quality: number | null; source: string; notes: string | null }) => {
               const hrs = differenceInMinutes(new Date(s.endTime), new Date(s.startTime)) / 60;
               return (
-                <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">
-                  <span className="text-2xl">{s.quality && s.quality >= 4 ? "😊" : s.quality && s.quality >= 2 ? "😐" : "😴"}</span>
+                <div key={s.id} className="premium-row flex items-center gap-3">
+                  <span className="premium-chip shrink-0">{s.quality ? `Q${s.quality}` : "SLP"}</span>
                   <div className="flex-1">
-                    <div className="text-sm font-semibold text-stone-700">{hrs.toFixed(1)} hours</div>
-                    <div className="text-xs text-stone-400">
+                    <div className="text-sm font-semibold text-[var(--text)]">{hrs.toFixed(1)} hours</div>
+                    <div className="text-xs text-[var(--text-tertiary)]">
                       {format(new Date(s.startTime), "HH:mm")} → {format(new Date(s.endTime), "HH:mm")}
                       {" · "}{format(new Date(s.startTime), "EEE, MMM d")}
                       {s.quality && ` · Quality: ${s.quality}/5`}
                     </div>
-                    {s.notes && <div className="text-xs text-stone-400 mt-0.5">{s.notes}</div>}
+                    {s.notes && <div className="text-xs text-[var(--text-tertiary)] mt-0.5">{s.notes}</div>}
                   </div>
-                  <span className="text-[10px] text-stone-300 uppercase font-medium">{s.source}</span>
+                  <span className="text-[10px] text-[var(--text-tertiary)] uppercase font-medium">{s.source}</span>
                   <DeleteButton url={`/api/health/sleep?id=${s.id}`} />
                 </div>
               );
@@ -69,18 +70,18 @@ export default async function SleepPage() {
 
 function Stat({ l, v, u, c }: { l: string; v: string; u: string; c: string }) {
   return (
-    <div className="p-4 rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)]">
-      <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">{l}</div>
+    <div className="premium-stat">
+      <div className="premium-label">{l}</div>
       <div className={`text-[1.75rem] font-bold tracking-tight mt-1 font-mono ${c}`}>{v}</div>
-      <div className="text-xs text-stone-400 mt-0.5">{u}</div>
+      <div className="text-xs text-[var(--text-tertiary)] mt-0.5">{u}</div>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section className="rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)] p-5 animate-fade-in"><h2 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">{title}</h2>{children}</section>;
+  return <section className="premium-panel animate-fade-in"><div className="mb-3 flex items-center justify-between gap-3"><h2 className="premium-panel-title">{title}</h2><span className="premium-panel-kicker">Recovery</span></div>{children}</section>;
 }
 
 function Empty({ msg }: { msg: string }) {
-  return <div className="py-8 text-center text-sm text-stone-400">{msg}</div>;
+  return <div className="premium-empty">{msg}</div>;
 }

@@ -25,14 +25,14 @@ export function JournalForm() {
       <div className="flex flex-col sm:flex-row gap-2">
         <select value={mood} onChange={e => setMood(e.target.value)} className="w-full sm:w-36">
           <option value="">No mood</option>
-          <option value="great">😄 Great</option>
-          <option value="good">🙂 Good</option>
-          <option value="okay">😐 Okay</option>
-          <option value="bad">😔 Bad</option>
-          <option value="terrible">😞 Terrible</option>
+          <option value="great">Great</option>
+          <option value="good">Good</option>
+          <option value="okay">Okay</option>
+          <option value="bad">Bad</option>
+          <option value="terrible">Terrible</option>
         </select>
         <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="Tags (comma-separated)" className="flex-1" />
-        <button type="submit" disabled={saving || !content.trim()} className="py-2.5 px-5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm whitespace-nowrap">
+        <button type="submit" disabled={saving || !content.trim()} className="premium-action whitespace-nowrap">
           {saving ? "Saving..." : "Save Entry"}
         </button>
       </div>

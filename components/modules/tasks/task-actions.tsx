@@ -46,16 +46,16 @@ export function CreateTaskForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto]">
       <input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="New task..."
-        className="flex-1"
+        className="min-w-0"
         required
       />
-      <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-24">
+      <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full sm:w-28">
         <option value="low">Low</option>
         <option value="medium">Medium</option>
         <option value="high">High</option>
@@ -64,7 +64,7 @@ export function CreateTaskForm() {
       <button
         type="submit"
         disabled={saving || !title.trim()}
-        className="px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm"
+        className="rounded-lg border border-[rgba(220,193,122,0.34)] bg-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--accent)] transition-all hover:bg-[rgba(220,193,122,0.2)] disabled:opacity-40 active:scale-[0.97]"
       >
         Add
       </button>
@@ -107,36 +107,36 @@ export function TaskCard({
 
   return (
     <div
-      className={`group p-3 rounded-xl border transition-colors ${
-        active ? "bg-amber-50/50 border-amber-200" : "bg-stone-50 border-[var(--border-light)] hover:bg-stone-100/50"
+      className={`group rounded-lg border p-3 transition-colors ${
+        active ? "border-[rgba(217,154,43,0.28)] bg-[var(--amber-soft)]" : "border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] hover:bg-[var(--surface-hover)]"
       } ${busy ? "opacity-50" : ""}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-stone-700">{task.title}</div>
+          <div className="text-sm font-semibold text-[var(--text)]">{task.title}</div>
           {task.description && (
-            <div className="text-xs text-stone-400 mt-1 line-clamp-2">{task.description}</div>
+            <div className="text-xs text-[var(--text-tertiary)] mt-1 line-clamp-2">{task.description}</div>
           )}
           <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
             {task.dueDate && (
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-white border border-[var(--border-light)] text-stone-500">
+              <span className="premium-chip">
                 {format(new Date(task.dueDate), "MMM d")}
               </span>
             )}
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${priorityCls(task.priority)}`}>
               {task.priority}
             </span>
-            {task.project && <span className="text-[10px] text-stone-400">{task.project.name}</span>}
+            {task.project && <span className="text-[10px] text-[var(--text-tertiary)]">{task.project.name}</span>}
           </div>
         </div>
 
         {/* Actions — visible on hover */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
           {NEXT_STATUS[task.status] && (
             <button
               onClick={moveTask}
               disabled={busy}
-              className="px-2 py-1 text-[10px] font-semibold rounded-lg bg-white border border-[var(--border)] text-stone-500 hover:text-teal-600 hover:border-teal-300 transition-colors"
+              className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[10px] font-semibold text-[var(--text-tertiary)] transition-colors hover:border-[rgba(220,193,122,0.38)] hover:text-[var(--accent)]"
               title={STATUS_LABEL[task.status]}
             >
               {STATUS_LABEL[task.status]}
@@ -145,7 +145,7 @@ export function TaskCard({
           <button
             onClick={deleteTask}
             disabled={busy}
-            className="px-2 py-1 text-[10px] font-semibold rounded-lg bg-white border border-[var(--border)] text-stone-500 hover:text-rose-600 hover:border-rose-300 transition-colors"
+            className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[10px] font-semibold text-[var(--text-tertiary)] transition-colors hover:border-[rgba(255,95,109,0.38)] hover:text-[var(--rose)]"
             title="Delete"
           >
             Del

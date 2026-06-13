@@ -39,9 +39,9 @@ function SvgIcon({ d, className }: { d: string; className?: string }) {
 
 function MobileTab({ item, active }: { item: NavItem; active: boolean }) {
   return (
-    <Link href={item.href} className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-0 flex-1 transition-colors ${active ? "text-teal-600" : "text-stone-400 hover:text-stone-600"}`}>
-      <SvgIcon d={item.icon} className="h-6 w-6" />
-      <span className="text-[10px] font-medium leading-none truncate max-w-full">{item.label}</span>
+    <Link href={item.href} className={`flex h-14 flex-col items-center justify-center gap-1 min-w-0 flex-1 transition-colors ${active ? "text-[var(--accent)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"}`}>
+      <SvgIcon d={item.icon} className="h-5 w-5" />
+      <span className="max-w-full truncate text-[10px] font-semibold uppercase leading-none tracking-wide">{item.label}</span>
     </Link>
   );
 }
@@ -50,13 +50,13 @@ function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <Link
       href={item.href}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+      className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
         active
-          ? "bg-teal-50 text-teal-700 shadow-sm"
-          : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+          ? "border-[rgba(215,181,109,0.32)] bg-[rgba(215,181,109,0.1)] text-[var(--accent)] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
+          : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--border)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
       }`}
     >
-      <SvgIcon d={item.icon} className={`h-5 w-5 shrink-0 ${active ? "text-teal-600" : ""}`} />
+      <SvgIcon d={item.icon} className="h-[18px] w-[18px] shrink-0" />
       <span>{item.label}</span>
     </Link>
   );
@@ -74,12 +74,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-dvh bg-[var(--bg)]">
+    <div className="flex min-h-dvh bg-[var(--bg)] text-[var(--text)]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 border-r border-[var(--border)] bg-[var(--surface)] px-3 py-4 gap-5 overflow-y-auto">
-        <Link href="/" className="flex items-center gap-2.5 px-3 py-1.5">
-          <Image src="/lifeos-logo.png" alt="Life OS" width={32} height={32} className="rounded-lg" unoptimized />
-          <span className="font-semibold text-base text-[var(--text)] tracking-tight">Life OS</span>
+      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[linear-gradient(180deg,#080b0f,#030405)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+        <Link href="/" className="flex items-center gap-3 rounded-lg border border-[var(--border-light)] bg-[rgba(255,255,255,0.02)] px-3 py-2 hover:border-[var(--border)] hover:bg-[var(--surface-hover)]">
+          <Image src="/lifeos-logo.png" alt="Life OS" width={28} height={28} className="rounded-md" unoptimized />
+          <div className="min-w-0">
+            <span className="block text-sm font-semibold tracking-tight text-[var(--text)]">Life OS</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Private Terminal</span>
+          </div>
         </Link>
 
         <nav className="flex flex-col gap-0.5">
@@ -88,10 +91,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="h-px bg-[var(--border-light)] mx-3" />
+        <div className="mx-3 h-px bg-[var(--border-light)]" />
 
         <nav className="flex flex-col gap-0.5">
-          <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-stone-400">
+          <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
             Health
           </div>
           {healthNav.map((item) => (
@@ -99,10 +102,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div className="h-px bg-[var(--border-light)] mx-3" />
+        <div className="mx-3 h-px bg-[var(--border-light)]" />
 
         <nav className="flex flex-col gap-0.5">
-          <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-stone-400">
+          <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
             Life
           </div>
           {lifeNav.map((item) => (
@@ -119,15 +122,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl pb-20 lg:pb-8">
+      <main className="min-w-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_9rem),radial-gradient(circle_at_top_right,rgba(220,193,122,0.065),transparent_34rem),radial-gradient(circle_at_bottom_left,rgba(115,167,216,0.035),transparent_30rem),var(--bg)]">
+        <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
           {children}
         </div>
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[var(--surface)] border-t border-[var(--border)] z-50 safe-area-bottom">
-        <div className="flex items-center justify-around h-[3.75rem] px-1">
+      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[rgba(3,4,5,0.94)] shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
+        <div className="flex h-16 items-center justify-around px-1">
           {mobileTabs.map((item) => (
             <MobileTab
               key={item.href}

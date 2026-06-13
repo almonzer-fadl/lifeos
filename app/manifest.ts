@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Your personal operating system for health, finance, and productivity",
     start_url: "/",
     display: "standalone",
-    background_color: "#faf8f5",
-    theme_color: "#faf8f5",
+    background_color: "#030405",
+    theme_color: "#030405",
     orientation: "any",
     icons: [
       {

@@ -30,14 +30,14 @@ export function SleepForm() {
       <Field label="Wake time"><input type="time" value={wake} onChange={e => setWake(e.target.value)} className="w-full" required /></Field>
       <Field label="Quality">
         <select value={quality} onChange={e => setQuality(e.target.value)} className="w-full">
-          {[1,2,3,4,5].map(q => <option key={q} value={q}>{q} {"⭐".repeat(q)}</option>)}
+          {[1,2,3,4,5].map(q => <option key={q} value={q}>{q}/5</option>)}
         </select>
       </Field>
-      <button type="submit" disabled={saving} className="py-2.5 px-4 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm">Save</button>
+      <button type="submit" disabled={saving} className="premium-action">Save</button>
     </form>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div><label className="text-[11px] font-medium text-stone-400 block mb-1">{label}</label>{children}</div>;
+  return <div><label className="premium-label mb-1 block">{label}</label>{children}</div>;
 }

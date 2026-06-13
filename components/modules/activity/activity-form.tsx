@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const TYPES = [
-  { value: "run", label: "Run", emoji: "🏃" },
-  { value: "swim", label: "Swim", emoji: "🏊" },
-  { value: "bike", label: "Bike", emoji: "🚴" },
-  { value: "walk", label: "Walk", emoji: "🚶" },
-  { value: "hike", label: "Hike", emoji: "🥾" },
-  { value: "other", label: "Other", emoji: "💪" },
+  { value: "run", label: "Run", code: "RUN" },
+  { value: "swim", label: "Swim", code: "SWM" },
+  { value: "bike", label: "Bike", code: "BIK" },
+  { value: "walk", label: "Walk", code: "WLK" },
+  { value: "hike", label: "Hike", code: "HIK" },
+  { value: "other", label: "Other", code: "TRN" },
 ];
 
 export function ActivityForm() {
@@ -47,17 +47,17 @@ export function ActivityForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex gap-1.5 flex-wrap">
-        {TYPES.map(({ value, label, emoji }) => (
+        {TYPES.map(({ value, label, code }) => (
           <button
             key={value} type="button"
             onClick={() => setType(value)}
-            className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-all active:scale-95 ${
+            className={`rounded-md border px-3 py-1.5 text-sm font-semibold transition-all active:scale-95 ${
               type === value
-                ? "bg-amber-100 text-amber-800 border border-amber-300 shadow-sm"
-                : "bg-stone-50 text-stone-500 border border-[var(--border-light)] hover:bg-stone-100"
+                ? "border-[rgba(220,193,122,0.38)] bg-[var(--accent-soft)] text-[var(--accent)]"
+                : "border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)]"
             }`}
           >
-            {emoji} {label}
+            <span className="font-mono text-[10px] opacity-70">{code}</span> {label}
           </button>
         ))}
       </div>
@@ -67,7 +67,7 @@ export function ActivityForm() {
         <Input label="Avg HR" value={hr} onChange={setHr} placeholder="145" />
         <Input label="Notes" value={notes} onChange={setNotes} placeholder="Evening run" />
       </div>
-      <button type="submit" disabled={saving || !duration} className="w-full py-2.5 bg-amber-600 text-white rounded-xl text-sm font-semibold hover:bg-amber-700 disabled:opacity-40 transition-all active:scale-[0.98] shadow-sm">
+      <button type="submit" disabled={saving || !duration} className="premium-action w-full">
         {saving ? "Saving..." : "Log Activity"}
       </button>
     </form>
@@ -79,7 +79,7 @@ function Input({ label, value, onChange, placeholder, step = "1" }: {
 }) {
   return (
     <div>
-      <label className="text-[11px] font-medium text-stone-400 block mb-1">{label}</label>
+      <label className="premium-label mb-1 block">{label}</label>
       <input type="number" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} step={step} min="0" className="w-full" />
     </div>
   );
