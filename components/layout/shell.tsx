@@ -122,7 +122,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="min-w-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_9rem),radial-gradient(circle_at_top_right,rgba(220,193,122,0.065),transparent_34rem),radial-gradient(circle_at_bottom_left,rgba(115,167,216,0.035),transparent_30rem),var(--bg)]">
+      <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_9rem),radial-gradient(circle_at_top_right,rgba(220,193,122,0.065),transparent_34rem),radial-gradient(circle_at_bottom_left,rgba(115,167,216,0.035),transparent_30rem),var(--bg)]">
         <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
           {children}
         </div>

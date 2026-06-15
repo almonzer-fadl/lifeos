@@ -104,7 +104,7 @@ export default async function AccountRegisterPage({ params }: { params: Promise<
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[500px] text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--border)]">
                   <th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Date</th>
