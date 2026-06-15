@@ -29,8 +29,8 @@ export default async function ActivityPage() {
     db.gymWorkout.findMany({ where: { date: { gte: sevenDaysAgo } }, orderBy: { date: "desc" }, take: 20, include: { sets: { include: { exercise: true }, orderBy: { setNumber: "asc" } } } }),
   ]);
 
-  const totalDist = activities.filter(a => a.type !== "other").reduce((s, a) => s + (a.distance || 0), 0);
-  const totalDur = activities.reduce((s, a) => {
+  const totalDist = activities.filter((a: { type: string; distance: number | null }) => a.type !== "other").reduce((s: number, a: { distance: number | null }) => s + (a.distance || 0), 0);
+  const totalDur = activities.reduce((s: number, a: { endTime: Date | null; startTime: Date }) => {
     if (!a.endTime) return s;
     return s + (new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000;
   }, 0);
