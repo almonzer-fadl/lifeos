@@ -4,20 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExerciseSearch } from "./exercise-search";
 
-type Exercise = {
-  id: string;
-  name: string;
-  muscleGroup: string;
-  equipment: string | null;
-};
-
-type SetEntry = {
-  exercise: Exercise | null;
-  setNumber: number;
-  weight: string;
-  reps: string;
-  rpe: string;
-};
+type Exercise = { id: string; name: string; muscleGroup: string; equipment: string | null };
+type SetEntry = { exercise: Exercise | null; setNumber: number; weight: string; reps: string; rpe: string };
 
 export function WorkoutLogger() {
   const router = useRouter();
@@ -27,30 +15,20 @@ export function WorkoutLogger() {
   const [saving, setSaving] = useState(false);
 
   function addSet() {
-    setSets([
-      ...sets,
-      { exercise: null, setNumber: sets.length + 1, weight: "", reps: "", rpe: "" },
-    ]);
+    setSets([...sets, { exercise: null, setNumber: sets.length + 1, weight: "", reps: "", rpe: "" }]);
   }
 
-  function updateSet(index: number, field: keyof SetEntry, value: unknown) {
-    const updated = [...sets];
-    (updated[index] as Record<string, unknown>)[field] = value;
-    setSets(updated);
+  function update(i: number, field: keyof SetEntry, val: unknown) {
+    const u = [...sets];
+    (u[i] as Record<string, unknown>)[field] = val;
+    setSets(u);
   }
 
-  function selectExercise(index: number, exercise: Exercise) {
-    updateSet(index, "exercise", exercise);
-  }
-
-  function removeSet(index: number) {
-    setSets(sets.filter((_, i) => i !== index));
-  }
+  function removeSet(i: number) { setSets(sets.filter((_, idx) => idx !== i)); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (sets.length === 0) return;
-
+    if (sets.length === 0 || sets.some(s => !s.exercise)) return;
     setSaving(true);
     await fetch("/api/health/workouts", {
       method: "POST",
@@ -59,7 +37,7 @@ export function WorkoutLogger() {
         date: new Date().toISOString(),
         name: name || "Workout",
         notes: notes || null,
-        sets: sets.map((s) => ({
+        sets: sets.map(s => ({
           exerciseId: s.exercise!.id,
           setNumber: s.setNumber,
           weight: s.weight ? parseFloat(s.weight) : null,
@@ -68,10 +46,7 @@ export function WorkoutLogger() {
         })),
       }),
     });
-
-    setName("");
-    setNotes("");
-    setSets([]);
+    setName(""); setNotes(""); setSets([]);
     setSaving(false);
     router.refresh();
   }
@@ -79,18 +54,8 @@ export function WorkoutLogger() {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex gap-2">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Workout name (e.g., Push Day)"
-          className="flex-1"
-        />
-        <button
-          type="button"
-          onClick={addSet}
-          className="px-4 py-2 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors"
-        >
+        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Workout name (e.g. Push Day)" className="flex-1" />
+        <button type="button" onClick={addSet} className="px-4 py-2 bg-stone-100 text-stone-700 rounded-xl text-sm font-medium hover:bg-stone-200 border border-[var(--border-light)] transition-all active:scale-95">
           + Add Set
         </button>
       </div>
@@ -98,85 +63,39 @@ export function WorkoutLogger() {
       {sets.length > 0 && (
         <div className="space-y-2">
           {sets.map((s, i) => (
-            <div
-              key={i}
-              className="flex flex-col sm:flex-row gap-2 p-3 rounded-lg bg-zinc-800/50 border border-zinc-800"
-            >
+            <div key={i} className="flex flex-col sm:flex-row gap-2 p-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">
               <div className="flex-1 min-w-0">
-                <ExerciseSearch
-                  onSelect={(ex) => selectExercise(i, ex)}
-                />
-                {s.exercise && (
-                  <div className="text-xs text-zinc-500 mt-1">
-                    {s.exercise.muscleGroup}
-                  </div>
-                )}
+                <ExerciseSearch onSelect={(ex) => update(i, "exercise", ex)} />
+                {s.exercise && <div className="text-[11px] text-stone-400 mt-1">{s.exercise.muscleGroup}</div>}
               </div>
-              <div className="flex gap-2 items-end">
-                <div>
-                  <label className="text-[10px] text-zinc-500 block">Kg</label>
-                  <input
-                    type="number"
-                    value={s.weight}
-                    onChange={(e) => updateSet(i, "weight", e.target.value)}
-                    placeholder="50"
-                    className="w-16 text-sm"
-                    step="0.5"
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] text-zinc-500 block">Reps</label>
-                  <input
-                    type="number"
-                    value={s.reps}
-                    onChange={(e) => updateSet(i, "reps", e.target.value)}
-                    placeholder="10"
-                    className="w-16 text-sm"
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] text-zinc-500 block">RPE</label>
-                  <input
-                    type="number"
-                    value={s.rpe}
-                    onChange={(e) => updateSet(i, "rpe", e.target.value)}
-                    placeholder="8"
-                    className="w-14 text-sm"
-                    step="0.5"
-                    min="1"
-                    max="10"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeSet(i)}
-                  className="text-zinc-500 hover:text-red-400 text-lg leading-none pb-1"
-                >
-                  ×
-                </button>
+              <div className="flex gap-1.5 items-end">
+                <NumInput label="Kg" value={s.weight} onChange={v => update(i, "weight", v)} placeholder="50" w="w-14" step="0.5" />
+                <NumInput label="Reps" value={s.reps} onChange={v => update(i, "reps", v)} placeholder="10" w="w-14" />
+                <NumInput label="RPE" value={s.rpe} onChange={v => update(i, "rpe", v)} placeholder="8" w="w-12" step="0.5" min="1" max="10" />
+                <button type="button" onClick={() => removeSet(i)} className="text-stone-400 hover:text-rose-500 text-lg pb-0.5 transition-colors">×</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        placeholder="Notes..."
-        className="w-full"
-        rows={2}
-      />
+      <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes..." className="w-full" rows={2} />
 
-      <button
-        type="submit"
-        disabled={saving || sets.length === 0 || sets.some((s) => !s.exercise)}
-        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
+      <button type="submit" disabled={saving || sets.length === 0 || sets.some(s => !s.exercise)}
+        className="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 disabled:opacity-40 transition-all active:scale-[0.98] shadow-sm">
         {saving ? "Saving..." : "Log Workout"}
       </button>
     </form>
+  );
+}
+
+function NumInput({ label, value, onChange, placeholder, w, step = "1", min = "0", max }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder: string; w: string; step?: string; min?: string; max?: string;
+}) {
+  return (
+    <div>
+      <label className="text-[10px] text-stone-400 block mb-0.5 font-medium">{label}</label>
+      <input type="number" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={`${w} text-sm`} step={step} min={min} max={max} />
+    </div>
   );
 }

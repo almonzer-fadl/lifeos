@@ -1,73 +1,50 @@
+"use client";
+
 import { estimateA1c, timeInRange } from "@/lib/h1bc";
 
-type Stats = {
-  readings: number[];
-  latestGlucose: number | null;
-  totalInsulin: number;
-};
+type Stats = { readings: number[]; latestGlucose: number | null; totalInsulin: number };
 
 export function T1DStats({ readings, latestGlucose, totalInsulin }: Stats) {
   const tir = timeInRange(readings);
-  const avg =
-    readings.length > 0
-      ? readings.reduce((a, b) => a + b, 0) / readings.length
-      : null;
+  const avg = readings.length > 0 ? readings.reduce((a, b) => a + b, 0) / readings.length : null;
   const a1c = avg ? estimateA1c(avg) : null;
 
+  const statColor = (v: number | null) =>
+    v === null ? "text-stone-300" : v < 70 ? "text-rose-600" : v > 180 ? "text-amber-600" : "text-emerald-600";
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-stagger">
       <StatCard
         label="Latest Glucose"
-        value={latestGlucose ? `${latestGlucose}` : "--"}
+        value={latestGlucose !== null ? `${latestGlucose}` : "--"}
         unit="mg/dL"
-        color={
-          latestGlucose
-            ? latestGlucose < 70
-              ? "text-red-400"
-              : latestGlucose > 180
-                ? "text-yellow-400"
-                : "text-green-400"
-            : "text-zinc-500"
-        }
+        valueClassName={statColor(latestGlucose)}
       />
-      <StatCard
-        label="Est. h1bc"
-        value={a1c ? a1c.toFixed(1) : "--"}
-        unit="%"
-        color="text-blue-400"
-      />
+      <StatCard label="Est. h1bc" value={a1c ? a1c.toFixed(1) : "--"} unit="%" valueClassName="text-teal-600" />
       <StatCard
         label="Time in Range"
         value={tir.total > 0 ? `${tir.inRange.toFixed(0)}` : "--"}
         unit="%"
-        color="text-green-400"
+        valueClassName="text-emerald-600"
       />
       <StatCard
         label="Today's Insulin"
         value={totalInsulin > 0 ? `${totalInsulin.toFixed(1)}` : "--"}
         unit="units"
-        color="text-purple-400"
+        valueClassName="text-violet-600"
       />
     </div>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  unit,
-  color,
-}: {
-  label: string;
-  value: string;
-  unit: string;
-  color: string;
+function StatCard({ label, value, unit, valueClassName }: {
+  label: string; value: string; unit: string; valueClassName: string;
 }) {
   return (
-    <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
-      <div className="text-xs text-zinc-500">{label}</div>
-      <div className={`text-2xl font-bold mt-1 ${color}`}>{value}</div>
-      <div className="text-xs text-zinc-600">{unit}</div>
+    <div className="p-4 rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)]">
+      <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">{label}</div>
+      <div className={`text-[1.75rem] font-bold tracking-tight mt-1 font-mono ${valueClassName}`}>{value}</div>
+      <div className="text-xs text-stone-400 mt-0.5">{unit}</div>
     </div>
   );
 }
