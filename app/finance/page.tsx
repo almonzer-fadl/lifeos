@@ -26,7 +26,7 @@ export default async function FinancePage() {
   const byCat: Record<string, number> = {};
   transactions.filter((t: TxLike) => t.type === "expense" && t.category).forEach((t: TxLike) => { byCat[t.category!.name] = (byCat[t.category!.name] || 0) + t.amount; });
   const topCats = Object.entries(byCat).sort(([, a]: [string, number], [, b]: [string, number]) => b - a).slice(0, 5);
-  const currencies = [...new Set(accounts.map((a: AcctLike) => a.currency))];
+  const currencies = [...new Set<string>(accounts.map((a: AcctLike) => a.currency))];
 
   return (
     <div className="p-5 lg:p-8 space-y-5">
