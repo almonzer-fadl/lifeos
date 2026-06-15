@@ -34,7 +34,7 @@ export default async function T1DPage() {
       }),
     ]);
 
-  const todayInsulinTotal = todayInsulin.reduce((sum, d) => sum + d.units, 0);
+  const todayInsulinTotal = todayInsulin.reduce((sum: number, d: { units: number }) => sum + d.units, 0);
   const latestGlucose = todayReadings[0]?.value ?? null;
 
   return (

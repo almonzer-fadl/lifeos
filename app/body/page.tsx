@@ -51,7 +51,7 @@ export default async function BodyPage() {
                 <th className="text-left py-2.5 pr-4 font-medium">Date</th><th className="text-left py-2.5 pr-4 font-medium">Test</th><th className="text-right py-2.5 pr-4 font-medium">Value</th><th className="text-left py-2.5 pr-4 font-medium">Ref Range</th><th className="text-left py-2.5 font-medium">Notes</th>
               </tr></thead>
               <tbody>
-                {labResults.map(r => {
+                {labResults.map((r: { id: string; date: Date; testName: string; value: number; unit: string; refRangeLow: number | null; refRangeHigh: number | null; notes: string | null }) => {
                   const out = r.refRangeLow != null && r.refRangeHigh != null && (r.value < r.refRangeLow || r.value > r.refRangeHigh);
                   return (
                     <tr key={r.id} className="border-b border-[var(--border-light)] hover:bg-stone-50/50 transition-colors">
@@ -74,7 +74,7 @@ export default async function BodyPage() {
       {supplementLogs.length > 0 && (
         <Section title="Supplements">
           <div className="space-y-1.5">
-            {supplementLogs.map(log => (
+            {supplementLogs.map((log: { id: string; date: Date; dosage: number; dosageUnit: string; timeOfDay: string | null; supplement: { name: string } }) => (
               <div key={log.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">
                 <div><div className="text-sm font-medium text-stone-700">{log.supplement.name}</div><div className="text-xs text-stone-400">{log.dosage} {log.dosageUnit} · {log.timeOfDay || "anytime"}</div></div>
                 <div className="text-xs text-stone-400">{format(new Date(log.date), "MMM d")}</div>

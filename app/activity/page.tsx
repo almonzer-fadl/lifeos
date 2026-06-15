@@ -67,7 +67,7 @@ export default async function ActivityPage() {
           <Empty message="No activities logged this week." />
         ) : (
           <div className="space-y-2">
-            {activities.map(a => {
+            {activities.map((a: { id: string; type: string; distance: number | null; endTime: Date | null; startTime: Date; heartRateAvg: number | null; notes: string | null; source: string }) => {
               const dur = a.endTime ? Math.round((new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000) : null;
               const pace = a.distance && dur ? fmtPace(a.distance, dur * 60) : null;
               return (
@@ -97,7 +97,7 @@ export default async function ActivityPage() {
       {workouts.length > 0 && (
         <Section title="Recent Workouts">
           <div className="space-y-3">
-            {workouts.map(w => (
+            {workouts.map((w: { id: string; name: string; date: Date; duration: number | null; notes: string | null; sets: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }[] }) => (
               <div key={w.id} className="p-4 rounded-xl bg-stone-50 border border-[var(--border-light)]">
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -107,7 +107,7 @@ export default async function ActivityPage() {
                   <span className="text-xs text-stone-400 font-medium">{w.sets.length} sets</span>
                 </div>
                 <div className="space-y-1">
-                  {w.sets.map(s => (
+                  {w.sets.map((s: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }) => (
                     <div key={s.id} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg bg-white border border-[var(--border-light)]">
                       <span className="text-stone-700 font-medium">{s.exercise.name}</span>
                       <span className="text-stone-400 text-xs font-mono">
