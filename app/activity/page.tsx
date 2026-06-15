@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { ActivityForm } from "@/components/modules/activity/activity-form";
 import { WorkoutLogger } from "@/components/modules/activity/workout-logger";
+import { DeleteButton } from "@/components/ui/delete-button";
 import { format, subDays } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +85,7 @@ export default async function ActivityPage() {
                     {a.notes && <div className="text-xs text-stone-400 mt-0.5 truncate">{a.notes}</div>}
                   </div>
                   <span className="text-[10px] text-stone-300 uppercase font-medium">{a.source}</span>
+                  <DeleteButton url={`/api/health/activity?id=${a.id}`} />
                 </div>
               );
             })}

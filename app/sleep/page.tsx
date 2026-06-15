@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { SleepForm } from "@/components/modules/sleep/sleep-form";
+import { DeleteButton } from "@/components/ui/delete-button";
 import { format, subDays, differenceInMinutes } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +56,7 @@ export default async function SleepPage() {
                     {s.notes && <div className="text-xs text-stone-400 mt-0.5">{s.notes}</div>}
                   </div>
                   <span className="text-[10px] text-stone-300 uppercase font-medium">{s.source}</span>
+                  <DeleteButton url={`/api/health/sleep?id=${s.id}`} />
                 </div>
               );
             })}

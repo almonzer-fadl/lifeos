@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { GlucoseChart } from "@/components/modules/t1d/glucose-chart";
 import { GlucoseForm, InsulinForm } from "@/components/modules/t1d/glucose-form";
 import { T1DStats } from "@/components/modules/t1d/stats-bar";
+import { DeleteButton } from "@/components/ui/delete-button";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -77,6 +78,7 @@ export default async function T1DPage() {
                   <th className="text-right py-2.5 pr-4 font-medium">Glucose</th>
                   <th className="text-right py-2.5 pr-4 font-medium">Source</th>
                   <th className="text-left py-2.5 font-medium">Notes</th>
+                  <th className="text-right py-2.5 font-medium w-10"></th>
                 </tr>
               </thead>
               <tbody>
@@ -93,6 +95,7 @@ export default async function T1DPage() {
                       </td>
                       <td className="py-2.5 pr-4 text-right text-stone-400 text-xs">{r.source}</td>
                       <td className="py-2.5 text-stone-400 text-xs">{r.notes || "—"}</td>
+                      <td className="py-2.5 text-right"><DeleteButton url={`/api/health/glucose?id=${r.id}`} /></td>
                     </tr>
                   );
                 })}
@@ -114,6 +117,7 @@ export default async function T1DPage() {
                   {d.brand && <span className="text-xs text-stone-400">{d.brand}</span>}
                 </div>
                 <span className="font-semibold text-violet-600 font-mono">{d.units}u</span>
+                <DeleteButton url={`/api/health/insulin?id=${d.id}`} />
               </div>
             ))}
           </div>
