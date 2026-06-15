@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 type NavItem = {
@@ -77,9 +78,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-60 border-r border-[var(--border)] bg-[var(--surface)] px-3 py-4 gap-5 overflow-y-auto">
         <Link href="/" className="flex items-center gap-2.5 px-3 py-1.5">
-          <div className="h-8 w-8 rounded-xl bg-teal-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">
-            OS
-          </div>
+          <Image src="/lifeos-logo.png" alt="Life OS" width={32} height={32} className="rounded-lg" unoptimized />
           <span className="font-semibold text-base text-[var(--text)] tracking-tight">Life OS</span>
         </Link>
 

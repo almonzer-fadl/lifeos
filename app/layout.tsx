@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     title: "Life OS",
   },
   icons: {
-    icon: "/icons/icon-192.png",
-    apple: "/icons/icon-192.png",
+    icon: "/lifeos-logo.png",
+    apple: "/lifeos-logo.png",
   },
 };
 
@@ -43,7 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" href="/lifeos-logo.png" />
+        <link rel="icon" href="/lifeos-logo.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
