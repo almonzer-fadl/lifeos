@@ -11,9 +11,9 @@ export default async function TasksPage() {
     take: 100,
   });
 
-  const todo = tasks.filter(t => t.status === "todo");
-  const inProg = tasks.filter(t => t.status === "in_progress");
-  const done = tasks.filter(t => t.status === "done");
+  const todo = tasks.filter((t: { status: string }) => t.status === "todo");
+  const inProg = tasks.filter((t: { status: string }) => t.status === "in_progress");
+  const done = tasks.filter((t: { status: string }) => t.status === "done");
 
   const priorityCls = (p: string) => ({
     urgent: "bg-rose-100 text-rose-700", high: "bg-amber-100 text-amber-700",
@@ -41,13 +41,13 @@ export default async function TasksPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-stagger">
         <Column title="Todo" count={todo.length} color="border-t-stone-400">
-          {todo.map(t => <TaskCard key={t.id} task={t} priorityCls={priorityCls} />)}
+          {todo.map((t: { id: string; title: string; description: string | null; dueDate: Date | null; priority: string; status: string; completedAt: Date | null; project: { name: string } | null }) => <TaskCard key={t.id} task={t} priorityCls={priorityCls} />)}
         </Column>
         <Column title="In Progress" count={inProg.length} color="border-t-amber-500">
-          {inProg.map(t => <TaskCard key={t.id} task={t} priorityCls={priorityCls} active />)}
+          {inProg.map((t: { id: string; title: string; description: string | null; dueDate: Date | null; priority: string; status: string; completedAt: Date | null; project: { name: string } | null }) => <TaskCard key={t.id} task={t} priorityCls={priorityCls} active />)}
         </Column>
         <Column title="Done" count={done.length} color="border-t-emerald-500">
-          {done.slice(0, 15).map(t => (
+          {done.slice(0, 15).map((t: { id: string; title: string; completedAt: Date | null }) => (
             <div key={t.id} className="p-3 rounded-xl bg-stone-50 border border-[var(--border-light)] text-sm text-stone-400 line-through">
               {t.title}
               {t.completedAt && <span className="text-[10px] text-stone-300 ml-1.5">{format(new Date(t.completedAt), "MMM d")}</span>}

@@ -42,14 +42,14 @@ export default async function T1DPage() {
       <PageHeader title="Type 1 Diabetes" subtitle="Glucose, insulin, and h1bc" />
 
       <T1DStats
-        readings={ninetyDayReadings.map((r) => r.value)}
+        readings={ninetyDayReadings.map((r: { value: number }) => r.value)}
         latestGlucose={latestGlucose}
         totalInsulin={todayInsulinTotal}
       />
 
       <Section title="Glucose (7 days)">
         <GlucoseChart
-          readings={recentReadings.map((r) => ({
+          readings={recentReadings.map((r: { id: string; timestamp: Date; value: number }) => ({
             id: r.id,
             timestamp: r.timestamp.toISOString(),
             value: r.value,
@@ -82,7 +82,7 @@ export default async function T1DPage() {
                 </tr>
               </thead>
               <tbody>
-                {todayReadings.map((r) => {
+                {todayReadings.map((r: { id: string; timestamp: Date; value: number; source: string; notes: string | null }) => {
                   const isLow = r.value < 70;
                   const isHigh = r.value > 180;
                   return (
@@ -109,7 +109,7 @@ export default async function T1DPage() {
       {todayInsulin.length > 0 && (
         <Section title="Today's Insulin">
           <div className="space-y-1.5">
-            {todayInsulin.map((d) => (
+            {todayInsulin.map((d: { id: string; timestamp: Date; type: string; brand: string | null; units: number }) => (
               <div key={d.id} className="flex items-center justify-between py-2 px-3 rounded-xl bg-stone-50 border border-[var(--border-light)]">
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-sm text-stone-500">{format(new Date(d.timestamp), "HH:mm")}</span>

@@ -23,7 +23,7 @@ export default async function JournalPage() {
 
       <div className="space-y-3 animate-stagger">
         {entries.length === 0 ? <Empty msg="No entries yet. Start journaling." /> : (
-          entries.map(e => (
+          entries.map((e: { id: string; date: Date; content: string; mood: string | null; tags: string | null }) => (
             <div key={e.id} className="rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)] p-5">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-sm font-semibold text-stone-500">{format(new Date(e.date), "EEEE, MMMM d, yyyy")}</span>

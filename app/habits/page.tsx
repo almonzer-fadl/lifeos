@@ -31,7 +31,7 @@ export default async function HabitsPage() {
           <div className="py-8 text-center text-sm text-stone-400">No habits set up. Add your first habit above.</div>
         ) : (
           <div className="space-y-2 animate-stagger">
-            {habits.map(h => (
+            {habits.map((h: { id: string; name: string; frequency: string; frequencyCount: number; timeOfDay: string | null; logs: { id: string; date: Date; completed: boolean }[] }) => (
               <HabitCard key={h.id} habit={h} />
             ))}
           </div>
