@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { ConfirmSheet } from "@/components/ui/confirm-sheet";
+import { toast } from "@/lib/toast";
 
 type Task = {
   id: string;
@@ -97,15 +99,24 @@ export function TaskCard({
     router.refresh();
   }
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   async function deleteTask() {
-    if (!confirm("Delete this task?")) return;
     setBusy(true);
-    await fetch(`/api/productivity/tasks?id=${task.id}`, { method: "DELETE" });
-    setBusy(false);
-    router.refresh();
+    try {
+      const res = await fetch(`/api/productivity/tasks?id=${task.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Task deleted");
+      router.refresh();
+    } catch {
+      toast.error("Failed to delete task");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
+    <>
     <div
       className={`group rounded-lg border p-3 transition-colors ${
         active ? "border-[rgba(217,154,43,0.28)] bg-[var(--amber-soft)]" : "border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] hover:bg-[var(--surface-hover)]"
@@ -143,7 +154,7 @@ export function TaskCard({
             </button>
           )}
           <button
-            onClick={deleteTask}
+            onClick={() => setShowDeleteConfirm(true)}
             disabled={busy}
             className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[10px] font-semibold text-[var(--text-tertiary)] transition-colors hover:border-[rgba(255,95,109,0.38)] hover:text-[var(--rose)]"
             title="Delete"
@@ -153,5 +164,15 @@ export function TaskCard({
         </div>
       </div>
     </div>
+    <ConfirmSheet
+      open={showDeleteConfirm}
+      onOpenChange={setShowDeleteConfirm}
+      title="Delete this task?"
+      description="This task will be permanently removed."
+      confirmLabel="Delete"
+      destructive
+      onConfirm={deleteTask}
+    />
+    </>
   );
 }
