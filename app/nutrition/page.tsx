@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NutritionForm } from "@/components/modules/nutrition/nutrition-form";
-import { format, startOfDay, endOfDay } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 
 export const dynamic = "force-dynamic";
 

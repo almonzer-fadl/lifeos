@@ -4,13 +4,12 @@ import { format } from "date-fns";
 export const dynamic = "force-dynamic";
 
 export default async function TasksPage() {
-  const [tasks, projects] = await Promise.all([
+  const [tasks] = await Promise.all([
     db.task.findMany({
       orderBy: [{ status: "asc" }, { priority: "desc" }, { dueDate: "asc" }],
       include: { project: true },
       take: 100,
     }),
-    db.project.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   const todo = tasks.filter((t) => t.status === "todo");
