@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExerciseSearch } from "./exercise-search";
+import { toast } from "@/lib/toast";
 
 type Exercise = { id: string; name: string; muscleGroup: string; equipment: string | null };
 type SetEntry = { exercise: Exercise | null; setNumber: number; weight: string; reps: string; rpe: string };
@@ -30,25 +31,32 @@ export function WorkoutLogger() {
     e.preventDefault();
     if (sets.length === 0 || sets.some(s => !s.exercise)) return;
     setSaving(true);
-    await fetch("/api/health/workouts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        date: new Date().toISOString(),
-        name: name || "Workout",
-        notes: notes || null,
-        sets: sets.map(s => ({
-          exerciseId: s.exercise!.id,
-          setNumber: s.setNumber,
-          weight: s.weight ? parseFloat(s.weight) : null,
-          reps: s.reps ? parseInt(s.reps) : null,
-          rpe: s.rpe ? parseFloat(s.rpe) : null,
-        })),
-      }),
-    });
-    setName(""); setNotes(""); setSets([]);
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/workouts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: new Date().toISOString(),
+          name: name || "Workout",
+          notes: notes || null,
+          sets: sets.map(s => ({
+            exerciseId: s.exercise!.id,
+            setNumber: s.setNumber,
+            weight: s.weight ? parseFloat(s.weight) : null,
+            reps: s.reps ? parseInt(s.reps) : null,
+            rpe: s.rpe ? parseFloat(s.rpe) : null,
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Workout logged");
+      router.push("/activity");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log workout");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

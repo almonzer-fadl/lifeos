@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 const TYPES = [
   { value: "run", label: "Run", code: "RUN" },
@@ -27,21 +28,28 @@ export function ActivityForm() {
     const now = new Date();
     const dur = parseFloat(duration);
     const endTime = dur ? new Date(now.getTime() + dur * 60000).toISOString() : null;
-    await fetch("/api/health/activity", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type,
-        startTime: now.toISOString(),
-        endTime,
-        distance: distance ? parseFloat(distance) * 1000 : null,
-        heartRateAvg: hr ? parseInt(hr) : null,
-        notes: notes || null,
-      }),
-    });
-    setDistance(""); setDuration(""); setHr(""); setNotes("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          startTime: now.toISOString(),
+          endTime,
+          distance: distance ? parseFloat(distance) * 1000 : null,
+          heartRateAvg: hr ? parseInt(hr) : null,
+          notes: notes || null,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Activity logged");
+      router.push("/activity");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log activity");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
