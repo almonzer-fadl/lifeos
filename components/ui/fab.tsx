@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 interface FabProps {
   href: string;
@@ -10,21 +11,28 @@ interface FabProps {
 
 export function Fab({ href, icon, label }: FabProps) {
   return (
-    <Link
-      href={href}
-      aria-label={label || "Add"}
-      className="fixed bottom-20 right-4 z-[51] lg:bottom-8 lg:right-8 w-14 h-14 rounded-2xl bg-[var(--surface)] border border-[var(--border-strong)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center justify-center transition-all hover:border-[var(--accent)] hover:scale-105 active:scale-95"
+    <motion.div
+      className="fixed bottom-20 right-4 z-[51] lg:bottom-8 lg:right-8"
+      whileHover={{ scale: 1.06 }}
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6 text-[var(--accent)]"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={1.5}
+      <Link
+        href={href}
+        aria-label={label || "Add"}
+        className="w-14 h-14 rounded-2xl bg-[var(--surface)] border border-[var(--border-strong)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center justify-center transition-all hover:border-[var(--accent)]"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-      </svg>
-    </Link>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6 text-[var(--accent)]"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+        </svg>
+      </Link>
+    </motion.div>
   );
 }
