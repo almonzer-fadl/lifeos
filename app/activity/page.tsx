@@ -21,7 +21,7 @@ function fmtPace(distM: number, durS: number): string {
   return `${min}:${sec.toString().padStart(2, "0")} /km`;
 }
 
-const TYPE_EMOJI: Record<string, string> = { run: "🏃", swim: "🏊", bike: "🚴", walk: "🚶", hike: "🥾", other: "💪" };
+const TYPE_MARK: Record<string, string> = { run: "RUN", swim: "SWM", bike: "BIK", walk: "WLK", hike: "HIK", other: "TRN" };
 
 export default async function ActivityPage() {
   const sevenDaysAgo = subDays(new Date(), 7);
@@ -37,10 +37,11 @@ export default async function ActivityPage() {
   }, 0);
 
   return (
-    <div className="p-5 lg:p-8 space-y-5">
-      <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">Activity</h1>
-        <p className="text-sm text-stone-500 mt-0.5">Running, swimming, cycling, and gym</p>
+    <div className="premium-page">
+      <div className="premium-header animate-fade-in">
+        <div className="premium-kicker">Performance Desk</div>
+        <h1 className="premium-title">Activity Command</h1>
+        <p className="premium-subtitle">Running, swimming, cycling, strength, and weekly load</p>
       </div>
 
       {/* Stats */}
@@ -49,11 +50,11 @@ export default async function ActivityPage() {
           { l: "Distance", v: `${(totalDist / 1000).toFixed(1)}`, u: "km" },
           { l: "Duration", v: fmtDuration(totalDur), u: "" },
           { l: "Workouts", v: `${workouts.length}`, u: "sessions" },
-        ].map(s => (
-          <div key={s.l} className="p-4 rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)]">
-            <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">{s.l}</div>
-            <div className="text-[1.75rem] font-bold tracking-tight mt-1 text-amber-600 font-mono">{s.v}</div>
-            <div className="text-xs text-stone-400 mt-0.5">{s.u}</div>
+        ].map((s) => (
+          <div key={s.l} className="premium-stat">
+            <div className="premium-label">{s.l}</div>
+            <div className="premium-value text-[var(--amber)]">{s.v}</div>
+            <div className="mt-1 text-xs text-[var(--text-tertiary)]">{s.u}</div>
           </div>
         ))}
       </div>
@@ -71,20 +72,20 @@ export default async function ActivityPage() {
               const dur = a.endTime ? Math.round((new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000) : null;
               const pace = a.distance && dur ? fmtPace(a.distance, dur * 60) : null;
               return (
-                <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-[var(--border-light)] hover:bg-stone-100/50 transition-colors">
-                  <span className="text-2xl">{TYPE_EMOJI[a.type] || "💪"}</span>
+                <div key={a.id} className="premium-row flex items-center gap-3">
+                  <span className="premium-chip shrink-0">{TYPE_MARK[a.type] || "TRN"}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold capitalize text-stone-700">
+                    <div className="text-sm font-semibold capitalize text-[var(--text)]">
                       {a.type}{a.distance ? ` · ${(a.distance / 1000).toFixed(1)} km` : ""}{pace ? ` · ${pace}` : ""}
                     </div>
-                    <div className="text-xs text-stone-400">
+                    <div className="text-xs text-[var(--text-tertiary)]">
                       {format(new Date(a.startTime), "EEE, MMM d · HH:mm")}
                       {dur ? ` · ${fmtDuration(dur)}` : ""}
                       {a.heartRateAvg ? ` · ${a.heartRateAvg} bpm` : ""}
                     </div>
-                    {a.notes && <div className="text-xs text-stone-400 mt-0.5 truncate">{a.notes}</div>}
+                    {a.notes && <div className="text-xs text-[var(--text-tertiary)] mt-0.5 truncate">{a.notes}</div>}
                   </div>
-                  <span className="text-[10px] text-stone-300 uppercase font-medium">{a.source}</span>
+                  <span className="text-[10px] text-[var(--text-tertiary)] uppercase font-medium">{a.source}</span>
                   <DeleteButton url={`/api/health/activity?id=${a.id}`} />
                 </div>
               );
@@ -98,25 +99,25 @@ export default async function ActivityPage() {
         <Section title="Recent Workouts">
           <div className="space-y-3">
             {workouts.map((w: { id: string; name: string; date: Date; duration: number | null; notes: string | null; sets: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }[] }) => (
-              <div key={w.id} className="p-4 rounded-xl bg-stone-50 border border-[var(--border-light)]">
+              <div key={w.id} className="premium-row">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <div className="text-sm font-semibold text-stone-700">{w.name}</div>
-                    <div className="text-xs text-stone-400">{format(new Date(w.date), "EEE, MMM d")}{w.duration ? ` · ${w.duration} min` : ""}</div>
+                    <div className="text-sm font-semibold text-[var(--text)]">{w.name}</div>
+                    <div className="text-xs text-[var(--text-tertiary)]">{format(new Date(w.date), "EEE, MMM d")}{w.duration ? ` · ${w.duration} min` : ""}</div>
                   </div>
-                  <span className="text-xs text-stone-400 font-medium">{w.sets.length} sets</span>
+                  <span className="premium-chip">{w.sets.length} sets</span>
                 </div>
                 <div className="space-y-1">
                   {w.sets.map((s: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }) => (
-                    <div key={s.id} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg bg-white border border-[var(--border-light)]">
-                      <span className="text-stone-700 font-medium">{s.exercise.name}</span>
-                      <span className="text-stone-400 text-xs font-mono">
+                    <div key={s.id} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg bg-[var(--surface)] border border-[var(--border-light)]">
+                      <span className="text-[var(--text-secondary)] font-medium">{s.exercise.name}</span>
+                      <span className="text-[var(--text-tertiary)] text-xs font-mono">
                         {s.weight ? `${s.weight}kg` : ""}{s.reps ? ` × ${s.reps}` : ""}{s.rpe ? ` @ ${s.rpe}` : ""}
                       </span>
                     </div>
                   ))}
                 </div>
-                {w.notes && <div className="text-xs text-stone-400 mt-2">{w.notes}</div>}
+                {w.notes && <div className="text-xs text-[var(--text-tertiary)] mt-2">{w.notes}</div>}
               </div>
             ))}
           </div>
@@ -128,13 +129,16 @@ export default async function ActivityPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)] p-5 animate-fade-in">
-      <h2 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">{title}</h2>
+    <section className="premium-panel animate-fade-in">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="premium-panel-title">{title}</h2>
+        <span className="premium-panel-kicker">Active</span>
+      </div>
       {children}
     </section>
   );
 }
 
 function Empty({ message }: { message: string }) {
-  return <div className="py-8 text-center text-sm text-stone-400">{message}</div>;
+  return <div className="premium-empty">{message}</div>;
 }

@@ -19,7 +19,7 @@ export function DeleteButton({ url, label = "Delete" }: { url: string; label?: s
     <button
       onClick={handleDelete}
       disabled={busy}
-      className="text-[10px] font-medium px-2 py-0.5 rounded-lg bg-white border border-[var(--border)] text-stone-400 hover:text-rose-500 hover:border-rose-300 transition-colors"
+      className="rounded-md border border-[rgba(255,95,109,0.22)] bg-[rgba(255,95,109,0.06)] px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)] transition-colors hover:border-[rgba(255,95,109,0.42)] hover:text-[var(--rose)] disabled:opacity-40"
     >
       {busy ? "..." : label}
     </button>

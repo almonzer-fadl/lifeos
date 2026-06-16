@@ -27,7 +27,7 @@ export function GlucoseForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col sm:flex-row gap-2.5">
-        <div className="flex items-center gap-2 flex-1 bg-stone-50 rounded-xl border border-[var(--border)] px-3 py-2 focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-50 transition-all">
+        <div className="flex items-center gap-2 flex-1 bg-[#06080b] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
           <input
             type="number"
             value={value}
@@ -36,7 +36,7 @@ export function GlucoseForm() {
             className="w-20 text-center text-lg font-semibold font-mono bg-transparent border-none p-0 focus:ring-0 focus:shadow-none"
             step="1" min="20" max="600" required
           />
-          <span className="text-stone-400 text-sm font-medium">mg/dL</span>
+          <span className="text-[var(--text-tertiary)] text-sm font-medium">mg/dL</span>
         </div>
         <input
           type="text"
@@ -48,7 +48,7 @@ export function GlucoseForm() {
         <button
           type="submit"
           disabled={saving || !value}
-          className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.97] shadow-sm"
+          className="premium-action"
         >
           {saving ? "Saving..." : "Log"}
         </button>
@@ -82,7 +82,7 @@ export function InsulinForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2.5">
-      <div className="flex items-center gap-2 bg-stone-50 rounded-xl border border-[var(--border)] px-3 py-2 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-50 transition-all">
+      <div className="flex items-center gap-2 bg-[#06080b] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
         <input
           type="number"
           value={units}
@@ -91,7 +91,7 @@ export function InsulinForm() {
           className="w-16 text-center text-lg font-semibold font-mono bg-transparent border-none p-0 focus:ring-0 focus:shadow-none"
           step="0.5" min="0" required
         />
-        <span className="text-stone-400 text-sm font-medium">units</span>
+        <span className="text-[var(--text-tertiary)] text-sm font-medium">units</span>
       </div>
       <select value={type} onChange={(e) => setType(e.target.value)}>
         <option value="rapid">Rapid</option>
@@ -116,7 +116,7 @@ export function InsulinForm() {
       <button
         type="submit"
         disabled={saving || !units}
-        className="px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.97] shadow-sm whitespace-nowrap"
+        className="premium-action whitespace-nowrap"
       >
         {saving ? "Saving..." : "Log Insulin"}
       </button>

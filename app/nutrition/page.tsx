@@ -30,19 +30,20 @@ export default async function NutritionPage() {
   }, { cal: 0, prot: 0, carb: 0, fat: 0, fib: 0 });
 
   return (
-    <div className="p-5 lg:p-8 space-y-5">
-      <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">Nutrition</h1>
-        <p className="text-sm text-stone-500 mt-0.5">Food diary, macros, and water</p>
+    <div className="premium-page">
+      <div className="premium-header animate-fade-in">
+        <div className="premium-kicker">Nutrition Desk</div>
+        <h1 className="premium-title">Nutrition Command</h1>
+        <p className="premium-subtitle">Food diary, macros, hydration, and daily intake</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-stagger">
-        <MCard l="Calories" v={`${macros.cal.toFixed(0)}`} g={nutritionGoal?.calories ? `${nutritionGoal.calories}` : "--"} u="kcal" c="text-orange-600" />
-        <MCard l="Protein" v={`${macros.prot.toFixed(0)}g`} g={nutritionGoal?.protein ? `${nutritionGoal.protein}g` : "--"} u="" c="text-rose-600" />
-        <MCard l="Carbs" v={`${macros.carb.toFixed(0)}g`} g={nutritionGoal?.carbs ? `${nutritionGoal.carbs}g` : "--"} u="" c="text-amber-600" />
-        <MCard l="Fat" v={`${macros.fat.toFixed(0)}g`} g={nutritionGoal?.fat ? `${nutritionGoal.fat}g` : "--"} u="" c="text-sky-600" />
-        <MCard l="Fiber" v={`${macros.fib.toFixed(0)}g`} g={nutritionGoal?.fiber ? `${nutritionGoal.fiber}g` : "--"} u="" c="text-emerald-600" />
-        <MCard l="Water" v={`${water}`} g={nutritionGoal?.waterMl ? `${nutritionGoal.waterMl}` : "--"} u="ml" c="text-cyan-600" />
+        <MCard l="Calories" v={`${macros.cal.toFixed(0)}`} g={nutritionGoal?.calories ? `${nutritionGoal.calories}` : "--"} u="kcal" c="text-[var(--orange)]" />
+        <MCard l="Protein" v={`${macros.prot.toFixed(0)}g`} g={nutritionGoal?.protein ? `${nutritionGoal.protein}g` : "--"} u="" c="text-[var(--rose)]" />
+        <MCard l="Carbs" v={`${macros.carb.toFixed(0)}g`} g={nutritionGoal?.carbs ? `${nutritionGoal.carbs}g` : "--"} u="" c="text-[var(--amber)]" />
+        <MCard l="Fat" v={`${macros.fat.toFixed(0)}g`} g={nutritionGoal?.fat ? `${nutritionGoal.fat}g` : "--"} u="" c="text-[var(--sky)]" />
+        <MCard l="Fiber" v={`${macros.fib.toFixed(0)}g`} g={nutritionGoal?.fiber ? `${nutritionGoal.fiber}g` : "--"} u="" c="text-[var(--emerald)]" />
+        <MCard l="Water" v={`${water}`} g={nutritionGoal?.waterMl ? `${nutritionGoal.waterMl}` : "--"} u="ml" c="text-[var(--sky)]" />
       </div>
 
       <Section title="Log Food"><NutritionForm /></Section>
@@ -56,7 +57,7 @@ export default async function NutritionPage() {
               if (!meals.length) return null;
               return (
                 <div key={mt}>
-                  <div className="text-xs font-semibold text-stone-400 uppercase mb-2 capitalize">{mt}</div>
+                  <div className="premium-label mb-2 capitalize">{mt}</div>
                   <div className="space-y-1.5">
                     {meals.map((e: { id: string; servings: number; grams: number | null; food: { name: string; brand: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null; servingSize: number | null; servingUnit: string | null } | null }) => {
                       const food = e.food;
@@ -64,13 +65,13 @@ export default async function NutritionPage() {
                       const f = e.grams ? e.grams / (food.servingSize || 100) : e.servings;
                       const grams = food.servingSize ? (food.servingSize * (e.grams ? e.grams / food.servingSize : e.servings)).toFixed(0) : null;
                       return (
-                        <div key={e.id} className="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 border border-[var(--border-light)]">
+                        <div key={e.id} className="premium-row flex items-center justify-between gap-3">
                           <div>
-                            <span className="text-sm text-stone-700 font-medium">{food.name}</span>
-                            {food.brand && <span className="text-xs text-stone-400 ml-1">· {food.brand}</span>}
-                            <span className="text-xs text-stone-400 ml-1.5">{e.servings > 1 ? `${e.servings}× ` : ""}{grams ? `${grams}g` : ""}</span>
+                            <span className="text-sm text-[var(--text)] font-medium">{food.name}</span>
+                            {food.brand && <span className="text-xs text-[var(--text-tertiary)] ml-1">· {food.brand}</span>}
+                            <span className="text-xs text-[var(--text-tertiary)] ml-1.5">{e.servings > 1 ? `${e.servings}× ` : ""}{grams ? `${grams}g` : ""}</span>
                           </div>
-                          <div className="text-xs text-stone-400 font-mono">
+                          <div className="text-xs text-[var(--text-tertiary)] font-mono">
                             {food.calories ? `${(food.calories * f).toFixed(0)} kcal` : ""}
                             {food.protein ? ` · P${(food.protein * f).toFixed(0)}` : ""}
                             {food.carbs ? ` C${(food.carbs * f).toFixed(0)}` : ""}
@@ -92,18 +93,18 @@ export default async function NutritionPage() {
 
 function MCard({ l, v, g, u, c }: { l: string; v: string; g: string; u: string; c: string }) {
   return (
-    <div className="p-3 rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)]">
-      <div className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">{l}</div>
+    <div className="premium-stat">
+      <div className="premium-label">{l}</div>
       <div className={`text-xl font-bold mt-1 font-mono ${c}`}>{v}</div>
-      <div className="text-[11px] text-stone-400">{g !== "--" ? `Goal: ${g} ${u}` : u}</div>
+      <div className="text-[11px] text-[var(--text-tertiary)]">{g !== "--" ? `Goal: ${g} ${u}` : u}</div>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section className="rounded-2xl bg-white border border-[var(--border)] shadow-[var(--shadow-card)] p-5 animate-fade-in"><h2 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">{title}</h2>{children}</section>;
+  return <section className="premium-panel animate-fade-in"><div className="mb-3 flex items-center justify-between gap-3"><h2 className="premium-panel-title">{title}</h2><span className="premium-panel-kicker">Daily</span></div>{children}</section>;
 }
 
 function Empty({ msg }: { msg: string }) {
-  return <div className="py-8 text-center text-sm text-stone-400">{msg}</div>;
+  return <div className="premium-empty">{msg}</div>;
 }

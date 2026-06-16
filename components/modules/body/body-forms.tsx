@@ -30,12 +30,12 @@ export function BodyMeasurementForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-end">
-      <Field label="Weight (kg)"><input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="75" step="0.1" className="w-20" /></Field>
-      <Field label="Body Fat %"><input type="number" value={bodyFat} onChange={e => setBodyFat(e.target.value)} placeholder="18" step="0.1" className="w-20" /></Field>
-      <Field label="Waist (cm)"><input type="number" value={waist} onChange={e => setWaist(e.target.value)} placeholder="85" step="0.1" className="w-20" /></Field>
-      <Field label="Notes"><input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Morning" className="w-32" /></Field>
-      <button type="submit" disabled={saving} className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm">Save</button>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(4,minmax(0,1fr))_auto] sm:items-end">
+      <Field label="Weight (kg)"><input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="75" step="0.1" className="w-full" /></Field>
+      <Field label="Body Fat %"><input type="number" value={bodyFat} onChange={e => setBodyFat(e.target.value)} placeholder="18" step="0.1" className="w-full" /></Field>
+      <Field label="Waist (cm)"><input type="number" value={waist} onChange={e => setWaist(e.target.value)} placeholder="85" step="0.1" className="w-full" /></Field>
+      <Field label="Notes"><input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Morning" className="w-full" /></Field>
+      <button type="submit" disabled={saving} className="premium-action">Save</button>
     </form>
   );
 }
@@ -69,13 +69,13 @@ export function LabResultForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-end">
-      <Field label="Test Name"><input type="text" value={testName} onChange={e => setTestName(e.target.value)} placeholder="e.g. HbA1c" className="w-28" required /></Field>
-      <Field label="Value"><input type="number" value={value} onChange={e => setValue(e.target.value)} placeholder="5.4" step="0.01" className="w-20" required /></Field>
-      <Field label="Unit"><input type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder="%" className="w-16" /></Field>
-      <Field label="Ref Low"><input type="number" value={refLow} onChange={e => setRefLow(e.target.value)} placeholder="4.0" step="0.01" className="w-20" /></Field>
-      <Field label="Ref High"><input type="number" value={refHigh} onChange={e => setRefHigh(e.target.value)} placeholder="5.6" step="0.01" className="w-20" /></Field>
-      <button type="submit" disabled={saving} className="px-4 py-2 bg-sky-600 text-white rounded-xl text-sm font-semibold hover:bg-sky-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm whitespace-nowrap">Add Result</button>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 sm:grid-cols-[1.2fr_repeat(4,minmax(0,0.8fr))_auto] sm:items-end">
+      <Field label="Test Name"><input type="text" value={testName} onChange={e => setTestName(e.target.value)} placeholder="e.g. HbA1c" className="w-full" required /></Field>
+      <Field label="Value"><input type="number" value={value} onChange={e => setValue(e.target.value)} placeholder="5.4" step="0.01" className="w-full" required /></Field>
+      <Field label="Unit"><input type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder="%" className="w-full" /></Field>
+      <Field label="Ref Low"><input type="number" value={refLow} onChange={e => setRefLow(e.target.value)} placeholder="4.0" step="0.01" className="w-full" /></Field>
+      <Field label="Ref High"><input type="number" value={refHigh} onChange={e => setRefHigh(e.target.value)} placeholder="5.6" step="0.01" className="w-full" /></Field>
+      <button type="submit" disabled={saving} className="premium-action whitespace-nowrap">Add Result</button>
     </form>
   );
 }
@@ -109,15 +109,15 @@ export function SupplementForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-      <Field label="Supplement"><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Vitamin D" className="w-32" required /></Field>
-      <Field label="Brand"><input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="Optional" className="w-24" /></Field>
-      <Field label="Dosage"><input type="number" value={dosage} onChange={e => setDosage(e.target.value)} step="0.5" min="0.5" className="w-16" /></Field>
-      <button type="submit" disabled={saving} className="px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm">Log</button>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_0.8fr_0.55fr_auto] sm:items-end">
+      <Field label="Supplement"><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Vitamin D" className="w-full" required /></Field>
+      <Field label="Brand"><input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="Optional" className="w-full" /></Field>
+      <Field label="Dosage"><input type="number" value={dosage} onChange={e => setDosage(e.target.value)} step="0.5" min="0.5" className="w-full" /></Field>
+      <button type="submit" disabled={saving} className="premium-action">Log</button>
     </form>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div><label className="text-[11px] font-medium text-stone-400 block mb-1">{label}</label>{children}</div>;
+  return <div><label className="premium-label mb-1 block">{label}</label>{children}</div>;
 }

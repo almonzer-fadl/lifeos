@@ -40,3 +40,4 @@ export async function DELETE(request: NextRequest) {
   await db.financialGoal.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
+

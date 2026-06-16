@@ -23,12 +23,12 @@ export function WaterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+    <form onSubmit={handleSubmit} className="grid grid-cols-[1fr_auto] gap-2 items-end">
       <div>
-        <label className="text-[11px] font-medium text-stone-400 block mb-1">Water (ml)</label>
-        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="250" step="50" min="50" className="w-24" required />
+        <label className="premium-label mb-1 block">Water (ml)</label>
+        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="250" step="50" min="50" className="w-full" required />
       </div>
-      <button type="submit" disabled={saving} className="px-4 py-2 bg-cyan-600 text-white rounded-xl text-sm font-semibold hover:bg-cyan-700 disabled:opacity-40 transition-all active:scale-[0.97] shadow-sm">Add Water</button>
+      <button type="submit" disabled={saving} className="premium-action">Add Water</button>
     </form>
   );
 }
