@@ -74,7 +74,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-dvh bg-[var(--bg)] text-[var(--text)]">
+    <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[linear-gradient(180deg,#080b0f,#030405)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
         <Link href="/" className="flex items-center gap-3 rounded-lg border border-[var(--border-light)] bg-[rgba(255,255,255,0.02)] px-3 py-2 hover:border-[var(--border)] hover:bg-[var(--surface-hover)]">
