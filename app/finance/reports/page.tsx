@@ -86,9 +86,9 @@ export default function ReportsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" horizontal={false} />
                 <XAxis type="number" tick={{ fill: "var(--text-tertiary)", fontSize: 11 }} axisLine={{ stroke: "var(--border)" }} />
                 <YAxis type="category" dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} width={100} />
-                <Tooltip contentStyle={{ background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text)" }} formatter={(v: number) => [`${v.toLocaleString()}`, "Amount"]} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {categoryChartData.map((_, i) => <Cell key={i} fill={catColors[i % catColors.length]} />)}
+                <Tooltip contentStyle={{ background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text)" }} />
+                <Bar dataKey="value">
+                  {categoryChartData.map((_: any, i: number) => <Cell key={i} fill={catColors[i % catColors.length]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -105,7 +105,7 @@ export default function ReportsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
                 <XAxis dataKey="month" tick={{ fill: "var(--text-tertiary)", fontSize: 11 }} axisLine={{ stroke: "var(--border)" }} />
                 <YAxis tick={{ fill: "var(--text-tertiary)", fontSize: 11 }} axisLine={{ stroke: "var(--border)" }} />
-                <Tooltip contentStyle={{ background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text)" }} formatter={(v: number) => [v.toLocaleString(), "Net Worth"]} />
+                <Tooltip contentStyle={{ background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text)", fontSize: 13 }} />
                 <Line type="monotone" dataKey="value" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3, fill: "var(--accent)" }} name="Net Worth" />
               </LineChart>
             </ResponsiveContainer>
