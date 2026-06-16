@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { ConfirmSheet } from "@/components/ui/confirm-sheet";
+import { toast } from "@/lib/toast";
 
 type Habit = {
   id: string;
@@ -91,15 +93,24 @@ export function HabitCard({ habit }: { habit: Habit }) {
     router.refresh();
   }
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   async function deleteHabit() {
-    if (!confirm(`Delete habit "${habit.name}"?`)) return;
     setBusy(true);
-    await fetch(`/api/productivity/habits?id=${habit.id}`, { method: "DELETE" });
-    setBusy(false);
-    router.refresh();
+    try {
+      const res = await fetch(`/api/productivity/habits?id=${habit.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success(`"${habit.name}" deleted`);
+      router.refresh();
+    } catch {
+      toast.error("Failed to delete habit");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
+    <>
     <div className={`flex items-center gap-3 rounded-lg border p-4 transition-all ${isDone ? "border-[rgba(66,211,146,0.3)] bg-[var(--emerald-soft)]" : "border-[var(--border)] bg-[var(--surface-raised)] shadow-[var(--shadow-card)]"} ${busy ? "opacity-50" : ""}`}>
       <button onClick={toggle} disabled={busy} className={`h-7 w-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? "bg-[var(--emerald)] border-[var(--emerald)]" : "border-[var(--border-strong)] hover:border-[var(--emerald)]"}`}>
         {isDone && <svg className="h-4 w-4 text-[#020304]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
@@ -112,7 +123,17 @@ export function HabitCard({ habit }: { habit: Habit }) {
         <div className="text-lg font-bold text-[var(--text)] font-mono">{streak > 0 ? streak : "—"}</div>
         <div className="text-[10px] text-[var(--text-tertiary)] font-medium">streak</div>
       </div>
-      <button onClick={deleteHabit} disabled={busy} className="text-[var(--text-tertiary)] hover:text-[var(--rose)] text-lg leading-none ml-1 transition-colors" title="Delete">×</button>
+      <button onClick={() => setShowDeleteConfirm(true)} disabled={busy} className="text-[var(--text-tertiary)] hover:text-[var(--rose)] text-lg leading-none ml-1 transition-colors" title="Delete">×</button>
     </div>
+    <ConfirmSheet
+      open={showDeleteConfirm}
+      onOpenChange={setShowDeleteConfirm}
+      title={`Delete "${habit.name}"?`}
+      description="This habit and all its history will be permanently removed."
+      confirmLabel="Delete"
+      destructive
+      onConfirm={deleteHabit}
+    />
+    </>
   );
 }
