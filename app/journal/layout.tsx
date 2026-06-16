@@ -14,7 +14,7 @@ export default function JournalLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   return (
     <PageTransition>
-      <div className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)/0.92] backdrop-blur-xl">
+      <div className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--surface-deep)/0.95] backdrop-blur-xl">
         <div className="flex items-center gap-0.5 overflow-x-auto px-3 py-2 scrollbar-none sm:px-4 lg:px-6">
           {subNav.map((item) => {
             const active = item.href === "/journal" ? pathname === "/journal" : pathname.startsWith(item.href);
