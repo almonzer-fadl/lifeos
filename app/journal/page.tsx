@@ -24,7 +24,7 @@ export default async function JournalPage() {
             <Link href="/journal/new" className="premium-action mt-3 text-xs">Write First Entry</Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-stagger">
             {entries.map((e) => (
               <Link key={e.id} href={`/journal/${e.id}`} className="block rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-4 transition-all hover:border-[var(--border)]">
                 <div className="mb-2 flex items-center justify-between">

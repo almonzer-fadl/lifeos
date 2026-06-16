@@ -20,7 +20,7 @@ export default async function HabitsPage() {
             <p className="text-xs text-[var(--text-tertiary)]">Create your first habit to start tracking.</p>
           </div>
         ) : (
-          <div className="space-y-2">{habits.map((h) => <HabitCard key={h.id} habit={h as any} />)}</div>
+          <div className="space-y-2 animate-stagger">{habits.map((h) => <HabitCard key={h.id} habit={h as any} />)}</div>
         )}
       </section>
     </div>

@@ -20,7 +20,7 @@ export default async function LogbookPage() {
             <Link href="/t1d/log" className="premium-action mt-3 text-xs">Log First Reading</Link>
           </div>
         ) : (
-          <div className="divide-y divide-[var(--border-light)]">
+          <div className="divide-y divide-[var(--border-light)] animate-stagger">
             {readings.map((r) => (
               <Link key={r.id} href={`/t1d/logbook/${r.id}`} className="flex items-center justify-between gap-3 px-3 py-3 transition-colors hover:bg-[var(--surface-hover)]">
                 <div className="flex items-center gap-3">

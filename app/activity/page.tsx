@@ -55,7 +55,7 @@ export default async function ActivityPage() {
         {activities.length === 0 ? (
           <Empty icon="M13 10V3L4 14h7v7l9-11h-7z" title="No activities yet" description="Log your first run, bike, or swim." action={{ label: "Log Cardio", href: "/activity/log/cardio" }} />
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 animate-stagger">
             {activities.slice(0, 8).map((a) => {
               const dur = a.endTime ? Math.round((new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000) : null;
               const pace = a.distance && dur ? fmtPace(a.distance, dur * 60) : null;
@@ -84,7 +84,7 @@ export default async function ActivityPage() {
         {workouts.length === 0 ? (
           <Empty icon="M4 6h16M4 10h16M4 14h16M4 18h16" title="No workouts yet" description="Log a gym session with exercises, sets, and reps." action={{ label: "Log Workout", href: "/activity/log/gym" }} />
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 animate-stagger">
             {workouts.map((w) => (
               <Link key={w.id} href={`/activity/${w.id}`} className="block rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3 transition-all hover:border-[var(--border)]">
                 <div className="mb-2 flex items-center justify-between">

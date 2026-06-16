@@ -96,7 +96,7 @@ export default async function FinancePage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 gap-2">
+        <section className="grid grid-cols-2 gap-2 animate-stagger">
           <Stat l="Income 30D" v={`+${s$(income)}`} u="" tone="positive" link="/finance/accounts" />
           <Stat l="Expenses 30D" v={`-${s$(expenses)}`} u="" tone="negative" link="/finance/accounts" />
           <Stat l="Bills / Mo" v={s$(monthlyRecurring)} u="" tone="amber" link="/finance/recurring" />
@@ -109,7 +109,7 @@ export default async function FinancePage() {
           {accountsWithBalance.filter((a) => !a.isDebt).length === 0 ? (
             <Empty icon="M3 10h18M3 14h18M3 6h18M3 18h18" title="No cash accounts" description="Track your checking, savings, and cash accounts." action={{ label: "Add Account", href: "/finance/accounts/new" }} />
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 animate-stagger">
               {accountsWithBalance.filter((a) => !a.isDebt).slice(0, 4).map((a) => (
                 <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
                   <div className="min-w-0"><div className="truncate text-sm font-medium text-[var(--text)]">{a.name}</div><div className="text-xs capitalize text-[var(--text-tertiary)]">{a.type}</div></div>
@@ -124,7 +124,7 @@ export default async function FinancePage() {
           {upcomingBills.length === 0 ? (
             <Empty icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" title="No upcoming bills" description="Schedule your recurring payments." action={{ label: "Add Bill", href: "/finance/recurring/new" }} />
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 animate-stagger">
               {upcomingBills.map((r) => (
                 <div key={r.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
                   <div className="min-w-0"><div className="truncate text-sm font-medium text-[var(--text)]">{r.description}</div><div className="text-xs text-[var(--text-tertiary)]">Due {format(new Date(r.nextDate), "MMM d")} | {r.account.name}</div></div>
@@ -139,7 +139,7 @@ export default async function FinancePage() {
           {goals.length === 0 ? (
             <Empty icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" title="No goals yet" description="Set savings targets and track progress." action={{ label: "Set Goal", href: "/finance/goals/new" }} />
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 animate-stagger">
               {goals.slice(0, 4).map((g) => {
                 const pct = g.targetAmount > 0 ? Math.min((g.currentAmount / g.targetAmount) * 100, 100) : 0;
                 return (
@@ -158,7 +158,7 @@ export default async function FinancePage() {
           {topCats.length === 0 ? (
             <Empty icon="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" title="No spending data" description="Categorize transactions to see spending breakdowns." action={{ label: "View Accounts", href: "/finance/accounts" }} />
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 animate-stagger">
               {topCats.map(([name, amt]) => (
                 <div key={name} className="flex items-center gap-3 px-3 py-1">
                   <span className="flex-1 text-sm font-medium text-[var(--text-secondary)]">{name}</span>
@@ -175,7 +175,7 @@ export default async function FinancePage() {
         {allTransactions.length === 0 ? (
           <Empty icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" title="No transactions yet" description="Start tracking your money by adding transactions." action={{ label: "Add Transaction", href: "/finance/accounts" }} />
         ) : (
-          <div className="overflow-hidden rounded-lg border border-[var(--border-light)]">
+          <div className="overflow-hidden rounded-lg border border-[var(--border-light)] animate-stagger">
             {allTransactions.slice(0, 8).map((t) => (
               <div key={t.id} className="flex items-center gap-3 border-b border-[var(--border-light)] px-3 py-2.5 transition-colors last:border-b-0 hover:bg-[var(--surface-hover)]">
                 <div className="min-w-0 flex-1">
@@ -193,7 +193,7 @@ export default async function FinancePage() {
         {accountsWithBalance.filter((a) => a.isDebt).length === 0 ? (
           <Empty icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" title="No liabilities" description="Track credit cards, loans, and mortgages." action={{ label: "Add Account", href: "/finance/accounts/new" }} />
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 animate-stagger">
             {accountsWithBalance.filter((a) => a.isDebt).map((a) => (
               <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
                 <div className="min-w-0"><div className="truncate text-sm font-medium text-[var(--text)]">{a.name}</div><div className="text-xs text-[var(--text-tertiary)]">{a.interestRate != null && `${a.interestRate}% APR`}{a.minimumPayment != null && ` | Min ${s$(a.minimumPayment)}`}</div></div>

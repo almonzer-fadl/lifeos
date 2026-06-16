@@ -233,6 +233,12 @@ button:disabled {
   border: 1px solid var(--border-light);
   border-radius: 0.5rem;
   padding: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.premium-panel:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 .premium-panel::before {
@@ -269,6 +275,13 @@ button:disabled {
   border-radius: 0.5rem;
   padding: 0.85rem;
   min-height: 5.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.premium-stat:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card);
+  transform: translateY(-1px);
 }
 
 .premium-label {
@@ -298,11 +311,13 @@ button:disabled {
   border: 1px solid var(--border-light);
   border-radius: 0.625rem;
   padding: 0.75rem;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .premium-row:hover {
   background: rgba(255, 255, 255, 0.045);
   border-color: var(--border);
+  transform: translateY(-1px);
 }
 
 .premium-empty {
@@ -365,6 +380,7 @@ button:disabled {
   background: var(--surface-hover);
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .premium-table {

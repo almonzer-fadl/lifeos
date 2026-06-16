@@ -44,7 +44,7 @@ export default async function SleepPage() {
             <Link href="/sleep/log" className="premium-action mt-3 text-xs">Log First Night</Link>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 animate-stagger">
             {sessionsWithMeta.map((s) => (
               <Link key={s.id} href={`/sleep/${s.id}`} className="flex items-center gap-4 rounded-lg px-3 py-3 transition-colors hover:bg-[var(--surface-hover)]">
                 <div className="min-w-0 flex-1">

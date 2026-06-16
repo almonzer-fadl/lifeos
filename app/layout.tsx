@@ -48,6 +48,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/lifeos-logo.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="color-scheme" content="dark" />
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.style.backgroundColor='#080a0c'` }} />
       </head>
       <body className="min-h-dvh antialiased">
         <Shell>{children}</Shell>
