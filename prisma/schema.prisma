@@ -298,11 +298,11 @@ model Account {
   name                 String
   currency             String                 @default("USD")
   type                 String                 // checking, savings, cash, credit, investment, crypto, loan, mortgage
-  initialBalance       Float                  @default(0)
+  initialBalance       Int                    @default(0) // in minor units (cents)
   isDebt               Boolean                @default(false)
   interestRate         Float?                 // annual percentage, e.g. 5.5 for 5.5%
-  minimumPayment       Float?                 // minimum monthly payment
-  creditLimit          Float?                 // for credit cards
+  minimumPayment       Int?                   // minimum monthly payment in cents
+  creditLimit          Int?                   // for credit cards, in cents
   paymentDueDay        Int?                   // day of month payment is due (1-31)
   payoffTarget         DateTime?              // target date to pay off the debt
   notes                String?
@@ -318,8 +318,8 @@ model Asset {
   id            String   @id @default(uuid())
   name          String
   type          String   // property, vehicle, investment, crypto, gold, collectible, other
-  purchaseValue Float    // original cost
-  currentValue  Float    // current estimated value
+  purchaseValue Int      // original cost in cents
+  currentValue  Int      // current estimated value in cents
   currency      String   @default("USD")
   purchaseDate  DateTime?
   notes         String?
@@ -332,7 +332,7 @@ model Asset {
 model RecurringTransaction {
   id              String    @id @default(uuid())
   type            String    // income, expense
-  amount          Float
+  amount          Int       // in cents
   currency        String    @default("USD")
   accountId       String
   categoryId      String?
@@ -355,8 +355,8 @@ model RecurringTransaction {
 model FinancialGoal {
   id            String   @id @default(uuid())
   name          String
-  targetAmount  Float
-  currentAmount Float    @default(0)
+  targetAmount  Int      // in cents
+  currentAmount Int      @default(0) // in cents
   currency      String   @default("USD")
   targetDate    DateTime?
   accountId     String?
@@ -390,11 +390,12 @@ model Transaction {
   date              DateTime @default(now())
   accountId         String
   categoryId        String?
-  amount            Float
+  amount            Int      // in cents
   currency          String   @default("USD")
   description       String?
   notes             String?
   type              String   // income, expense, transfer
+  status            String   @default("pending") // pending, cleared, reconciled
   isTransfer        Boolean  @default(false)
   transferAccountId String?
   account           Account  @relation("TransactionAccount", fields: [accountId], references: [id])
@@ -403,13 +404,14 @@ model Transaction {
   @@index([date])
   @@index([accountId])
   @@index([categoryId])
+  @@index([status])
 }
 
 model Budget {
   id         String   @id @default(uuid())
   categoryId String
   month      DateTime // first day of month
-  amount     Float
+  amount     Int      // in cents
   currency   String   @default("USD")
   category   Category @relation(fields: [categoryId], references: [id])
 

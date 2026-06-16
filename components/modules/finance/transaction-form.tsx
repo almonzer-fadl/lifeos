@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 type Account = { id: string; name: string; currency: string };
 type Category = { id: string; name: string; type: string };
@@ -23,8 +24,13 @@ export function TransactionForm({ accounts, categories, currencies }: { accounts
     e.preventDefault();
     if (!amount || !accountId) return;
     setSaving(true);
-    await fetch("/api/finance/transactions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, amount: parseFloat(amount), currency, accountId, categoryId: categoryId || null, description: description || null }) });
-    setAmount(""); setDescription(""); setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/finance/transactions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, amount, currency, accountId, categoryId: categoryId || null, description: description || null }) });
+      if (!res.ok) throw new Error();
+      toast.success(`Transaction saved`);
+      setAmount(""); setDescription("");
+      router.refresh();
+    } catch { toast.error("Failed to save transaction"); } finally { setSaving(false); }
   }
 
   return (
