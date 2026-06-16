@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { subDays } from "date-fns";
+import { Fab } from "@/components/ui/fab";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,7 @@ export default async function HomePage() {
           </section>
         )}
       </div>
+      <Fab href="/t1d/log" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="Quick Add" />
     </div>
   );
 }

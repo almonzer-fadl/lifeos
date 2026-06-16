@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
-import { BodyMeasurementForm } from "@/components/modules/body/body-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +25,13 @@ export default async function BodyPage() {
         </div>
       )}
 
-      <Section title="Quick Log" kicker="Weight" action={{ label: "Full Log", href: "/body/log" }}><BodyMeasurementForm /></Section>
+      <Section title="Quick Actions" kicker="Log" action={{ label: "Full Log", href: "/body/log" }}>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <Link href="/body/log" className="premium-action">Log Weight</Link>
+          <Link href="/body/log/labs" className="premium-action">Add Lab Result</Link>
+          <Link href="/body/supplements" className="premium-action">Log Supplement</Link>
+        </div>
+      </Section>
 
       <Section title="Measurement History" kicker={String(measurements.length)} action={{ label: "All", href: "/body/measurements" }}>
         {measurements.length === 0 ? (

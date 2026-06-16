@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
 import { Odometer } from "@/components/ui/odometer";
+import { Fab } from "@/components/ui/fab";
 import { centsToDollars } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -202,6 +203,7 @@ export default async function FinancePage() {
           </div>
         )}
       </Section>
+      <Fab href="/finance/accounts" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="Add Transaction" />
     </div>
   );
 }

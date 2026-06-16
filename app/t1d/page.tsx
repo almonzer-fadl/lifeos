@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { T1DStats } from "@/components/modules/t1d/stats-bar";
 import { GlucoseChart } from "@/components/modules/t1d/glucose-chart";
+import { Fab } from "@/components/ui/fab";
 import { format, subDays } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -85,6 +86,7 @@ export default async function T1DPage() {
           )}
         </section>
       </div>
+      <Fab href="/t1d/log" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="Log Glucose" />
     </div>
   );
 }
