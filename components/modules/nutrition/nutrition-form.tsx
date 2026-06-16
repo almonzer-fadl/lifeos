@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 type Food = { id: string; name: string; brand: string | null; servingSize: number | null; servingUnit: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null };
 
@@ -31,9 +32,13 @@ export function NutritionForm() {
     e.preventDefault();
     if (!selected) return;
     setSaving(true);
-    await fetch("/api/health/nutrition", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mealType, foodId: selected.id, servings: parseInt(servings) || 1, grams: grams ? parseFloat(grams) : null }) });
-    setQuery(""); setSelected(null); setServings("1"); setGrams("");
-    setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/health/nutrition", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mealType, foodId: selected.id, servings: parseInt(servings) || 1, grams: grams ? parseFloat(grams) : null }) });
+      if (!res.ok) throw new Error();
+      toast.success("Food logged");
+      router.push("/nutrition");
+      router.refresh();
+    } catch { toast.error("Failed to log food"); } finally { setSaving(false); }
   }
 
   return (

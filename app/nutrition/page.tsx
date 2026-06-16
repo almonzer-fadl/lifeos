@@ -1,89 +1,66 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
-import { NutritionForm } from "@/components/modules/nutrition/nutrition-form";
-import { WaterForm } from "@/components/modules/nutrition/water-form";
-import { startOfDay, endOfDay } from "date-fns";
+import { format, subDays } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
 export default async function NutritionPage() {
-  const today = new Date();
-  const todayStart = startOfDay(today);
-  const todayEnd = endOfDay(today);
-
-  const [todayEntries, waterToday, nutritionGoal] = await Promise.all([
-    db.foodDiaryEntry.findMany({ where: { date: { gte: todayStart, lt: todayEnd } }, include: { food: true }, orderBy: { createdAt: "desc" } }),
-    db.waterLog.findMany({ where: { date: { gte: todayStart, lt: todayEnd } } }),
-    db.nutritionGoal.findFirst(),
+  const today = subDays(new Date(), 0);
+  const [entries, waterEntries] = await Promise.all([
+    db.foodDiaryEntry.findMany({ where: { date: { gte: subDays(new Date(), 1) } }, orderBy: { createdAt: "desc" }, take: 30, include: { food: true } }),
+    db.waterLog.findMany({ where: { date: { gte: subDays(new Date(), 1) } }, orderBy: { createdAt: "desc" }, take: 20 }),
   ]);
 
-  const water = waterToday.reduce((s: number, w: { amountMl: number }) => s + w.amountMl, 0);
-  const macros = todayEntries.reduce((acc: { cal: number; prot: number; carb: number; fat: number; fib: number }, e: { mealType: string; servings: number; grams: number | null; food: { name: string; brand: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null; fiber: number | null; servingSize: number | null; servingUnit: string | null } | null }) => {
-    if (!e.food) return acc;
-    const f = e.grams ? e.grams / (e.food.servingSize || 100) : e.servings;
-    return {
-      cal: acc.cal + (e.food.calories || 0) * f,
-      prot: acc.prot + (e.food.protein || 0) * f,
-      carb: acc.carb + (e.food.carbs || 0) * f,
-      fat: acc.fat + (e.food.fat || 0) * f,
-      fib: acc.fib + (e.food.fiber || 0) * f,
-    };
-  }, { cal: 0, prot: 0, carb: 0, fat: 0, fib: 0 });
+  const totalWater = waterEntries.reduce((s, w) => s + w.amountMl, 0);
+  const calories = entries.reduce((s, e) => s + ((e.food as any)?.calories || 0) * e.servings, 0);
+  const protein = entries.reduce((s, e) => s + ((e.food as any)?.protein || 0) * e.servings, 0);
+  const carbs = entries.reduce((s, e) => s + ((e.food as any)?.carbs || 0) * e.servings, 0);
+  const fat = entries.reduce((s, e) => s + ((e.food as any)?.fat || 0) * e.servings, 0);
+
+  const byMeal: Record<string, typeof entries> = {};
+  entries.forEach((e) => { if (e.mealType) { if (!byMeal[e.mealType]) byMeal[e.mealType] = []; byMeal[e.mealType].push(e); } });
 
   return (
     <div className="premium-page">
       <div className="premium-header animate-fade-in">
-        <div className="premium-kicker">Nutrition Desk</div>
-        <h1 className="premium-title">Nutrition Command</h1>
-        <p className="premium-subtitle">Food diary, macros, hydration, and daily intake</p>
+        <div className="premium-kicker">Fuel Desk</div>
+        <h1 className="premium-title">Nutrition Diary</h1>
+        <p className="premium-subtitle">Today's intake</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-stagger">
-        <MCard l="Calories" v={`${macros.cal.toFixed(0)}`} g={nutritionGoal?.calories ? `${nutritionGoal.calories}` : "--"} u="kcal" c="text-[var(--orange)]" />
-        <MCard l="Protein" v={`${macros.prot.toFixed(0)}g`} g={nutritionGoal?.protein ? `${nutritionGoal.protein}g` : "--"} u="" c="text-[var(--rose)]" />
-        <MCard l="Carbs" v={`${macros.carb.toFixed(0)}g`} g={nutritionGoal?.carbs ? `${nutritionGoal.carbs}g` : "--"} u="" c="text-[var(--amber)]" />
-        <MCard l="Fat" v={`${macros.fat.toFixed(0)}g`} g={nutritionGoal?.fat ? `${nutritionGoal.fat}g` : "--"} u="" c="text-[var(--sky)]" />
-        <MCard l="Fiber" v={`${macros.fib.toFixed(0)}g`} g={nutritionGoal?.fiber ? `${nutritionGoal.fiber}g` : "--"} u="" c="text-[var(--emerald)]" />
-        <MCard l="Water" v={`${water}`} g={nutritionGoal?.waterMl ? `${nutritionGoal.waterMl}` : "--"} u="ml" c="text-[var(--sky)]" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 animate-stagger">
+        <div className="premium-stat"><div className="premium-label">Calories</div><div className="premium-value">{calories}</div><div className="text-xs text-[var(--text-tertiary)]">kcal</div></div>
+        <div className="premium-stat"><div className="premium-label">Protein</div><div className="premium-value text-[var(--sky)]">{protein}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
+        <div className="premium-stat"><div className="premium-label">Carbs</div><div className="premium-value text-[var(--amber)]">{carbs}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
+        <div className="premium-stat"><div className="premium-label">Fat</div><div className="premium-value text-[var(--rose)]">{fat}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
       </div>
 
-      <Section title="Log Food"><NutritionForm /></Section>
-      <Section title="Water"><WaterForm /></Section>
+      <div className="premium-stat flex items-center justify-between">
+        <div><div className="premium-label">Water</div><div className="premium-value text-[var(--sky)]">{(totalWater / 1000).toFixed(1)}<span className="text-sm font-normal text-[var(--text-tertiary)]">L</span></div></div>
+        <Link href="/nutrition/log" className="premium-action text-xs">+ Log →</Link>
+      </div>
 
-      <Section title="Today's Diary">
-        {todayEntries.length === 0 ? <Empty msg="Nothing logged today." /> : (
-          <div className="space-y-3">
-            {["breakfast","lunch","dinner","snack"].map(mt => {
-              const meals = todayEntries.filter(e => e.mealType === mt);
-              if (!meals.length) return null;
-              return (
-                <div key={mt}>
-                  <div className="premium-label mb-2 capitalize">{mt}</div>
-                  <div className="space-y-1.5">
-                    {meals.map((e: { id: string; servings: number; grams: number | null; food: { name: string; brand: string | null; calories: number | null; protein: number | null; carbs: number | null; fat: number | null; servingSize: number | null; servingUnit: string | null } | null }) => {
-                      const food = e.food;
-                      if (!food) return null;
-                      const f = e.grams ? e.grams / (food.servingSize || 100) : e.servings;
-                      const grams = food.servingSize ? (food.servingSize * (e.grams ? e.grams / food.servingSize : e.servings)).toFixed(0) : null;
-                      return (
-                        <div key={e.id} className="premium-row flex items-center justify-between gap-3">
-                          <div>
-                            <span className="text-sm text-[var(--text)] font-medium">{food.name}</span>
-                            {food.brand && <span className="text-xs text-[var(--text-tertiary)] ml-1">· {food.brand}</span>}
-                            <span className="text-xs text-[var(--text-tertiary)] ml-1.5">{e.servings > 1 ? `${e.servings}× ` : ""}{grams ? `${grams}g` : ""}</span>
-                          </div>
-                          <div className="text-xs text-[var(--text-tertiary)] font-mono">
-                            {food.calories ? `${(food.calories * f).toFixed(0)} kcal` : ""}
-                            {food.protein ? ` · P${(food.protein * f).toFixed(0)}` : ""}
-                            {food.carbs ? ` C${(food.carbs * f).toFixed(0)}` : ""}
-                            {food.fat ? ` F${(food.fat * f).toFixed(0)}` : ""}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+      <Section title="Today's Meals" kicker={String(entries.length)} action={{ label: "Log Food", href: "/nutrition/log" }}>
+        {entries.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-sm text-[var(--text-tertiary)]">No food logged today</p>
+            <Link href="/nutrition/log" className="premium-action mt-3 text-xs">Log Meal</Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {Object.entries(byMeal).map(([meal, items]) => (
+              <div key={meal}>
+                <div className="premium-label mb-2 capitalize">{meal}</div>
+                <div className="space-y-1">
+                  {items.map((e) => (
+                    <div key={e.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 bg-[var(--surface)] border border-[var(--border-light)]">
+                      <div className="min-w-0"><div className="text-sm font-medium text-[var(--text)]">{(e as any).food?.name || "Food"}</div><div className="text-xs text-[var(--text-tertiary)]">{e.servings ? `${e.servings} serving` : ""}</div></div>
+                      <span className="shrink-0 font-mono text-sm text-[var(--text-secondary)]">{(e as any).food?.calories ? `${(e as any).food.calories * e.servings} kcal` : "—"}</span>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </Section>
@@ -91,20 +68,11 @@ export default async function NutritionPage() {
   );
 }
 
-function MCard({ l, v, g, u, c }: { l: string; v: string; g: string; u: string; c: string }) {
+function Section({ title, kicker, children, action }: { title: string; kicker: string; children: React.ReactNode; action?: { label: string; href: string } }) {
   return (
-    <div className="premium-stat">
-      <div className="premium-label">{l}</div>
-      <div className={`text-xl font-bold mt-1 font-mono ${c}`}>{v}</div>
-      <div className="text-[11px] text-[var(--text-tertiary)]">{g !== "--" ? `Goal: ${g} ${u}` : u}</div>
-    </div>
+    <section className="premium-panel animate-fade-in">
+      <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold text-[var(--text)]">{title}</h2><div className="flex items-center gap-2"><span className="premium-panel-kicker">{kicker}</span>{action && <Link href={action.href} className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">{action.label} →</Link>}</div></div>
+      {children}
+    </section>
   );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section className="premium-panel animate-fade-in"><div className="mb-3 flex items-center justify-between gap-3"><h2 className="premium-panel-title">{title}</h2><span className="premium-panel-kicker">Daily</span></div>{children}</section>;
-}
-
-function Empty({ msg }: { msg: string }) {
-  return <div className="premium-empty">{msg}</div>;
 }

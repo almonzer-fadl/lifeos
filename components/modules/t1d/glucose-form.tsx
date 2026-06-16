@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 export function GlucoseForm() {
   const router = useRouter();
@@ -13,15 +14,17 @@ export function GlucoseForm() {
     e.preventDefault();
     if (!value) return;
     setSaving(true);
-    await fetch("/api/health/glucose", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value: parseFloat(value), notes: notes || null }),
-    });
-    setValue("");
-    setNotes("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/glucose", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: parseFloat(value), notes: notes || null }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Glucose logged");
+      router.push("/t1d");
+      router.refresh();
+    } catch { toast.error("Failed to log glucose"); } finally { setSaving(false); }
   }
 
   return (
@@ -69,15 +72,17 @@ export function InsulinForm() {
     e.preventDefault();
     if (!units) return;
     setSaving(true);
-    await fetch("/api/health/insulin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ units: parseFloat(units), type, brand: brand || null, notes: notes || null }),
-    });
-    setUnits("");
-    setNotes("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/insulin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ units: parseFloat(units), type, brand: brand || null, notes: notes || null }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Insulin logged");
+      router.push("/t1d");
+      router.refresh();
+    } catch { toast.error("Failed to log insulin"); } finally { setSaving(false); }
   }
 
   return (
