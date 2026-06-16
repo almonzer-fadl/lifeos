@@ -25,7 +25,6 @@ export function SleepForm() {
       if (!res.ok) throw new Error();
       toast.success("Sleep logged");
       router.push("/sleep");
-      router.refresh();
     } catch {
       toast.error("Failed to log sleep");
     } finally {

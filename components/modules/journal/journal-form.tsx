@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 export function JournalForm() {
   const router = useRouter();
@@ -14,9 +15,16 @@ export function JournalForm() {
     e.preventDefault();
     if (!content.trim()) return;
     setSaving(true);
-    await fetch("/api/productivity/journal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content, mood: mood || null, tags: tags || null }) });
-    setContent(""); setMood(""); setTags("");
-    setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/productivity/journal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content, mood: mood || null, tags: tags || null }) });
+      if (!res.ok) throw new Error();
+      toast.success("Entry saved");
+      setContent(""); setMood(""); setTags("");
+    } catch {
+      toast.error("Failed to save entry");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

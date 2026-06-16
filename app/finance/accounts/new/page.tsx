@@ -42,7 +42,6 @@ export default function NewAccountPage() {
       if (!res.ok) throw new Error();
       toast.success("Account created");
       router.push("/finance/accounts");
-      router.refresh();
     } catch {
       toast.error("Failed to create account");
     } finally {

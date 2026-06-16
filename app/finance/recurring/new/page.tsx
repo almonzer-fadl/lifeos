@@ -29,7 +29,6 @@ export default function NewRecurringPage() {
       if (!res.ok) throw new Error();
       toast.success("Recurring bill added");
       router.push("/finance/recurring");
-      router.refresh();
     } catch {
       toast.error("Failed to add recurring bill");
     } finally {

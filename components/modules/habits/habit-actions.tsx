@@ -26,14 +26,21 @@ export function CreateHabitForm() {
     e.preventDefault();
     if (!name.trim()) return;
     setSaving(true);
-    await fetch("/api/productivity/habits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, frequency, timeOfDay: timeOfDay || null }),
-    });
-    setName(""); setTimeOfDay("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/productivity/habits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, frequency, timeOfDay: timeOfDay || null }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Habit created");
+      setName(""); setTimeOfDay("");
+      router.refresh();
+    } catch {
+      toast.error("Failed to create habit");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -77,20 +84,26 @@ export function HabitCard({ habit }: { habit: Habit }) {
 
   async function toggle() {
     setBusy(true);
-    if (isDone) {
-      // Delete today's log
-      if (todayLog) {
-        await fetch(`/api/productivity/habits/log?id=${todayLog.id}`, { method: "DELETE" });
+    try {
+      if (isDone) {
+        if (todayLog) {
+          const res = await fetch(`/api/productivity/habits/log?id=${todayLog.id}`, { method: "DELETE" });
+          if (!res.ok) throw new Error();
+        }
+      } else {
+        const res = await fetch("/api/productivity/habits/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ habitId: habit.id, completed: true }),
+        });
+        if (!res.ok) throw new Error();
       }
-    } else {
-      await fetch("/api/productivity/habits/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ habitId: habit.id, completed: true }),
-      });
+      router.refresh();
+    } catch {
+      toast.error("Failed to update habit");
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
-    router.refresh();
   }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

@@ -22,7 +22,6 @@ export default function NewHabitPage() {
       if (!res.ok) throw new Error();
       toast.success("Habit created");
       router.push("/habits");
-      router.refresh();
     } catch { toast.error("Failed to create habit"); } finally { setSaving(false); }
   }
 

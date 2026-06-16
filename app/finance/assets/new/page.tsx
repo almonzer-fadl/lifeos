@@ -28,7 +28,6 @@ export default function NewAssetPage() {
       if (!res.ok) throw new Error();
       toast.success("Asset added");
       router.push("/finance/assets");
-      router.refresh();
     } catch {
       toast.error("Failed to add asset");
     } finally {

@@ -29,7 +29,6 @@ export function BodyMeasurementForm() {
       if (!res.ok) throw new Error();
       toast.success("Measurement logged");
       router.push("/body");
-      router.refresh();
     } catch {
       toast.error("Failed to log measurement");
     } finally {
@@ -75,7 +74,6 @@ export function LabResultForm() {
       if (!res.ok) throw new Error();
       toast.success("Lab result logged");
       router.push("/body/labs");
-      router.refresh();
     } catch { toast.error("Failed to log lab result"); } finally { setSaving(false); }
   }
 
@@ -102,21 +100,27 @@ export function SupplementForm() {
     e.preventDefault();
     if (!name) return;
     setSaving(true);
-    // Create supplement then log it
-    const suppRes = await fetch("/api/health/nutrition/food-search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, brand: brand || null, servingSize: 1 }),
-    });
-    const supp = await suppRes.json();
-    await fetch("/api/health/nutrition", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ foodId: supp.id, servings: parseInt(dosage), mealType: "snack" }),
-    });
-    setName(""); setBrand(""); setDosage("1");
-    setSaving(false);
-    router.refresh();
+    try {
+      const suppRes = await fetch("/api/health/nutrition/food-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, brand: brand || null, servingSize: 1 }),
+      });
+      const supp = await suppRes.json();
+      const res = await fetch("/api/health/nutrition", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ foodId: supp.id, servings: parseInt(dosage), mealType: "snack" }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Supplement logged");
+      setName(""); setBrand(""); setDosage("1");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log supplement");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

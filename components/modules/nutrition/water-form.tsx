@@ -18,7 +18,6 @@ export function WaterForm() {
       if (!res.ok) throw new Error();
       toast.success("Water logged");
       router.push("/nutrition");
-      router.refresh();
     } catch { toast.error("Failed to log water"); } finally { setSaving(false); }
   }
 

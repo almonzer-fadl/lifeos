@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 type Account = { id: string; name: string; currency: string; type: string };
 type Tab = "account" | "asset" | "goal" | "recurring";
@@ -46,19 +47,27 @@ function AccountForm({ currencies }: { currencies: string[] }) {
     e.preventDefault();
     if (!name) return;
     setSaving(true);
-    await fetch("/api/finance/accounts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name, type, currency, initialBalance: parseFloat(initialBalance) || 0,
-        isDebt, interestRate: interestRate ? parseFloat(interestRate) : null,
-        minimumPayment: minPayment ? parseFloat(minPayment) : null,
-        creditLimit: creditLimit ? parseFloat(creditLimit) : null,
-        paymentDueDay: dueDay ? parseInt(dueDay) : null,
-      }),
-    });
-    setName(""); setInitialBalance("0"); setInterestRate(""); setMinPayment(""); setCreditLimit(""); setDueDay(""); setIsDebt(false);
-    setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/finance/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name, type, currency, initialBalance: parseFloat(initialBalance) || 0,
+          isDebt, interestRate: interestRate ? parseFloat(interestRate) : null,
+          minimumPayment: minPayment ? parseFloat(minPayment) : null,
+          creditLimit: creditLimit ? parseFloat(creditLimit) : null,
+          paymentDueDay: dueDay ? parseInt(dueDay) : null,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Account created");
+      setName(""); setInitialBalance("0"); setInterestRate(""); setMinPayment(""); setCreditLimit(""); setDueDay(""); setIsDebt(false);
+      router.refresh();
+    } catch {
+      toast.error("Failed to create account");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -100,13 +109,21 @@ function AssetForm({ currencies }: { currencies: string[] }) {
     e.preventDefault();
     if (!name) return;
     setSaving(true);
-    await fetch("/api/finance/assets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, type, purchaseValue: parseFloat(purchaseValue) || 0, currentValue: parseFloat(currentValue) || parseFloat(purchaseValue) || 0, currency }),
-    });
-    setName(""); setPurchaseValue(""); setCurrentValue("");
-    setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/finance/assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, type, purchaseValue: parseFloat(purchaseValue) || 0, currentValue: parseFloat(currentValue) || parseFloat(purchaseValue) || 0, currency }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Asset added");
+      setName(""); setPurchaseValue(""); setCurrentValue("");
+      router.refresh();
+    } catch {
+      toast.error("Failed to add asset");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -136,13 +153,21 @@ function GoalForm({ accounts, currencies }: { accounts: Account[]; currencies: s
     e.preventDefault();
     if (!name || !targetAmount) return;
     setSaving(true);
-    await fetch("/api/finance/goals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, targetAmount: parseFloat(targetAmount), currentAmount: parseFloat(currentAmount) || 0, currency, accountId: accountId || null }),
-    });
-    setName(""); setTargetAmount(""); setCurrentAmount("0"); setAccountId("");
-    setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/finance/goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, targetAmount: parseFloat(targetAmount), currentAmount: parseFloat(currentAmount) || 0, currency, accountId: accountId || null }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Goal created");
+      setName(""); setTargetAmount(""); setCurrentAmount("0"); setAccountId("");
+      router.refresh();
+    } catch {
+      toast.error("Failed to create goal");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -173,14 +198,22 @@ function RecurringForm({ accounts, currencies }: { accounts: Account[]; currenci
     e.preventDefault();
     if (!description || !amount) return;
     setSaving(true);
-    const now = new Date();
-    await fetch("/api/finance/recurring", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description, type, amount: parseFloat(amount), currency, accountId, frequency, startDate: now.toISOString(), nextDate: now.toISOString() }),
-    });
-    setDescription(""); setAmount("");
-    setSaving(false); router.refresh();
+    try {
+      const now = new Date();
+      const res = await fetch("/api/finance/recurring", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description, type, amount: parseFloat(amount), currency, accountId, frequency, startDate: now.toISOString(), nextDate: now.toISOString() }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Recurring added");
+      setDescription(""); setAmount("");
+      router.refresh();
+    } catch {
+      toast.error("Failed to add recurring");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

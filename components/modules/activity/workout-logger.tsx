@@ -51,7 +51,6 @@ export function WorkoutLogger() {
       if (!res.ok) throw new Error();
       toast.success("Workout logged");
       router.push("/activity");
-      router.refresh();
     } catch {
       toast.error("Failed to log workout");
     } finally {

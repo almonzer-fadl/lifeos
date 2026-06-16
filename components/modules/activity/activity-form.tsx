@@ -44,7 +44,6 @@ export function ActivityForm() {
       if (!res.ok) throw new Error();
       toast.success("Activity logged");
       router.push("/activity");
-      router.refresh();
     } catch {
       toast.error("Failed to log activity");
     } finally {

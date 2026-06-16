@@ -52,7 +52,8 @@ export default function ImportPage() {
       toast.success(`Imported ${data.imported} transactions`);
       router.refresh();
     } else {
-      toast.error("Import failed");
+      const err = await res.json().catch(() => ({}));
+      toast.error((err as { error?: string }).error || "Import failed");
     }
     setLoading(false);
   }

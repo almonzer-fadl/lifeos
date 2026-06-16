@@ -23,7 +23,6 @@ export function GlucoseForm() {
       if (!res.ok) throw new Error();
       toast.success("Glucose logged");
       router.push("/t1d");
-      router.refresh();
     } catch { toast.error("Failed to log glucose"); } finally { setSaving(false); }
   }
 
@@ -81,7 +80,6 @@ export function InsulinForm() {
       if (!res.ok) throw new Error();
       toast.success("Insulin logged");
       router.push("/t1d");
-      router.refresh();
     } catch { toast.error("Failed to log insulin"); } finally { setSaving(false); }
   }
 
