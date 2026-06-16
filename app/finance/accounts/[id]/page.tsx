@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
 import { TransactionForm } from "@/components/modules/finance/transaction-form";
+import { TransactionLedger } from "@/components/modules/finance/transaction-ledger";
 import { centsToDollars } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -61,30 +62,16 @@ export default async function AccountRegisterPage({ params }: { params: Promise<
         <TransactionForm accounts={[{ id: account.id, name: account.name, currency: account.currency }]} categories={categories} currencies={[account.currency]} />
       </section>
 
-      <section className="premium-panel animate-fade-in">
-        <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold text-[var(--text)]">Transaction Ledger</h2><span className="rounded border border-[var(--border-light)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{transactions.length} entries</span></div>
-        {transactions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center"><p className="text-sm text-[var(--text-tertiary)]">No transactions yet</p><p className="text-xs text-[var(--text-tertiary)]">Add your first transaction above</p></div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px] text-left text-sm">
-              <thead><tr className="border-b border-[var(--border)]"><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Date</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Description</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Category</th><th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Amount</th><th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Balance</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Status</th></tr></thead>
-              <tbody className="animate-stagger">
-                {txWithBalance.map((t) => (
-                  <tr key={t.id} className="border-b border-[var(--border-light)] transition-colors hover:bg-[var(--surface-hover)]">
-                    <td className="px-3 py-2.5 text-xs text-[var(--text-tertiary)] whitespace-nowrap">{format(new Date(t.date), "MMM d")}</td>
-                    <td className="px-3 py-2.5 text-sm text-[var(--text)] truncate max-w-[200px]">{t.description || "—"}</td>
-                    <td className="px-3 py-2.5 text-xs text-[var(--text-tertiary)]">{t.category?.name || "—"}</td>
-                    <td className={`px-3 py-2.5 text-right font-mono text-sm font-semibold whitespace-nowrap ${t.type === "income" ? "text-[var(--emerald)]" : t.type === "expense" ? "text-[var(--rose)]" : "text-[var(--text-tertiary)]"}`}>{t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{f$(t.amount)}</td>
-                    <td className={`px-3 py-2.5 text-right font-mono text-sm font-semibold whitespace-nowrap ${t.balance >= 0 ? "text-[var(--text)]" : "text-[var(--rose)]"}`}>{f$(t.balance)}</td>
-                    <td className="px-3 py-2.5 text-[10px] capitalize text-[var(--text-tertiary)]">{t.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      <TransactionLedger transactions={txWithBalance.map((t) => ({
+        id: t.id,
+        date: t.date,
+        description: t.description,
+        category: t.category ? { name: t.category.name } : null,
+        type: t.type,
+        amount: t.amount,
+        balance: t.balance,
+        status: t.status,
+      }))} />
     </div>
   );
 }

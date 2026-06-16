@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ConfirmSheet } from "@/components/ui/confirm-sheet";
@@ -92,10 +92,12 @@ export function TaskCard({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [optimisticHidden, setOptimisticHidden] = useState(false);
 
   async function moveTask() {
     const next = NEXT_STATUS[task.status];
     if (!next) return;
+    setOptimisticHidden(true);
     setBusy(true);
     try {
       const res = await fetch("/api/productivity/tasks", {
@@ -106,6 +108,7 @@ export function TaskCard({
       if (!res.ok) throw new Error();
       router.refresh();
     } catch {
+      setOptimisticHidden(false);
       toast.error("Failed to move task");
     } finally {
       setBusy(false);
@@ -131,7 +134,9 @@ export function TaskCard({
   return (
     <>
     <div
-      className={`group rounded-lg border p-3 transition-colors ${
+      className={`group rounded-lg border p-3 transition-all ${
+        optimisticHidden ? "opacity-0 scale-95 pointer-events-none" : ""
+      } ${
         active ? "border-[rgba(217,154,43,0.28)] bg-[var(--amber-soft)]" : "border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] hover:bg-[var(--surface-hover)]"
       } ${busy ? "opacity-50" : ""}`}
     >

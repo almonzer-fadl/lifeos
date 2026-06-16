@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { PageTransition } from "@/components/ui/page-transition";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 
 type NavItem = {
   label: string;
@@ -125,7 +126,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)]">
         <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
-          <PageTransition>{children}</PageTransition>
+          <PullToRefresh>
+            <PageTransition>{children}</PageTransition>
+          </PullToRefresh>
         </div>
       </main>
 

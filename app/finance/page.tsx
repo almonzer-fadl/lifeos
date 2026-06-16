@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { format, subDays } from "date-fns";
+import { format, subDays, startOfYear } from "date-fns";
 import { Odometer } from "@/components/ui/odometer";
 import { Fab } from "@/components/ui/fab";
+import { DateRangeSwitch } from "@/components/modules/finance/date-range-switch";
 import { centsToDollars } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,8 @@ function $(cents: number) { return centsToDollars(cents); }
 function f$(cents: number) { return $(cents).toFixed(2); }
 function s$(cents: number) { return Math.round($(cents)).toLocaleString(); }
 
-export default async function FinancePage() {
+export default async function FinancePage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
+  const { range } = await searchParams;
   const [accounts, allTransactions, categories, assets, recurring, goals] = await Promise.all([
     db.account.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
     db.transaction.findMany({ orderBy: { date: "desc" }, include: { account: true, category: true } }),
@@ -36,9 +38,11 @@ export default async function FinancePage() {
   const assetValue = assets.reduce((s, a) => s + a.currentValue, 0);
   const netWorth = cashBalance + assetValue - debtBalance;
 
-  // Recent 30 days for dashboard stats
-  const thirtyDaysAgo = subDays(new Date(), 30);
-  const recentTxs = allTransactions.filter((t) => new Date(t.date) >= thirtyDaysAgo);
+  const rangeDays = range === "7d" ? 7 : range === "90d" ? 90 : range === "ytd" ? "ytd" : 30;
+  const rangeStart = rangeDays === "ytd" ? startOfYear(new Date()) : subDays(new Date(), rangeDays as number);
+  const rangeLabel = range === "7d" ? "7D" : range === "90d" ? "90D" : range === "ytd" ? "YTD" : "30D";
+
+  const recentTxs = allTransactions.filter((t) => new Date(t.date) >= rangeStart);
   const income = recentTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const expenses = recentTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
 
@@ -74,6 +78,10 @@ export default async function FinancePage() {
 
       <div className="premium-command-grid">
         <section className="premium-command-card">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Period</div>
+            <DateRangeSwitch />
+          </div>
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Total Net Worth</div>
@@ -97,8 +105,8 @@ export default async function FinancePage() {
         </section>
 
         <section className="grid grid-cols-2 gap-2 animate-stagger">
-          <Stat l="Income 30D" v={`+${s$(income)}`} u="" tone="positive" link="/finance/accounts" />
-          <Stat l="Expenses 30D" v={`-${s$(expenses)}`} u="" tone="negative" link="/finance/accounts" />
+          <Stat l={`Income ${rangeLabel}`} v={`+${s$(income)}`} u="" tone="positive" link="/finance/accounts" />
+          <Stat l={`Expenses ${rangeLabel}`} v={`-${s$(expenses)}`} u="" tone="negative" link="/finance/accounts" />
           <Stat l="Bills / Mo" v={s$(monthlyRecurring)} u="" tone="amber" link="/finance/recurring" />
           <Stat l="Accounts" v={`${accounts.length}`} u={`${assets.length} assets`} tone="neutral" link="/finance/accounts" />
         </section>
@@ -154,7 +162,7 @@ export default async function FinancePage() {
           )}
         </Section>
 
-        <Section title="Top Spending" kicker="30D" action={{ label: "Reports", href: "/finance/reports" }}>
+        <Section title="Top Spending" kicker={rangeLabel} action={{ label: "Reports", href: "/finance/reports" }}>
           {topCats.length === 0 ? (
             <Empty icon="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" title="No spending data" description="Categorize transactions to see spending breakdowns." action={{ label: "View Accounts", href: "/finance/accounts" }} />
           ) : (
