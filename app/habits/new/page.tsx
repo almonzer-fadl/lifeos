@@ -11,7 +11,7 @@ export default function NewHabitPage() {
   const [timeOfDay, setTimeOfDay] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const inputClass = "w-full border-[var(--border)] bg-[#080b0e] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
+  const inputClass = "w-full border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

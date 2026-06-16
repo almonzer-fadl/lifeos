@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 type Account = { id: string; name: string; currency: string };
 type Category = { id: string; name: string; type: string };
 
-const inputClass = "w-full border-[var(--border)] bg-[#080b0e] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
+const inputClass = "w-full border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
 
 export function TransactionForm({ accounts, categories, currencies }: { accounts: Account[]; categories: Category[]; currencies: string[] }) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export function TransactionForm({ accounts, categories, currencies }: { accounts
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[#07090b] p-1">
+      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[var(--bg)] p-1">
         <button type="button" onClick={() => setType("expense")} className={`rounded-md py-2 text-xs font-semibold uppercase tracking-wide transition-all active:scale-[0.99] ${type === "expense" ? "bg-[var(--rose-soft)] text-[var(--rose)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"}`}>Expense</button>
         <button type="button" onClick={() => setType("income")} className={`rounded-md py-2 text-xs font-semibold uppercase tracking-wide transition-all active:scale-[0.99] ${type === "income" ? "bg-[var(--emerald-soft)] text-[var(--emerald)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"}`}>Income</button>
       </div>
