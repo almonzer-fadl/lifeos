@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET() {
   const habits = await db.habit.findMany({
@@ -21,12 +23,16 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.habit, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const habit = await db.habit.create({
     data: {
-      name: body.name,
-      frequency: body.frequency || "daily",
+      name: validation.data.name,
+      frequency: validation.data.frequency || "daily",
       frequencyCount: body.frequencyCount || 1,
-      timeOfDay: body.timeOfDay || null,
+      timeOfDay: validation.data.timeOfDay,
       category: body.category || null,
       color: body.color || null,
     },

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -33,13 +35,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.foodDiary, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const entry = await db.foodDiaryEntry.create({
     data: {
       date: body.date ? new Date(body.date) : new Date(),
-      mealType: body.mealType || "snack",
-      foodId: body.foodId,
-      servings: body.servings || 1,
-      grams: body.grams || null,
+      mealType: validation.data.mealType || "snack",
+      foodId: validation.data.foodId,
+      servings: validation.data.servings || 1,
+      grams: validation.data.grams,
     },
     include: { food: true },
   });

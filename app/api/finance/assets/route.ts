@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput } from "@/lib/money";
-
-const VALID_TYPES = ["property", "vehicle", "investment", "crypto", "gold", "collectible", "other"];
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET() {
   const assets = await db.asset.findMany({ orderBy: { name: "asc" } });
@@ -12,23 +12,20 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (!body.name || typeof body.name !== "string" || body.name.trim().length === 0) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
-  }
-  if (body.type && !VALID_TYPES.includes(body.type)) {
-    return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(", ")}` }, { status: 400 });
-  }
+  const validation = validateBody(schemas.asset, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
 
   const purchaseValue = body.purchaseValue != null ? parseMoneyInput(body.purchaseValue) : 0;
   const currentValue = body.currentValue != null ? parseMoneyInput(body.currentValue) : purchaseValue;
 
   const asset = await db.asset.create({
     data: {
-      name: body.name.trim(),
-      type: body.type || "other",
+      name: validation.data.name,
+      type: validation.data.type,
       purchaseValue,
       currentValue,
-      currency: body.currency || "USD",
+      currency: validation.data.currency,
       purchaseDate: body.purchaseDate ? new Date(body.purchaseDate) : null,
       notes: body.notes || null,
     },
@@ -42,7 +39,7 @@ export async function PATCH(request: NextRequest) {
 
   const data: Record<string, unknown> = {};
   if (body.name) data.name = body.name;
-  if (body.type && VALID_TYPES.includes(body.type)) data.type = body.type;
+  if (body.type) data.type = body.type;
   if (body.currentValue != null && !isNaN(parseFloat(body.currentValue))) data.currentValue = parseMoneyInput(body.currentValue);
   if (body.notes !== undefined) data.notes = body.notes;
   if (body.currency) data.currency = body.currency;

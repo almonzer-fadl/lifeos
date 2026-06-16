@@ -403,12 +403,25 @@ model Transaction {
   category          Category? @relation(fields: [categoryId], references: [id])
   parentTransaction Transaction? @relation("SplitChildren", fields: [parentTransactionId], references: [id])
   childTransactions Transaction[] @relation("SplitChildren")
+  audits            TransactionAudit[]
 
   @@index([date])
   @@index([accountId])
   @@index([categoryId])
   @@index([status])
   @@index([parentTransactionId])
+}
+
+model TransactionAudit {
+  id            String   @id @default(uuid())
+  transactionId String
+  action        String   // created, updated, deleted
+  changes       Json     // { before: {...}, after: {...} } or { deleted: {...} }
+  timestamp     DateTime @default(now())
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@index([timestamp])
 }
 
 model Budget {

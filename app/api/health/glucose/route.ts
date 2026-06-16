@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -26,13 +28,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.glucose, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const reading = await db.glucoseReading.create({
     data: {
       timestamp: body.timestamp ? new Date(body.timestamp) : new Date(),
-      value: body.value,
-      unit: body.unit || "mg/dL",
+      value: validation.data.value,
+      unit: validation.data.unit || "mg/dL",
       source: body.source || "manual",
-      notes: body.notes || null,
+      notes: validation.data.notes,
     },
   });
 

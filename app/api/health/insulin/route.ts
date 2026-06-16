@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -26,13 +28,17 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.insulin, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const dose = await db.insulinDose.create({
     data: {
       timestamp: body.timestamp ? new Date(body.timestamp) : new Date(),
-      type: body.type || "rapid",
-      brand: body.brand || null,
-      units: body.units,
-      notes: body.notes || null,
+      type: validation.data.type || "rapid",
+      brand: validation.data.brand,
+      units: validation.data.units,
+      notes: validation.data.notes,
     },
   });
 

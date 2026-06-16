@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput, dollarsToCents } from "@/lib/money";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
+import { logTransactionAudit } from "@/lib/audit";
 
 const VALID_TYPES = ["income", "expense", "transfer"];
 const VALID_STATUSES = ["pending", "cleared", "reconciled"];
@@ -95,6 +98,8 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
+    await logTransactionAudit(sourceTx.id, "created", { source: sourceTx, destination: destTx });
+
     return NextResponse.json({ source: sourceTx, destination: destTx }, { status: 201 });
   }
 
@@ -140,39 +145,37 @@ export async function POST(request: NextRequest) {
       )
     );
 
+    await logTransactionAudit(parent.id, "created", { parent, splits: children });
+
     return NextResponse.json({ ...parent, splits: children }, { status: 201 });
   }
 
   // ---- STANDARD transaction ----
-  if (!body.accountId) {
-    return NextResponse.json({ error: "accountId is required" }, { status: 400 });
-  }
-  if (body.type && !VALID_TYPES.includes(body.type)) {
-    return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(", ")}` }, { status: 400 });
-  }
-  if (body.status && !VALID_STATUSES.includes(body.status)) {
-    return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}` }, { status: 400 });
-  }
-  if (body.amount == null || isNaN(parseFloat(body.amount))) {
-    return NextResponse.json({ error: "Valid amount is required" }, { status: 400 });
+  const validation = validateBody(schemas.transaction, body);
+  if (validation.error) return validation.error;
+
+  if (!validation.data) {
+    return NextResponse.json({ error: "Validation failed" }, { status: 400 });
   }
 
   const tx = await db.transaction.create({
     data: {
-      date: body.date ? new Date(body.date) : new Date(),
-      accountId: body.accountId,
-      categoryId: body.categoryId || null,
+      date: new Date(validation.data.date),
+      accountId: validation.data.accountId,
+      categoryId: validation.data.categoryId,
       amount: parseMoneyInput(body.amount),
-      currency: body.currency || "USD",
-      type: body.type || "expense",
-      status: body.status || "pending",
-      description: body.description || null,
+      currency: validation.data.currency,
+      type: validation.data.type,
+      status: validation.data.status,
+      description: validation.data.description,
       notes: body.notes || null,
-      isTransfer: body.isTransfer === true,
-      transferAccountId: body.transferAccountId || null,
+      isTransfer: validation.data.isTransfer,
+      transferAccountId: validation.data.transferAccountId,
     },
     include: { account: true, category: true },
   });
+
+  await logTransactionAudit(tx.id, "created", tx as unknown as Record<string, unknown>);
 
   return NextResponse.json(tx, { status: 201 });
 }
@@ -180,6 +183,9 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const body = await request.json();
   if (!body.id) return NextResponse.json({ error: "id is required" }, { status: 400 });
+
+  const existing = await db.transaction.findUnique({ where: { id: body.id } });
+  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const data: Record<string, unknown> = {};
   if (body.status && VALID_STATUSES.includes(body.status)) data.status = body.status;
@@ -189,7 +195,14 @@ export async function PATCH(request: NextRequest) {
   if (body.notes !== undefined) data.notes = body.notes;
   if (body.amount != null && !isNaN(parseFloat(body.amount))) data.amount = parseMoneyInput(body.amount);
 
-  const tx = await db.transaction.update({ where: { id: body.id }, data, include: { account: true, category: true, childTransactions: { include: { category: true } } } });
+  const tx = await db.transaction.update({
+    where: { id: body.id },
+    data,
+    include: { account: true, category: true, childTransactions: { include: { category: true } } },
+  });
+
+  await logTransactionAudit(tx.id, "updated", { before: existing, after: tx });
+
   return NextResponse.json(tx);
 }
 
@@ -205,6 +218,8 @@ export async function DELETE(request: NextRequest) {
   if (tx.childTransactions.length > 0) {
     await db.transaction.deleteMany({ where: { parentTransactionId: id } });
   }
+
+  await logTransactionAudit(id, "deleted", { deleted: tx });
 
   await db.transaction.delete({ where: { id } });
   return NextResponse.json({ success: true });
