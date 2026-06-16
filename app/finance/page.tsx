@@ -1,8 +1,8 @@
-import { FinanceForms } from "@/components/modules/finance/finance-forms";
-import { TransactionForm } from "@/components/modules/finance/transaction-form";
-import { DeleteButton } from "@/components/ui/delete-button";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
+import { Odometer } from "@/components/ui/odometer";
+import { ProgressRing } from "@/components/ui/progress-ring";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +41,8 @@ export default async function FinancePage() {
   const topCats = Object.entries(byCat).sort(([, a]: [string, number], [, b]: [string, number]) => b - a).slice(0, 5);
 
   const upcomingBills = recurring
-    .filter((r: { nextDate: Date }) => new Date(r.nextDate) <= subDays(new Date(), -30))
-    .slice(0, 8);
+    .filter((r: { nextDate: Date }) => new Date(r.nextDate) <= subDays(new Date(), -14))
+    .slice(0, 5);
 
   const monthlyRecurring = recurring
     .filter((r: { type: string }) => r.type === "expense")
@@ -75,7 +75,11 @@ export default async function FinancePage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">Total Net Worth</div>
-              <div className={`mt-2 font-mono text-5xl font-semibold leading-none tracking-tight sm:text-6xl ${netWorth >= 0 ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{netWorth.toFixed(0)}</div>
+              <Odometer
+                value={netWorth}
+                prefix={netWorth >= 0 ? "" : "-"}
+                className={`mt-2 block font-mono text-5xl font-semibold leading-none tracking-tight sm:text-6xl ${netWorth >= 0 ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}
+              />
               <div className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{currencies[0] || "USD"}</div>
             </div>
             <div className="rounded-md border border-[rgba(215,181,109,0.28)] bg-[var(--accent-soft)] px-2.5 py-1.5 text-right">
@@ -91,142 +95,138 @@ export default async function FinancePage() {
         </section>
 
         <section className="grid grid-cols-2 gap-2">
-          <Stat l="Income 30D" v={`+${income.toFixed(0)}`} u="" tone="positive" />
-          <Stat l="Expenses 30D" v={`-${expenses.toFixed(0)}`} u="" tone="negative" />
-          <Stat l="Bills / Mo" v={`${monthlyRecurring.toFixed(0)}`} u="" tone="amber" />
-          <Stat l="Accounts" v={`${accounts.length}`} u={`${assets.length} assets`} tone="neutral" />
+          <Stat l="Income 30D" v={`+${income.toFixed(0)}`} u="" tone="positive" link="/finance/accounts" />
+          <Stat l="Expenses 30D" v={`-${expenses.toFixed(0)}`} u="" tone="negative" link="/finance/accounts" />
+          <Stat l="Bills / Mo" v={`${monthlyRecurring.toFixed(0)}`} u="" tone="amber" link="/finance/recurring" />
+          <Stat l="Accounts" v={`${accounts.length}`} u={`${assets.length} assets`} tone="neutral" link="/finance/accounts" />
         </section>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[0.85fr_1.15fr]">
-        <Section title="Capital Entry" kicker="Add">
-          <FinanceForms accounts={accounts} currencies={currencies} />
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <Section title="Accounts" kicker="Cash" action={{ label: "All", href: "/finance/accounts" }}>
+          {accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).length === 0 ? (
+            <Empty icon="M3 10h18M3 14h18M3 6h18M3 18h18" title="No cash accounts" description="Track your checking, savings, and cash accounts." action={{ label: "Add Account", href: "/finance/accounts/new" }} />
+          ) : (
+            <div className="space-y-1">
+              {accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).slice(0, 4).map((a: AcctLike & { balance: number }) => (
+                <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-[var(--text)]">{a.name}</div>
+                    <div className="text-xs capitalize text-[var(--text-tertiary)]">{a.type}</div>
+                  </div>
+                  <span className={`shrink-0 font-mono text-sm font-semibold ${a.balance >= 0 ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{a.balance.toFixed(2)}</span>
+                </Link>
+              ))}
+              {accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).length > 4 && (
+                <Link href="/finance/accounts" className="block py-1 text-center text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">
+                  +{accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).length - 4} more
+                </Link>
+              )}
+            </div>
+          )}
         </Section>
 
-        <Section title="Transaction Entry" kicker="Post">
-          <TransactionForm accounts={accounts} categories={categories} currencies={currencies} />
+        <Section title="Upcoming Bills" kicker="Due" action={{ label: "All", href: "/finance/recurring" }}>
+          {upcomingBills.length === 0 ? (
+            <Empty icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" title="No upcoming bills" description="Schedule your recurring payments and subscriptions." action={{ label: "Add Bill", href: "/finance/recurring/new" }} />
+          ) : (
+            <div className="space-y-1">
+              {upcomingBills.map((r: { id: string; description: string; amount: number; currency: string; nextDate: Date; frequency: string; account: { name: string } }) => (
+                <div key={r.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-[var(--text)]">{r.description}</div>
+                    <div className="text-xs text-[var(--text-tertiary)]">Due {format(new Date(r.nextDate), "MMM d")} | {r.account.name}</div>
+                  </div>
+                  <span className="shrink-0 font-mono text-sm font-semibold text-[var(--amber)]">{r.amount.toFixed(0)} {r.currency}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+
+        <Section title="Goals" kicker="Target" action={{ label: "All", href: "/finance/goals" }}>
+          {goals.length === 0 ? (
+            <Empty icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" title="No goals yet" description="Set savings targets and track your progress." action={{ label: "Set Goal", href: "/finance/goals/new" }} />
+          ) : (
+            <div className="space-y-3">
+              {goals.slice(0, 4).map((g: { id: string; name: string; targetAmount: number; currentAmount: number; currency: string; targetDate: Date | null }) => {
+                const pct = g.targetAmount > 0 ? Math.min((g.currentAmount / g.targetAmount) * 100, 100) : 0;
+                return (
+                  <Link key={g.id} href={`/finance/goals/${g.id}`} className="block rounded-lg p-3 transition-colors hover:bg-[var(--surface-hover)]">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="truncate text-sm font-medium text-[var(--text)]">{g.name}</span>
+                      <span className="shrink-0 font-mono text-xs text-[var(--text-secondary)]">{g.currentAmount.toFixed(0)} / {g.targetAmount.toFixed(0)}</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--border-light)]">
+                      <div className="h-full rounded-full bg-[var(--emerald)] transition-all" style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">{pct.toFixed(0)}% complete</div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </Section>
+
+        <Section title="Top Spending" kicker="30D" action={{ label: "Reports", href: "/finance/reports" }}>
+          {topCats.length === 0 ? (
+            <Empty icon="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" title="No spending data" description="Categorize transactions to see spending breakdowns." action={{ label: "View Accounts", href: "/finance/accounts" }} />
+          ) : (
+            <div className="space-y-2.5">
+              {topCats.map(([name, amt]: [string, number]) => (
+                <div key={name} className="flex items-center gap-3 px-3 py-1">
+                  <span className="flex-1 text-sm font-medium text-[var(--text-secondary)]">{name}</span>
+                  <span className="font-mono text-sm font-semibold text-[var(--rose)]">{amt.toFixed(0)}</span>
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-[var(--border-light)]">
+                    <div className="h-full rounded-full bg-[var(--rose)]" style={{ width: `${expenses > 0 ? (amt / expenses) * 100 : 0}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
       </div>
 
-      <Section title="Cash Accounts" kicker="Accounts">
-        {accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).length === 0 ? <Empty msg="No cash accounts configured." /> : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {accountsWithBalance.filter((a: AcctLike & { balance: number }) => !a.isDebt).map((a: AcctLike & { balance: number }) => (
-              <AccountCard key={a.id} a={a} />
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Asset Register" kicker="Assets">
-        {assets.length === 0 ? <Empty msg="No assets tracked yet." /> : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {assets.map((a: { id: string; name: string; type: string; currentValue: number; purchaseValue: number; currency: string }) => (
-              <div key={a.id} className="rounded-lg border border-[rgba(215,181,109,0.2)] bg-[rgba(215,181,109,0.06)] p-3">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-semibold text-[var(--text)]">{a.name}</span>
-                  <span className="rounded border border-[rgba(215,181,109,0.24)] bg-[rgba(215,181,109,0.08)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--accent)]">{a.type}</span>
-                </div>
-                <div className="font-mono text-xl font-semibold text-[var(--accent)]">{a.currentValue.toFixed(0)} <span className="text-xs font-normal text-[var(--text-tertiary)]">{a.currency}</span></div>
-                <div className="mt-1 text-xs text-[var(--text-tertiary)]">Purchased {a.purchaseValue.toFixed(0)} | Gain <span className={a.currentValue >= a.purchaseValue ? "text-[var(--emerald)]" : "text-[var(--rose)]"}>{(a.currentValue - a.purchaseValue).toFixed(0)}</span></div>
-                <DeleteButton url={`/api/finance/assets?id=${a.id}`} />
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Liability Desk" kicker="Debts">
-        {accountsWithBalance.filter((a: AcctLike & { balance: number }) => a.isDebt).length === 0 ? <Empty msg="No liabilities tracked yet." /> : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {accountsWithBalance.filter((a: AcctLike & { balance: number }) => a.isDebt).map((a: AcctLike & { balance: number }) => (
-              <div key={a.id} className="rounded-lg border border-[rgba(255,95,109,0.22)] bg-[rgba(255,95,109,0.055)] p-3">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-semibold text-[var(--text)]">{a.name}</span>
-                  <span className="rounded border border-[rgba(255,95,109,0.22)] bg-[rgba(255,95,109,0.08)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--rose)]">{a.currency}</span>
-                </div>
-                <div className="font-mono text-xl font-semibold text-[var(--rose)]">{Math.abs(a.balance).toFixed(0)} <span className="text-xs font-normal text-[var(--text-tertiary)]">remaining</span></div>
-                <div className="mt-2 space-y-0.5 text-xs text-[var(--text-tertiary)]">
-                  {a.interestRate != null && <div>Interest: {a.interestRate}% APR</div>}
-                  {a.minimumPayment != null && <div>Min payment: {a.minimumPayment} {a.currency}</div>}
-                  {a.paymentDueDay != null && <div>Due: day {a.paymentDueDay}</div>}
-                  {a.payoffTarget && <div>Payoff target: {format(new Date(a.payoffTarget), "MMM yyyy")}</div>}
-                  {a.creditLimit != null && <div>Credit limit: {a.creditLimit.toFixed(0)} {a.currency}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Forward Obligations" kicker="Bills">
-        {upcomingBills.length === 0 ? <Empty msg="No upcoming recurring bills." /> : (
-          <div className="space-y-1">
-            {upcomingBills.map((r: { id: string; description: string; amount: number; currency: string; nextDate: Date; frequency: string; account: { name: string } }) => (
-              <div key={r.id} className="flex items-center justify-between gap-3 border-b border-[var(--border-light)] px-1 py-2 last:border-b-0">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-[var(--text)]">{r.description}</div>
-                  <div className="text-xs capitalize text-[var(--text-tertiary)]">{r.frequency} | {r.account.name} | next {format(new Date(r.nextDate), "MMM d")}</div>
-                </div>
-                <span className="shrink-0 font-mono text-sm font-semibold text-[var(--amber)]">{r.amount.toFixed(0)} {r.currency}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Capital Objectives" kicker="Goals">
-        {goals.length === 0 ? <Empty msg="No financial goals defined." /> : (
-          <div className="space-y-2">
-            {goals.map((g: { id: string; name: string; targetAmount: number; currentAmount: number; currency: string; targetDate: Date | null; notes: string | null }) => {
-              const pct = g.targetAmount > 0 ? (g.currentAmount / g.targetAmount) * 100 : 0;
-              return (
-                <div key={g.id} className="rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3">
-                  <div className="mb-2 flex items-center justify-between gap-3">
-                    <div className="min-w-0 truncate text-sm font-semibold text-[var(--text)]">{g.name}</div>
-                    <span className="shrink-0 font-mono text-xs text-[var(--text-secondary)]">{g.currentAmount.toFixed(0)} / {g.targetAmount.toFixed(0)} {g.currency}</span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-[var(--border-light)]">
-                    <div className="h-full rounded-full bg-[var(--emerald)] transition-all" style={{ width: `${Math.min(pct, 100)}%` }} />
-                  </div>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="text-[11px] text-[var(--text-tertiary)]">{pct.toFixed(0)}% complete</span>
-                    {g.targetDate && <span className="text-[11px] text-[var(--text-tertiary)]">Target {format(new Date(g.targetDate), "MMM yyyy")}</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Expense Concentration" kicker="Spend">
-        {topCats.length === 0 ? <Empty msg="No categorized spending concentration yet." /> : (
-          <div className="space-y-2.5">
-            {topCats.map(([name, amt]: [string, number]) => (
-              <div key={name} className="flex items-center gap-3">
-                <span className="flex-1 text-sm font-medium text-[var(--text-secondary)]">{name}</span>
-                <span className="font-mono text-sm font-semibold text-[var(--rose)]">{amt.toFixed(0)}</span>
-                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[var(--border-light)]"><div className="h-full rounded-full bg-[var(--rose)]" style={{ width: `${expenses > 0 ? (amt / expenses) * 100 : 0}%` }} /></div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Recent Ledger" kicker="Transactions">
-        {transactions.length === 0 ? <Empty msg="No transactions yet." /> : (
+      <Section title="Recent Ledger" kicker="Transactions" action={{ label: "View All", href: "/finance/accounts" }}>
+        {transactions.length === 0 ? (
+          <Empty icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" title="No transactions yet" description="Start tracking your money by adding transactions to your accounts." action={{ label: "Add Transaction", href: "/finance/accounts" }} />
+        ) : (
           <div className="overflow-hidden rounded-lg border border-[var(--border-light)]">
-            {transactions.slice(0, 30).map((t: TxLike) => (
+            {transactions.slice(0, 8).map((t: TxLike) => (
               <div key={t.id} className="flex items-center gap-3 border-b border-[var(--border-light)] px-3 py-2.5 transition-colors last:border-b-0 hover:bg-[var(--surface-hover)]">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-[var(--text)]">{t.description || t.category?.name || "Transaction"}</div>
-                  <div className="text-xs text-[var(--text-tertiary)]">{format(new Date(t.date), "MMM d")}{t.account && ` | ${t.account.name}`}{t.category && ` | ${t.category.name}`}</div>
+                  <div className="text-xs text-[var(--text-tertiary)]">
+                    {format(new Date(t.date), "MMM d")}
+                    {t.account && ` | ${t.account.name}`}
+                    {t.category && ` | ${t.category.name}`}
+                  </div>
                 </div>
                 <span className={`whitespace-nowrap font-mono text-sm font-semibold ${t.type === "income" ? "text-[var(--emerald)]" : t.type === "expense" ? "text-[var(--rose)]" : "text-[var(--text-tertiary)]"}`}>
                   {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{t.amount.toFixed(2)} {t.currency}
                 </span>
               </div>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      <Section title="Liabilities" kicker="Debts" action={{ label: "Manage", href: "/finance/debts" }}>
+        {accountsWithBalance.filter((a: AcctLike & { balance: number }) => a.isDebt).length === 0 ? (
+          <Empty icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" title="No liabilities" description="Track credit cards, loans, and mortgages." action={{ label: "Add Account", href: "/finance/accounts/new" }} />
+        ) : (
+          <div className="space-y-1">
+            {accountsWithBalance.filter((a: AcctLike & { balance: number }) => a.isDebt).map((a: AcctLike & { balance: number }) => (
+              <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-[var(--text)]">{a.name}</div>
+                  <div className="text-xs text-[var(--text-tertiary)]">
+                    {a.interestRate != null && `${a.interestRate}% APR`}
+                    {a.minimumPayment != null && ` | Min ${a.minimumPayment}`}
+                  </div>
+                </div>
+                <span className="shrink-0 font-mono text-sm font-semibold text-[var(--rose)]">{Math.abs(a.balance).toFixed(0)} {a.currency}</span>
+              </Link>
             ))}
           </div>
         )}
@@ -256,50 +256,61 @@ function MarketChip({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Stat({ l, v, u, tone }: { l: string; v: string; u: string; tone: Tone }) {
-  return (
-    <div className="premium-stat">
+function Stat({ l, v, u, tone, link }: { l: string; v: string; u: string; tone: Tone; link?: string }) {
+  const content = (
+    <div className="premium-stat cursor-pointer transition-all hover:border-[var(--border-strong)] hover:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_76px_rgba(0,0,0,0.38)]">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{l}</div>
       <div className={`mt-2 font-mono text-2xl font-semibold tracking-tight ${toneClass(tone)}`}>{v}</div>
       {u && <div className="mt-1 text-xs text-[var(--text-tertiary)]">{u}</div>}
     </div>
   );
+  if (link) return <Link href={link}>{content}</Link>;
+  return content;
 }
 
 function Exposure({ label, value, tone, prefix = "" }: { label: string; value: number; tone: Tone; prefix?: string }) {
   return (
-    <div className="rounded-md border border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] p-2.5">
+    <Link href="/finance/accounts" className="block rounded-md border border-[var(--border-light)] bg-[rgba(255,255,255,0.025)] p-2.5 transition-all hover:border-[var(--border)] hover:bg-[rgba(255,255,255,0.04)]">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{label}</div>
       <div className={`mt-1 font-mono text-lg font-semibold ${toneClass(tone)}`}>{prefix}{value.toFixed(0)}</div>
-    </div>
+    </Link>
   );
 }
 
-function AccountCard({ a }: { a: AcctLike & { balance: number } }) {
-  return (
-    <div className="rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="truncate text-sm font-semibold text-[var(--text)]">{a.name}</div>
-        <span className="rounded border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--text-secondary)]">{a.currency}</span>
-      </div>
-      <div className={`font-mono text-xl font-semibold ${a.balance >= 0 ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{a.balance.toFixed(2)}</div>
-      <div className="mt-1 text-xs capitalize text-[var(--text-tertiary)]">{a.type}</div>
-    </div>
-  );
-}
-
-function Section({ title, kicker, children }: { title: string; kicker: string; children: React.ReactNode }) {
+function Section({ title, kicker, children, action }: { title: string; kicker: string; children: React.ReactNode; action?: { label: string; href: string } }) {
   return (
     <section className="premium-panel animate-fade-in">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-[var(--text)]">{title}</h2>
-        <span className="rounded border border-[var(--border-light)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{kicker}</span>
+        <div className="flex items-center gap-2">
+          <span className="rounded border border-[var(--border-light)] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">{kicker}</span>
+          {action && (
+            <Link href={action.href} className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">
+              {action.label} →
+            </Link>
+          )}
+        </div>
       </div>
       {children}
     </section>
   );
 }
 
-function Empty({ msg }: { msg: string }) {
-  return <div className="rounded-lg border border-dashed border-[var(--border)] py-8 text-center text-sm text-[var(--text-tertiary)]">{msg}</div>;
+function Empty({ icon, title, description, action }: { icon: string; title: string; description: string; action?: { label: string; href: string } }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+        </svg>
+      </div>
+      <h3 className="mb-1 text-sm font-semibold text-[var(--text)]">{title}</h3>
+      <p className="mb-4 max-w-xs text-xs text-[var(--text-tertiary)]">{description}</p>
+      {action && (
+        <Link href={action.href} className="premium-action text-xs">
+          {action.label}
+        </Link>
+      )}
+    </div>
+  );
 }
