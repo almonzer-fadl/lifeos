@@ -37,7 +37,7 @@ export default function ActivityLayout({ children }: { children: React.ReactNode
           {subNav.map((item) => {
             const active = item.href === "/activity" ? pathname === "/activity" : pathname.startsWith(item.href);
             return (
-              <Link key={item.href} href={item.href} className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all ${active ? "bg-[var(--accent-soft)] text-[var(--accent)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"}`}>
+              <Link key={item.href} href={item.href} className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all ${active ? "bg-[var(--surface-hover)] text-[var(--text)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"}`}>
                 {item.label}
               </Link>
             );

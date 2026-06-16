@@ -52,7 +52,7 @@ function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
         active
-          ? "border-[rgba(215,181,109,0.32)] bg-[rgba(215,181,109,0.1)] text-[var(--accent)] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
+          ? "border-[var(--border-strong)] bg-[var(--surface-hover)] text-[var(--text)]"
           : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--border)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
       }`}
     >
@@ -76,7 +76,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[linear-gradient(180deg,#080b0f,#030405)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
         <Link href="/" className="flex items-center gap-3 rounded-lg border border-[var(--border-light)] bg-[rgba(255,255,255,0.02)] px-3 py-2 hover:border-[var(--border)] hover:bg-[var(--surface-hover)]">
           <Image src="/lifeos-logo.png" alt="Life OS" width={28} height={28} className="rounded-md" unoptimized />
           <div className="min-w-0">
@@ -122,7 +122,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_9rem),radial-gradient(circle_at_top_right,rgba(220,193,122,0.065),transparent_34rem),radial-gradient(circle_at_bottom_left,rgba(115,167,216,0.035),transparent_30rem),var(--bg)]">
+      <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)]">
         <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
           {children}
         </div>
