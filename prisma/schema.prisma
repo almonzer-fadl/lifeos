@@ -9,39 +9,50 @@ datasource db {
 // ─── T1D ────────────────────────────────────────────────────────────
 
 model GlucoseReading {
-  id        String   @id @default(uuid())
-  timestamp DateTime
-  value     Float
-  unit      String   @default("mg/dL") // mg/dL or mmol/L
-  source    String   @default("manual") // manual, nightscout, dexcom, libre
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  timestamp       DateTime
+  value           Float
+  unit            String   @default("mg/dL") // mg/dL or mmol/L
+  source          String   @default("manual") // manual, nightscout, dexcom, libre
+  notes           String?
+  carbEntryId     String?  // FK to CarbEntry (if post-meal)
+  insulinOnBoard  Float?   // calculated IOB at time of reading
+  timeInRange     Boolean? // computed: within target range?
+  exerciseContext String?  // pre_workout, post_workout, rest_day
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([timestamp])
 }
 
 model InsulinDose {
-  id        String   @id @default(uuid())
-  timestamp DateTime
-  type      String   // rapid, long, mixed, correction
-  brand     String?  // novorapid, lantus, tresiba, etc.
-  units     Float
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  timestamp            DateTime
+  type                 String   // rapid, long, mixed, correction
+  brand                String?  // novorapid, lantus, tresiba, etc.
+  units                Float
+  notes                String?
+  carbEntryId          String?  // FK to CarbEntry (for bolus doses)
+  insulinOnBoardAfter  Float?   // calculated IOB after this dose
+  site                 String?  // injection site used
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   @@index([timestamp])
 }
 
 model BasalRate {
-  id        String   @id @default(uuid())
-  rate      Float    // units per hour
-  startTime String   // HH:mm format
-  endTime   String   // HH:mm format
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  rate         Float    // units per hour
+  startTime    String   // HH:mm format
+  endTime      String   // HH:mm format
+  notes        String?
+  profileName  String?  // "Standard", "Workout Day", "Sick Day"
+  isWorkoutDay Boolean  @default(false)
+  validFrom    DateTime?
+  validUntil   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // ─── Activity ──────────────────────────────────────────────────────
@@ -306,6 +317,7 @@ model Account {
   paymentDueDay        Int?                   // day of month payment is due (1-31)
   payoffTarget         DateTime?              // target date to pay off the debt
   notes                String?
+  isFatherSupport      Boolean                @default(false)
   isActive             Boolean                @default(true)
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
@@ -342,11 +354,13 @@ model RecurringTransaction {
   startDate       DateTime
   endDate         DateTime?
   nextDate        DateTime  // next occurrence
+  subscriptionId  String?
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   account         Account   @relation(fields: [accountId], references: [id])
   category        Category? @relation(fields: [categoryId], references: [id])
+  subscription    Subscription? @relation(fields: [subscriptionId], references: [id])
 
   @@index([nextDate])
   @@index([isActive])
@@ -399,11 +413,15 @@ model Transaction {
   isTransfer        Boolean  @default(false)
   transferAccountId String?
   parentTransactionId String? // for split transactions
+  invoiceId         String?
+  contactId         String?
+  isFatherSupport   Boolean  @default(false)
   idempotencyKey    String?  // client-generated UUID for safe retries
   account           Account  @relation("TransactionAccount", fields: [accountId], references: [id])
   category          Category? @relation(fields: [categoryId], references: [id])
   parentTransaction Transaction? @relation("SplitChildren", fields: [parentTransactionId], references: [id])
   childTransactions Transaction[] @relation("SplitChildren")
+  invoice           Invoice?  @relation(fields: [invoiceId], references: [id])
   audits            TransactionAudit[]
 
   @@index([date])
@@ -569,4 +587,161 @@ model Notification {
   @@index([read])
   @@index([pushed])
   @@index([createdAt])
+}
+
+// ─── Finance (Phase 1) ─────────────────────────────────────────────
+
+model Invoice {
+  id            String   @id @default(uuid())
+  invoiceNumber String   @unique
+  clientId      String
+  projectId     String?
+  status        String   @default("draft") // draft, sent, paid, overdue, cancelled
+  currency      String   @default("MYR")
+  subtotal      Int
+  taxRate       Float    @default(0)
+  taxAmount     Int      @default(0)
+  total         Int
+  issuedDate    DateTime @default(now())
+  dueDate       DateTime
+  paidDate      DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lineItems     InvoiceLineItem[]
+  payments      PaymentReceived[]
+  transactions  Transaction[]
+
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model InvoiceLineItem {
+  id          String  @id @default(uuid())
+  invoiceId   String
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Int
+  amount      Int
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model PaymentReceived {
+  id            String   @id @default(uuid())
+  invoiceId     String
+  amount        Int
+  currency      String   @default("MYR")
+  paymentDate   DateTime @default(now())
+  method        String?  // bank_transfer, wise, paypal, cash
+  reference     String?
+  notes         String?
+  transactionId String?
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+}
+
+model RunwaySnapshot {
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  totalSavings    Int
+  monthlyBurnRate Int
+  runwayMonths    Float
+  monthlyIncome   Int
+  notes           String?
+
+  @@index([date])
+}
+
+model Subscription {
+  id              String   @id @default(uuid())
+  name            String
+  provider        String
+  amount          Int
+  currency        String   @default("MYR")
+  billingCycle    String   // monthly, yearly, weekly
+  nextBillingDate DateTime
+  category        String?  // software, rent, phone, health, education
+  isActive        Boolean  @default(true)
+  notes           String?
+  recurringTxId   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  recurringTransactions RecurringTransaction[]
+
+  @@index([nextBillingDate])
+  @@index([isActive])
+}
+
+// ─── T1D (Phase 1) ───────────────────────────────────────────────
+
+model CarbEntry {
+  id              String   @id @default(uuid())
+  timestamp       DateTime
+  carbs           Float    // grams of carbohydrates
+  description     String?  // "nasi lemak", "pre-run banana"
+  source          String   @default("manual") // manual, food_diary
+  foodDiaryEntryId String? // link to nutrition module
+  createdAt       DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model InsulinCarbRatio {
+  id         String   @id @default(uuid())
+  ratio      Float    // grams of carbs per 1 unit of insulin
+  timeOfDay  String   // morning, afternoon, evening, night
+  validFrom  DateTime @default(now())
+  validUntil DateTime?
+  notes      String?
+
+  @@index([validFrom])
+}
+
+model CorrectionFactor {
+  id         String   @id @default(uuid())
+  factor     Float    // mg/dL drop per 1 unit of insulin
+  timeOfDay  String   // morning, afternoon, evening, night
+  validFrom  DateTime @default(now())
+  validUntil DateTime?
+  notes      String?
+
+  @@index([validFrom])
+}
+
+model TargetRange {
+  id         String   @id @default(uuid())
+  low        Float    // mg/dL
+  high       Float    // mg/dL
+  timeOfDay  String   // morning, afternoon, evening, night, workout
+  validFrom  DateTime @default(now())
+  validUntil DateTime?
+
+  @@index([validFrom])
+}
+
+model KetoneReading {
+  id        String   @id @default(uuid())
+  timestamp DateTime
+  value     Float    // mmol/L
+  type      String   @default("blood") // blood, urine
+  context   String?  // "post long run", "illness", "routine check"
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model InjectionSite {
+  id          String   @id @default(uuid())
+  site        String   // abdomen_l, abdomen_r, thigh_l, thigh_r, arm_l, arm_r, buttock_l, buttock_r
+  usedAt      DateTime
+  insulinType String   // rapid, long
+  notes       String?
+
+  @@index([usedAt])
+  @@index([site])
 }
