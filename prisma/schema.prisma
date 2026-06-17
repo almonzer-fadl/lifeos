@@ -613,15 +613,21 @@ model HabitLog {
 }
 
 model JournalEntry {
-  id        String   @id @default(uuid())
-  date      DateTime @default(now())
-  content   String   // markdown
-  mood      String?  // great, good, okay, bad, terrible
-  tags      String?  // comma-separated
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid())
+  date           DateTime @default(now())
+  entryType      String   @default("free") // morning_intention, evening_review, weekly_review, free
+  content        String   // markdown
+  structuredData Json?    // for template-based entries
+  mood           String?  // great, good, okay, bad, terrible
+  photoPath      String?
+  audioPath      String?
+  wordCount      Int?
+  tags           String?  // comma-separated
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  @@unique([date])
+  @@index([date])
+  @@index([entryType])
 }
 
 model CalendarEvent {
@@ -1085,6 +1091,17 @@ model TaskTimeBlock {
 
   @@index([scheduledDate])
   @@index([blockSlot])
+}
+
+// ─── Journal (Phase 2) ────────────────────────────────────────────
+
+model JournalTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  entryType String   @unique // morning_intention, evening_review, weekly_review
+  prompts   Json
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 // ─── Activity (Phase 1) ────────────────────────────────────────────
