@@ -46,8 +46,20 @@ export async function POST(request: NextRequest) {
       foodId: validation.data.foodId,
       servings: validation.data.servings || 1,
       grams: validation.data.grams,
+      carbEstimate: body.carbEstimate ?? undefined,
+      bolusSuggested: body.bolusSuggested ?? undefined,
+      bolusTaken: body.bolusTaken ?? undefined,
+      postMealGlucose: body.postMealGlucose ?? undefined,
+      costEstimate: body.costEstimate ?? undefined,
     },
     include: { food: true },
+  });
+
+  // Update frequent food usage count
+  await db.frequentFood.upsert({
+    where: { foodId: validation.data.foodId },
+    create: { foodId: validation.data.foodId, useCount: 1, lastUsedAt: new Date() },
+    update: { useCount: { increment: 1 }, lastUsedAt: new Date() },
   });
 
   return NextResponse.json(entry, { status: 201 });

@@ -38,66 +38,61 @@ export default async function HomePage() {
     <div className="premium-page animate-fade-in">
       <div className="premium-header">
         <div className="premium-kicker">{new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" }).format(now)}</div>
-        <h1 className="premium-title">{greeting}, Almonzer</h1>
-        <p className="premium-subtitle">Your private office is up to date with your latest wellness and management metrics.</p>
+        <h1 className="premium-title">Welcome home, Almonzer.</h1>
+        <p className="premium-subtitle">Your estate is currently operating within optimal parameters. Here is your daily summary.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 animate-stagger">
-        <Widget label="Total Capital" value={cashBalance - debtBalance > 0 ? `+${(cashBalance - debtBalance).toFixed(0)}` : `${(cashBalance - debtBalance).toFixed(0)}`} tone={cashBalance >= debtBalance ? "positive" : "negative"} href="/finance" />
-        <Widget label="Monthly Flow" value={income >= expenses ? `+${(income - expenses).toFixed(0)}` : `${(income - expenses).toFixed(0)}`} tone={income >= expenses ? "positive" : "negative"} href="/finance" />
-        <Widget label="Habit Streak" value={`${habitsDone}/${habits.length}`} tone={habitsDone === habits.length && habits.length > 0 ? "positive" : "neutral"} href="/habits" />
-        <Widget label="Agenda" value={`${pendingTasks} Items`} tone={pendingTasks > 0 ? "amber" : "neutral"} href="/tasks" />
-        {avgSleep > 0 && <Widget label="Rest Quality" value={`${avgSleep.toFixed(1)}h`} tone="steel" href="/sleep" />}
-        {latestGlucose && <Widget label="Vital Sign" value={`${latestGlucose}`} tone={latestGlucose < 70 ? "negative" : latestGlucose > 180 ? "amber" : "positive"} href="/t1d" />}
-        <Widget label="Holdings" value={`${accounts.length} Accounts`} tone="neutral" href="/finance/accounts" />
-        <Widget label="Receipts" value={`+${income.toFixed(0)}`} tone="positive" href="/finance" />
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 animate-stagger">
+        <Widget label="Consolidated Capital" value={cashBalance - debtBalance > 0 ? `+${(cashBalance - debtBalance).toFixed(0)}` : `${(cashBalance - debtBalance).toFixed(0)}`} tone={cashBalance >= debtBalance ? "positive" : "negative"} href="/finance" />
+        <Widget label="Monthly Cashflow" value={income >= expenses ? `+${(income - expenses).toFixed(0)}` : `${(income - expenses).toFixed(0)}`} tone={income >= expenses ? "positive" : "negative"} href="/finance" />
+        <Widget label="Discipline Streak" value={`${habitsDone}/${habits.length}`} tone={habitsDone === habits.length && habits.length > 0 ? "positive" : "neutral"} href="/habits" />
+        <Widget label="Pending Actions" value={`${pendingTasks}`} tone={pendingTasks > 0 ? "amber" : "neutral"} href="/tasks" />
       </div>
 
-      <div className="my-4">
+      <div className="my-8">
         <AIDashboardWidget />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {pendingTasks > 0 && (
-          <section className="premium-panel">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-base font-serif text-[var(--text)]">Daily Agenda</h2>
-                <p className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">Immediate focus items</p>
-              </div>
-              <Link href="/tasks" className="text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] hover:underline">View All</Link>
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <div className="lg:col-span-4">
+          <section className="space-y-8">
+            <div>
+              <h2 className="text-xl font-serif text-[var(--text)]">Daily Agenda</h2>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Priority Tasks</p>
             </div>
             <div className="space-y-1">
               {tasks.map((t) => (
-                <Link key={t.id} href={`/tasks/${t.id}`} className="group flex items-center gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-[rgba(255,255,255,0.03)]">
+                <Link key={t.id} href={`/tasks/${t.id}`} className="group flex items-center gap-4 rounded-2xl p-4 transition-all hover:bg-white hover:shadow-md">
                   <div className={`h-1.5 w-1.5 rounded-full shrink-0 ${t.status === "in_progress" ? "bg-[var(--sky)]" : "bg-[var(--accent)]"}`} />
                   <span className="truncate text-sm text-[var(--text-secondary)] group-hover:text-[var(--text)]">{t.title}</span>
                 </Link>
               ))}
             </div>
+            <Link href="/tasks" className="premium-action text-xs">View Full Agenda</Link>
           </section>
-        )}
-        {transactions.length > 0 && (
-          <section className="premium-panel">
-            <div className="mb-5 flex items-center justify-between">
+        </div>
+
+        <div className="lg:col-span-8">
+          <section className="space-y-8">
+            <div className="flex items-end justify-between">
               <div>
-                <h2 className="text-base font-serif text-[var(--text)]">Recent Ledger</h2>
-                <p className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">Latest financial movements</p>
+                <h2 className="text-xl font-serif text-[var(--text)]">Financial Ledger</h2>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Recent Movements</p>
               </div>
-              <Link href="/finance/accounts" className="text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] hover:underline">Full Audit</Link>
+              <Link href="/finance/accounts" className="text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] hover:underline">Full Audit →</Link>
             </div>
-            <div className="space-y-1">
+            <div className="overflow-hidden rounded-[40px] bg-white p-2 shadow-lg">
               {transactions.slice(0, 5).map((t) => (
-                <div key={t.id} className="flex items-center justify-between rounded-xl px-4 py-3 transition-colors hover:bg-[rgba(255,255,255,0.02)]">
-                  <span className="truncate text-sm text-[var(--text-secondary)]">{t.description || t.category?.name || "Private Transaction"}</span>
-                  <span className={`shrink-0 ml-4 text-sm font-medium ${t.type === "income" ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{t.type === "income" ? "+" : "-"}{t.amount.toFixed(0)}</span>
+                <div key={t.id} className="flex items-center justify-between rounded-[32px] px-8 py-5 transition-colors hover:bg-[var(--bg)]">
+                  <span className="truncate text-sm font-medium text-[var(--text-secondary)]">{t.description || t.category?.name || "Private Transaction"}</span>
+                  <span className={`shrink-0 ml-4 text-sm font-serif ${t.type === "income" ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{t.type === "income" ? "+" : "-"}{t.amount.toFixed(0)}</span>
                 </div>
               ))}
             </div>
           </section>
-        )}
+        </div>
       </div>
-      <Fab href="/t1d/log" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="New Entry" />
+      <Fab href="/t1d/log" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="New Registry" />
     </div>
   );
 }
