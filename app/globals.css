@@ -73,16 +73,18 @@ body {
   line-height: 1.8;
 }
 
-/* Texture Overlay */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.02;
-  filter: contrast(110%);
-  pointer-events: none;
-  z-index: 9999;
+/* Texture Overlay — disabled on mobile due to compositing layer issues */
+@media (min-width: 1024px) {
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+    opacity: 0.02;
+    filter: contrast(110%);
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 /* Material Depth */
