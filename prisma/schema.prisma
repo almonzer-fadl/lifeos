@@ -566,8 +566,9 @@ model Project {
   notes           String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  tasks           Task[]
-  invoices        Invoice[]
+  tasks               Task[]
+  invoices            Invoice[]
+  recurringTemplates  RecurringTaskTemplate[]
   milestones      ProjectMilestone[]
   mrrSnapshots    MRRSnapshot[]
 
@@ -1038,6 +1039,52 @@ model HabitSession {
   habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
   @@index([habitId, date])
+}
+
+// ─── Tasks (Phase 2) ──────────────────────────────────────────────
+
+model Subtask {
+  id        String @id @default(uuid())
+  taskId    String
+  title     String
+  status    String @default("todo") // todo, done
+  sortOrder Int    @default(0)
+  task      Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+model RecurringTaskTemplate {
+  id               String   @id @default(uuid())
+  title            String
+  description      String?
+  priority         String   @default("medium")
+  projectId        String?
+  energyLevel      String?  // deep, shallow, admin
+  timeBlockSlot    String?  // deep_work_1, deep_work_2, admin, free, university
+  frequency        String   // daily, weekly, monthly, weekdays
+  frequencyCount   Int      @default(1)
+  timeOfDay        String?  // morning, afternoon, evening
+  estimatedMinutes Int?
+  isActive         Boolean  @default(true)
+  lastGeneratedAt  DateTime?
+  createdAt        DateTime @default(now())
+  project          Project? @relation(fields: [projectId], references: [id])
+}
+
+model TaskTimeBlock {
+  id               String   @id @default(uuid())
+  taskId           String   @unique
+  scheduledDate    DateTime
+  blockSlot        String   // deep_work_1, deep_work_2, admin, free, university
+  estimatedMinutes Int?
+  actualMinutes    Int?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  task             Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledDate])
+  @@index([blockSlot])
 }
 
 // ─── Activity (Phase 1) ────────────────────────────────────────────
