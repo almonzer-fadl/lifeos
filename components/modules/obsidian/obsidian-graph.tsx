@@ -45,6 +45,16 @@ export function ObsidianGraph() {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const animRef = useRef<number>(0);
 
+  // View state for Pan & Zoom
+  const viewState = useRef({
+    x: 0,
+    y: 0,
+    zoom: 1,
+    targetX: 0,
+    targetY: 0,
+    targetZoom: 1,
+  });
+
   // Node physics state (mutable for animation)
   const nodeState = useRef<Map<string, { x: number; y: number; vx: number; vy: number; size: number; color: string }>>(new Map());
 
@@ -55,7 +65,7 @@ export function ObsidianGraph() {
       .catch(e => { setError(e.message); setLoading(false); });
   }, []);
 
-  // Initialize physics
+  // Initialize physics and center view
   const initPhysics = useCallback(() => {
     if (!data || !containerRef.current) return;
     const w = containerRef.current.clientWidth;
@@ -84,6 +94,16 @@ export function ObsidianGraph() {
         x, y, vx: 0, vy: 0, size, color,
       });
     });
+
+    // Reset view
+    viewState.current = {
+      x: 0,
+      y: 0,
+      zoom: 1,
+      targetX: 0,
+      targetY: 0,
+      targetZoom: 1,
+    };
   }, [data, selectedFolder]);
 
   // Animation loop
@@ -108,6 +128,12 @@ export function ObsidianGraph() {
       : data.nodes;
     const nodeIds = new Set(folderNodes.map(n => n.id));
     const edges = data.edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
+
+    // Smooth camera transition
+    const vs = viewState.current;
+    vs.zoom += (vs.targetZoom - vs.zoom) * 0.1;
+    vs.x += (vs.targetX - vs.x) * 0.1;
+    vs.y += (vs.targetY - vs.y) * 0.1;
 
     // Quiet Physics step
     for (const [id, node] of nodes) {
@@ -154,26 +180,34 @@ export function ObsidianGraph() {
       node.y += node.vy;
     }
 
-    // Clear with luminous Ivory background
+    // Clear background - Infinite Ivory
     ctx.fillStyle = "#fcfbf7";
-    ctx.fillRect(0, 0, w, h);
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for background clear
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(devicePixelRatio, devicePixelRatio);
 
-    // Draw background texture gradient
+    // Apply View Transform
+    ctx.save();
+    ctx.translate(w / 2 + vs.x, h / 2 + vs.y);
+    ctx.scale(vs.zoom, vs.zoom);
+    ctx.translate(-w / 2, -h / 2);
+
+    // Draw background texture gradient (scaled with view)
     const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/1.2);
     grad.addColorStop(0, "rgba(255,255,255,0)");
-    grad.addColorStop(1, "rgba(140, 109, 45, 0.03)");
+    grad.addColorStop(1, "rgba(140, 109, 45, 0.05)");
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(-w * 5, -h * 5, w * 15, h * 15);
 
-    // Draw delicate edges (hairline)
+    // Draw delicate edges
     ctx.save();
-    ctx.lineWidth = 0.4;
+    ctx.lineWidth = 0.8 / vs.zoom; // Doubled edge width
     for (const edge of edges) {
       const source = nodeMap.get(edge.source);
       const target = nodeMap.get(edge.target);
       if (!source || !target) continue;
 
-      ctx.strokeStyle = "rgba(20, 22, 24, 0.06)";
+      ctx.strokeStyle = "rgba(20, 22, 24, 0.12)"; // Darkened for visibility
       ctx.beginPath();
       ctx.moveTo(source.x, source.y);
       ctx.lineTo(target.x, target.y);
@@ -189,22 +223,24 @@ export function ObsidianGraph() {
       // Node body - solid and clean
       ctx.fillStyle = isHovered || isSelected ? "var(--accent)" : node.color;
       ctx.beginPath();
-      ctx.arc(node.x, node.y, isHovered ? node.size + 2 : node.size, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, isHovered ? node.size + 4 : node.size, 0, Math.PI * 2);
       ctx.fill();
 
       // Delicate stroke
-      ctx.strokeStyle = "rgba(255,255,255,0.8)";
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 2 / vs.zoom;
       ctx.stroke();
 
       // Serif Label for curated nodes
-      if (node.size > 5 || isHovered) {
+      if ((node.size > 6 && vs.zoom > 0.4) || isHovered) {
         ctx.fillStyle = isHovered ? "var(--text)" : "var(--text-tertiary)";
-        ctx.font = `${isHovered ? "italic " : ""}11px var(--font-serif), serif`;
+        ctx.font = `${isHovered ? "italic " : ""}12px var(--font-serif), serif`;
         ctx.textAlign = "center";
-        ctx.fillText(id, node.x, node.y + node.size + 16);
+        ctx.fillText(id, node.x, node.y + node.size + 20);
       }
     }
+
+    ctx.restore();
 
     animRef.current = requestAnimationFrame(animateRef.current);
   }, [data, selectedFolder, hoveredNode, selectedNode]);
@@ -222,15 +258,26 @@ export function ObsidianGraph() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    let isDragging = false;
+    let isDraggingNode = false;
+    let isPanning = false;
     let draggedId: string | null = null;
+    let lastX = 0;
+    let lastY = 0;
 
     const getNodeAt = (mx: number, my: number): string | null => {
+      const vs = viewState.current;
+      const w = containerRef.current?.clientWidth || 0;
+      const h = containerRef.current?.clientHeight || 0;
+      
+      // Transform screen space to world space
+      const wx = (mx - (w / 2 + vs.x)) / vs.zoom + (w / 2);
+      const wy = (my - (h / 2 + vs.y)) / vs.zoom + (h / 2);
+
       const nodeMap = nodeState.current;
       for (const [id, node] of nodeMap) {
-        const dx = node.x - mx;
-        const dy = node.y - my;
-        if (Math.sqrt(dx * dx + dy * dy) < node.size + 10) return id;
+        const dx = node.x - wx;
+        const dy = node.y - wy;
+        if (Math.sqrt(dx * dx + dy * dy) < (node.size + 10)) return id;
       }
       return null;
     };
@@ -240,14 +287,26 @@ export function ObsidianGraph() {
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
 
-      if (isDragging && draggedId) {
+      if (isDraggingNode && draggedId) {
+        const vs = viewState.current;
+        const w = containerRef.current?.clientWidth || 0;
+        const h = containerRef.current?.clientHeight || 0;
+        const wx = (mx - (w / 2 + vs.x)) / vs.zoom + (w / 2);
+        const wy = (my - (h / 2 + vs.y)) / vs.zoom + (h / 2);
+
         const node = nodeState.current.get(draggedId);
         if (node) {
-          node.x = mx;
-          node.y = my;
+          node.x = wx;
+          node.y = wy;
           node.vx = 0;
           node.vy = 0;
         }
+      } else if (isPanning) {
+        const vs = viewState.current;
+        vs.targetX += (e.clientX - lastX);
+        vs.targetY += (e.clientY - lastY);
+        lastX = e.clientX;
+        lastY = e.clientY;
       } else {
         const hovered = getNodeAt(mx, my);
         const folderNodes = selectedFolder
@@ -256,10 +315,10 @@ export function ObsidianGraph() {
         if (hovered && folderNodes) {
           const node = folderNodes.find(n => n.id === hovered);
           setHoveredNode(node || null);
-          canvas.style.cursor = "default";
+          canvas.style.cursor = "pointer";
         } else {
           setHoveredNode(null);
-          canvas.style.cursor = "default";
+          canvas.style.cursor = "grab";
         }
       }
     };
@@ -270,13 +329,18 @@ export function ObsidianGraph() {
       const my = e.clientY - rect.top;
       const id = getNodeAt(mx, my);
       if (id) {
-        isDragging = true;
+        isDraggingNode = true;
         draggedId = id;
+      } else {
+        isPanning = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        canvas.style.cursor = "grabbing";
       }
     };
 
     const onMouseUp = (e: MouseEvent) => {
-      if (!isDragging) {
+      if (!isDraggingNode && !isPanning) {
         const rect = canvas.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
@@ -288,17 +352,28 @@ export function ObsidianGraph() {
           setSelectedNode(node || null);
         }
       }
-      isDragging = false;
+      isDraggingNode = false;
+      isPanning = false;
       draggedId = null;
+      if (canvas) canvas.style.cursor = "grab";
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const vs = viewState.current;
+      const zoomDelta = e.deltaY * -0.001;
+      vs.targetZoom = Math.max(0.2, Math.min(vs.targetZoom + zoomDelta, 4));
     };
 
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("mousedown", onMouseDown);
     canvas.addEventListener("mouseup", onMouseUp);
+    canvas.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       canvas.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("mousedown", onMouseDown);
       canvas.removeEventListener("mouseup", onMouseUp);
+      canvas.removeEventListener("wheel", onWheel);
     };
   }, [data, selectedFolder]);
 
@@ -359,13 +434,18 @@ export function ObsidianGraph() {
       {/* Graph canvas */}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-[32px] bg-[#fcfbf7] shadow-inner"
+        className="relative w-full overflow-hidden rounded-[40px] bg-[#fcfbf7] shadow-inner"
         style={{
           minHeight: "500px",
           height: "65vh",
         }}
       >
         <canvas ref={canvasRef} className="w-full h-full" />
+        
+        {/* Interaction Hint */}
+        <div className="absolute top-8 right-8 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-40 pointer-events-none">
+          Scroll to zoom · Drag to pan
+        </div>
       </div>
 
       {/* Selected node detail */}
@@ -373,32 +453,34 @@ export function ObsidianGraph() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8 rounded-[32px] bg-white p-8 shadow-xl border border-[var(--border-light)]"
+          className="mt-8 rounded-[40px] bg-white p-10 shadow-2xl border border-[var(--border-light)]"
         >
-          <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start justify-between gap-8">
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div
                   className="h-3 w-3 rounded-full"
                   style={{ backgroundColor: folderColor(selectedNode.folder) }}
                 />
-                <h3 className="font-serif text-2xl text-[var(--text)]">{selectedNode.name}</h3>
+                <h3 className="font-serif text-3xl text-[var(--text)]">{selectedNode.name}</h3>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-tertiary)] mt-2">
+              <p className="text-[10px] uppercase tracking-[0.4em] text-[var(--text-tertiary)] mt-4">
                 Sector: {selectedNode.folder} · {selectedNode.links} Intellectual Links
               </p>
             </div>
             <button
               onClick={() => setSelectedNode(null)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--text-tertiary)] transition-colors hover:text-[var(--text)]"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--text-tertiary)] transition-all hover:text-[var(--text)] hover:scale-110"
             >
-              ✕
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
           {selectedNode.tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap gap-3">
               {selectedNode.tags.map(t => (
-                <span key={t} className="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">
+                <span key={t} className="rounded-full bg-[var(--accent-soft)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">
                   #{t}
                 </span>
               ))}
