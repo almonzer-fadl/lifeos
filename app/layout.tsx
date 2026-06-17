@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Shell } from "@/components/layout/shell";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
@@ -14,6 +14,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["400", "500"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080a0c",
+  themeColor: "#0b0d0f",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -42,14 +49,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/lifeos-logo.png" />
         <link rel="icon" href="/lifeos-logo.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="color-scheme" content="dark" />
-        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.style.backgroundColor='#080a0c'` }} />
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.style.backgroundColor='#0b0d0f'` }} />
       </head>
       <body className="min-h-dvh antialiased">
         <Shell>{children}</Shell>

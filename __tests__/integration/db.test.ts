@@ -1,17 +1,19 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { db } from "@/lib/db";
 
-// Integration tests — require a running PostgreSQL with the schema applied.
+// Integration tests — require DATABASE_URL env var to be set.
 // Run: DATABASE_URL=postgresql://... npx vitest run __tests__/integration/
 
-describe("database connection", () => {
+const hasDb = !!process.env.DATABASE_URL;
+
+describe.skipIf(!hasDb)("database connection", () => {
   it("can connect and query", async () => {
     const result = await db.$queryRaw<Array<{ one: number }>>`SELECT 1 AS one`;
     expect(result[0].one).toBe(1);
   });
 });
 
-describe("crud roundtrip", () => {
+describe.skipIf(!hasDb)("crud roundtrip", () => {
   const testAccountId = "test-integration-account";
 
   afterAll(async () => {
@@ -57,7 +59,7 @@ describe("crud roundtrip", () => {
   });
 });
 
-describe("search integration", () => {
+describe.skipIf(!hasDb)("search integration", () => {
   const testHabitId = "test-search-habit";
 
   afterAll(async () => {
@@ -83,7 +85,7 @@ describe("search integration", () => {
   });
 });
 
-describe("notification persistence", () => {
+describe.skipIf(!hasDb)("notification persistence", () => {
   afterAll(async () => {
     await db.notification.deleteMany({
       where: { title: { contains: "Integration test" } },
@@ -112,7 +114,7 @@ describe("notification persistence", () => {
   });
 });
 
-describe("insight persistence", () => {
+describe.skipIf(!hasDb)("insight persistence", () => {
   afterAll(async () => {
     await db.insight.deleteMany({
       where: { headline: { contains: "Integration test" } },
