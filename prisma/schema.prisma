@@ -1142,6 +1142,109 @@ model BlockCompliance {
   @@index([date])
 }
 
+// ─── Education (Phase 2) ──────────────────────────────────────────
+
+model Course {
+  id           String       @id @default(uuid())
+  code         String
+  name         String
+  semester     String
+  credits      Int
+  instructor   String?
+  schedule     String?
+  color        String?
+  targetGrade  String?
+  currentGrade Float?
+  notes        String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  assignments  Assignment[]
+  exams        Exam[]
+
+  @@unique([code, semester])
+}
+
+model Assignment {
+  id            String   @id @default(uuid())
+  courseId      String
+  title         String
+  description   String?
+  dueDate       DateTime
+  submittedDate DateTime?
+  weight        Float?
+  score         Float?
+  maxScore      Float    @default(100)
+  percentage    Float?
+  status        String   @default("pending") // pending, submitted, graded, late
+  grade         String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([dueDate])
+  @@index([courseId])
+}
+
+model Exam {
+  id         String   @id @default(uuid())
+  courseId   String
+  title      String
+  date       DateTime
+  duration   Int?
+  location   String?
+  weight     Float?
+  score      Float?
+  maxScore   Float    @default(100)
+  percentage Float?
+  grade      String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([courseId])
+}
+
+model GPASnapshot {
+  id           String   @id @default(uuid())
+  semester     String
+  gpa          Float
+  cgpa         Float
+  totalCredits Int
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  @@unique([semester])
+}
+
+model LanguageProgress {
+  id            String            @id @default(uuid())
+  language      String            @unique
+  currentLevel  String
+  targetLevel   String
+  targetDate    DateTime?
+  streakDays    Int               @default(0)
+  totalMinutes  Int               @default(0)
+  totalSessions Int               @default(0)
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  sessions      LanguageSession[]
+}
+
+model LanguageSession {
+  id         String           @id @default(uuid())
+  languageId String
+  date       DateTime         @default(now())
+  duration   Int
+  activity   String           // duolingo, textbook, conversation, listening, writing, vocabulary
+  notes      String?
+  language   LanguageProgress @relation(fields: [languageId], references: [id], onDelete: Cascade)
+
+  @@index([languageId, date])
+}
+
 // ─── Activity (Phase 1) ────────────────────────────────────────────
 
 model PersonalRecord {
