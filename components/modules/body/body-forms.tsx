@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 export function BodyMeasurementForm() {
   const router = useRouter();
@@ -14,19 +15,26 @@ export function BodyMeasurementForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    await fetch("/api/health/body-measurements", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        weight: weight ? parseFloat(weight) : null,
-        bodyFatPct: bodyFat ? parseFloat(bodyFat) : null,
-        waist: waist ? parseFloat(waist) : null,
-        notes: notes || null,
-      }),
-    });
-    setWeight(""); setBodyFat(""); setWaist(""); setNotes("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/body-measurements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          weight: weight ? parseFloat(weight) : null,
+          bodyFatPct: bodyFat ? parseFloat(bodyFat) : null,
+          waist: waist ? parseFloat(waist) : null,
+          notes: notes || null,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Measurement logged");
+      router.push("/body");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log measurement");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

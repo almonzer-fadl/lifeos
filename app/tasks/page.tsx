@@ -1,77 +1,50 @@
 import { db } from "@/lib/db";
-import { format } from "date-fns";
-import { CreateTaskForm, TaskCard } from "@/components/modules/tasks/task-actions";
+import { TaskCard } from "@/components/modules/tasks/task-actions";
 
 export const dynamic = "force-dynamic";
 
+function priorityCls(p: string) {
+  const map: Record<string, string> = { urgent: "text-[var(--rose)] bg-[var(--rose-soft)]", high: "text-[var(--amber)] bg-[var(--amber-soft)]", medium: "text-[var(--sky)] bg-[var(--sky-soft)]", low: "text-[var(--text-tertiary)] bg-[rgba(255,255,255,0.04)]" };
+  return map[p] || map.medium;
+}
+
 export default async function TasksPage() {
-  const tasks = await db.task.findMany({
-    orderBy: [{ status: "asc" }, { priority: "desc" }, { dueDate: "asc" }],
-    include: { project: true },
-    take: 100,
-  });
-
-  const todo = tasks.filter((t: { status: string }) => t.status === "todo");
-  const inProg = tasks.filter((t: { status: string }) => t.status === "in_progress");
-  const done = tasks.filter((t: { status: string }) => t.status === "done");
-
-  const priorityCls = (p: string) => ({
-    urgent: "bg-[var(--rose-soft)] text-[var(--rose)] border border-[rgba(255,95,109,0.24)]",
-    high: "bg-[var(--amber-soft)] text-[var(--amber)] border border-[rgba(217,154,43,0.24)]",
-    medium: "bg-[var(--sky-soft)] text-[var(--sky)] border border-[rgba(115,167,216,0.24)]",
-    low: "bg-[rgba(255,255,255,0.025)] text-[var(--text-tertiary)] border border-[var(--border-light)]",
-  }[p] || "bg-[rgba(255,255,255,0.025)] text-[var(--text-tertiary)] border border-[var(--border-light)]");
+  const tasks = await db.task.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }], include: { project: true } });
+  const todo = tasks.filter((t) => t.status === "todo");
+  const inProgress = tasks.filter((t) => t.status === "in_progress");
+  const done = tasks.filter((t) => t.status === "done");
 
   return (
     <div className="premium-page">
-      <div className="premium-header animate-fade-in flex items-end justify-between">
-        <div>
-          <div className="premium-kicker">Execution Desk</div>
-          <h1 className="premium-title">Tasks Command</h1>
-          <p className="premium-subtitle">{todo.length} todo · {inProg.length} in progress · {done.length} done</p>
-        </div>
-        <div className="flex gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[var(--text-tertiary)]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-        </div>
+      <div className="premium-header animate-fade-in">
+        <div className="premium-kicker">Task Command</div>
+        <h1 className="premium-title">Tasks</h1>
+        <p className="premium-subtitle">{todo.length} todo · {inProgress.length} in progress · {done.length} done</p>
       </div>
 
-      {/* Create form */}
-      <div className="premium-panel animate-fade-in">
-        <CreateTaskForm />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-stagger">
-        <Column title="Todo" count={todo.length} color="border-t-[var(--text-tertiary)]">
-          {todo.map((t: { id: string; title: string; description: string | null; dueDate: Date | null; priority: string; status: string; completedAt: Date | null; project: { name: string } | null }) => <TaskCard key={t.id} task={t} priorityCls={priorityCls} />)}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Column title="Todo" color="border-t-[var(--amber)]" count={todo.length}>
+          {todo.map((t) => <TaskCard key={t.id} task={t as any} priorityCls={priorityCls} />)}
         </Column>
-        <Column title="In Progress" count={inProg.length} color="border-t-[var(--amber)]">
-          {inProg.map((t: { id: string; title: string; description: string | null; dueDate: Date | null; priority: string; status: string; completedAt: Date | null; project: { name: string } | null }) => <TaskCard key={t.id} task={t} priorityCls={priorityCls} active />)}
+        <Column title="In Progress" color="border-t-[var(--sky)]" count={inProgress.length}>
+          {inProgress.map((t) => <TaskCard key={t.id} task={t as any} priorityCls={priorityCls} />)}
         </Column>
-        <Column title="Done" count={done.length} color="border-t-[var(--emerald)]">
-          {done.slice(0, 15).map((t: { id: string; title: string; completedAt: Date | null }) => (
-            <div key={t.id} className="premium-row text-sm text-[var(--text-tertiary)] line-through">
-              {t.title}
-              {t.completedAt && <span className="text-[10px] text-[var(--text-tertiary)] ml-1.5">{format(new Date(t.completedAt), "MMM d")}</span>}
-            </div>
-          ))}
+        <Column title="Done" color="border-t-[var(--emerald)]" count={done.length}>
+          {done.slice(0, 10).map((t) => <TaskCard key={t.id} task={t as any} priorityCls={priorityCls} />)}
         </Column>
       </div>
     </div>
   );
 }
 
-function Column({ title, count, color, children }: { title: string; count: number; color: string; children: React.ReactNode }) {
+function Column({ title, color, count, children }: { title: string; color: string; count: number; children: React.ReactNode }) {
   return (
-    <div className={`rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-card)] border-t-[3px] ${color} overflow-hidden`}>
-      <div className="px-5 py-3 border-b border-[var(--border-light)]">
-        <h2 className="premium-label">{title} ({count})</h2>
+    <section className={`rounded-lg bg-[var(--surface)] border ${color} border-[var(--border)] shadow-[var(--shadow-card)] overflow-hidden`}>
+      <div className="px-3 py-2.5 border-b border-[var(--border-light)] flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-[var(--text)]">{title}</h2>
+        <span className="rounded border border-[var(--border-light)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-tertiary)]">{count}</span>
       </div>
-      <div className="p-3 space-y-2">
-        {count === 0 && <div className="premium-empty">No tasks</div>}
-        {children}
-      </div>
-    </div>
+      <div className="p-2 space-y-2 min-h-[100px]">{children}</div>
+    </section>
   );
 }

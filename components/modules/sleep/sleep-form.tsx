@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 export function SleepForm() {
   const router = useRouter();
@@ -19,8 +20,17 @@ export function SleepForm() {
     const start = new Date(`${date}T${bed}:00`);
     const end = new Date(`${date}T${wake}:00`);
     if (end <= start) end.setDate(end.getDate() + 1);
-    await fetch("/api/health/sleep", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ startTime: start.toISOString(), endTime: end.toISOString(), quality: parseInt(quality), notes: notes || null }) });
-    setNotes(""); setSaving(false); router.refresh();
+    try {
+      const res = await fetch("/api/health/sleep", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ startTime: start.toISOString(), endTime: end.toISOString(), quality: parseInt(quality), notes: notes || null }) });
+      if (!res.ok) throw new Error();
+      toast.success("Sleep logged");
+      router.push("/sleep");
+      router.refresh();
+    } catch {
+      toast.error("Failed to log sleep");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

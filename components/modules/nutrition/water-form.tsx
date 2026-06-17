@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 export function WaterForm() {
   const router = useRouter();
@@ -12,14 +13,13 @@ export function WaterForm() {
     e.preventDefault();
     if (!amount) return;
     setSaving(true);
-    await fetch("/api/health/water", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amountMl: parseInt(amount) }),
-    });
-    setAmount("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/water", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amountMl: parseInt(amount) }) });
+      if (!res.ok) throw new Error();
+      toast.success("Water logged");
+      router.push("/nutrition");
+      router.refresh();
+    } catch { toast.error("Failed to log water"); } finally { setSaving(false); }
   }
 
   return (
