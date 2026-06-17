@@ -1,8 +1,7 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
-import { ActivityForm } from "@/components/modules/activity/activity-form";
-import { WorkoutLogger } from "@/components/modules/activity/workout-logger";
-import { DeleteButton } from "@/components/ui/delete-button";
 import { format, subDays } from "date-fns";
+import { DeleteButton } from "@/components/ui/delete-button";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +25,12 @@ const TYPE_MARK: Record<string, string> = { run: "RUN", swim: "SWM", bike: "BIK"
 export default async function ActivityPage() {
   const sevenDaysAgo = subDays(new Date(), 7);
   const [activities, workouts] = await Promise.all([
-    db.activity.findMany({ where: { startTime: { gte: sevenDaysAgo } }, orderBy: { startTime: "desc" }, take: 50, include: { splits: true } }),
-    db.gymWorkout.findMany({ where: { date: { gte: sevenDaysAgo } }, orderBy: { date: "desc" }, take: 20, include: { sets: { include: { exercise: true }, orderBy: { setNumber: "asc" } } } }),
+    db.activity.findMany({ where: { startTime: { gte: sevenDaysAgo } }, orderBy: { startTime: "desc" }, take: 30, include: { splits: true } }),
+    db.gymWorkout.findMany({ where: { date: { gte: sevenDaysAgo } }, orderBy: { date: "desc" }, take: 10, include: { sets: { include: { exercise: true }, orderBy: { setNumber: "asc" } } } }),
   ]);
 
-  const totalDist = activities.filter((a: { type: string; distance: number | null }) => a.type !== "other").reduce((s: number, a: { distance: number | null }) => s + (a.distance || 0), 0);
-  const totalDur = activities.reduce((s: number, a: { endTime: Date | null; startTime: Date }) => {
+  const totalDist = activities.filter((a) => a.type !== "other").reduce((s, a) => s + (a.distance || 0), 0);
+  const totalDur = activities.reduce((s, a) => {
     if (!a.endTime) return s;
     return s + (new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000;
   }, 0);
@@ -40,67 +39,54 @@ export default async function ActivityPage() {
     <div className="premium-page">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Performance Desk</div>
-        <h1 className="premium-title">Activity Command</h1>
-        <p className="premium-subtitle">Running, swimming, cycling, strength, and weekly load</p>
+        <h1 className="premium-title">Activity Feed</h1>
+        <p className="premium-subtitle">Running, cycling, swimming, strength — weekly load</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-stagger">
-        {[{ l: "Sessions (7d)", v: `${activities.length}`, u: "" },
-          { l: "Distance", v: `${(totalDist / 1000).toFixed(1)}`, u: "km" },
-          { l: "Duration", v: fmtDuration(totalDur), u: "" },
-          { l: "Workouts", v: `${workouts.length}`, u: "sessions" },
-        ].map((s) => (
-          <div key={s.l} className="premium-stat">
-            <div className="premium-label">{s.l}</div>
-            <div className="premium-value text-[var(--amber)]">{s.v}</div>
-            <div className="mt-1 text-xs text-[var(--text-tertiary)]">{s.u}</div>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-stagger">
+        <Stat l="Sessions (7d)" v={`${activities.length}`} />
+        <Stat l="Distance" v={`${(totalDist / 1000).toFixed(1)}`} u="km" />
+        <Stat l="Duration" v={fmtDuration(totalDur)} />
+        <Stat l="Workouts" v={`${workouts.length}`} u="sessions" />
       </div>
 
-      <Section title="Log Cardio"><ActivityForm /></Section>
-      <Section title="Log Gym Workout"><WorkoutLogger /></Section>
-
-      {/* Recent activities */}
-      <Section title="Recent">
+      <Section title="Cardio" kicker="Recent" action={{ label: "Log", href: "/activity/log/cardio" }}>
         {activities.length === 0 ? (
-          <Empty message="No activities logged this week." />
+          <Empty icon="M13 10V3L4 14h7v7l9-11h-7z" title="No activities yet" description="Log your first run, bike, or swim." action={{ label: "Log Cardio", href: "/activity/log/cardio" }} />
         ) : (
-          <div className="space-y-2">
-            {activities.map((a: { id: string; type: string; distance: number | null; endTime: Date | null; startTime: Date; heartRateAvg: number | null; notes: string | null; source: string }) => {
+          <div className="space-y-1">
+            {activities.slice(0, 8).map((a) => {
               const dur = a.endTime ? Math.round((new Date(a.endTime).getTime() - new Date(a.startTime).getTime()) / 60000) : null;
               const pace = a.distance && dur ? fmtPace(a.distance, dur * 60) : null;
               return (
-                <div key={a.id} className="premium-row flex items-center gap-3">
+                <Link key={a.id} href={`/activity/${a.id}`} className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[var(--surface-hover)]">
                   <span className="premium-chip shrink-0">{TYPE_MARK[a.type] || "TRN"}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold capitalize text-[var(--text)]">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold capitalize text-[var(--text)]">
                       {a.type}{a.distance ? ` · ${(a.distance / 1000).toFixed(1)} km` : ""}{pace ? ` · ${pace}` : ""}
                     </div>
                     <div className="text-xs text-[var(--text-tertiary)]">
-                      {format(new Date(a.startTime), "EEE, MMM d · HH:mm")}
-                      {dur ? ` · ${fmtDuration(dur)}` : ""}
-                      {a.heartRateAvg ? ` · ${a.heartRateAvg} bpm` : ""}
+                      {format(new Date(a.startTime), "EEE, MMM d · HH:mm")}{dur ? ` · ${fmtDuration(dur)}` : ""}{a.heartRateAvg ? ` · ${a.heartRateAvg} bpm` : ""}
                     </div>
-                    {a.notes && <div className="text-xs text-[var(--text-tertiary)] mt-0.5 truncate">{a.notes}</div>}
                   </div>
-                  <span className="text-[10px] text-[var(--text-tertiary)] uppercase font-medium">{a.source}</span>
-                  <DeleteButton url={`/api/health/activity?id=${a.id}`} />
-                </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
               );
             })}
           </div>
         )}
       </Section>
 
-      {/* Workouts */}
-      {workouts.length > 0 && (
-        <Section title="Recent Workouts">
-          <div className="space-y-3">
-            {workouts.map((w: { id: string; name: string; date: Date; duration: number | null; notes: string | null; sets: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }[] }) => (
-              <div key={w.id} className="premium-row">
-                <div className="flex items-center justify-between mb-3">
+      <Section title="Gym Workouts" kicker="Recent" action={{ label: "Log", href: "/activity/log/gym" }}>
+        {workouts.length === 0 ? (
+          <Empty icon="M4 6h16M4 10h16M4 14h16M4 18h16" title="No workouts yet" description="Log a gym session with exercises, sets, and reps." action={{ label: "Log Workout", href: "/activity/log/gym" }} />
+        ) : (
+          <div className="space-y-2">
+            {workouts.map((w) => (
+              <Link key={w.id} href={`/activity/${w.id}`} className="block rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3 transition-all hover:border-[var(--border)]">
+                <div className="mb-2 flex items-center justify-between">
                   <div>
                     <div className="text-sm font-semibold text-[var(--text)]">{w.name}</div>
                     <div className="text-xs text-[var(--text-tertiary)]">{format(new Date(w.date), "EEE, MMM d")}{w.duration ? ` · ${w.duration} min` : ""}</div>
@@ -108,37 +94,57 @@ export default async function ActivityPage() {
                   <span className="premium-chip">{w.sets.length} sets</span>
                 </div>
                 <div className="space-y-1">
-                  {w.sets.map((s: { id: string; weight: number | null; reps: number | null; rpe: number | null; exercise: { name: string } }) => (
-                    <div key={s.id} className="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg bg-[var(--surface)] border border-[var(--border-light)]">
-                      <span className="text-[var(--text-secondary)] font-medium">{s.exercise.name}</span>
-                      <span className="text-[var(--text-tertiary)] text-xs font-mono">
-                        {s.weight ? `${s.weight}kg` : ""}{s.reps ? ` × ${s.reps}` : ""}{s.rpe ? ` @ ${s.rpe}` : ""}
-                      </span>
+                  {w.sets.slice(0, 3).map((s) => (
+                    <div key={s.id} className="flex items-center justify-between rounded-md bg-[var(--surface)] px-2 py-1.5 text-xs">
+                      <span className="text-[var(--text-secondary)]">{s.exercise.name}</span>
+                      <span className="font-mono text-[var(--text-tertiary)]">{s.weight ? `${s.weight}kg` : ""}{s.reps ? ` × ${s.reps}` : ""}</span>
                     </div>
                   ))}
+                  {w.sets.length > 3 && <div className="text-[10px] text-[var(--text-tertiary)] pl-2">+{w.sets.length - 3} more sets</div>}
                 </div>
-                {w.notes && <div className="text-xs text-[var(--text-tertiary)] mt-2">{w.notes}</div>}
-              </div>
+              </Link>
             ))}
           </div>
-        </Section>
-      )}
+        )}
+      </Section>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Stat({ l, v, u }: { l: string; v: string; u?: string }) {
+  return (
+    <div className="premium-stat">
+      <div className="premium-label">{l}</div>
+      <div className="premium-value text-[var(--amber)]">{v}</div>
+      {u && <div className="mt-1 text-xs text-[var(--text-tertiary)]">{u}</div>}
+    </div>
+  );
+}
+
+function Section({ title, kicker, children, action }: { title: string; kicker: string; children: React.ReactNode; action?: { label: string; href: string } }) {
   return (
     <section className="premium-panel animate-fade-in">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="premium-panel-title">{title}</h2>
-        <span className="premium-panel-kicker">Active</span>
+        <div className="flex items-center gap-2">
+          <span className="premium-panel-kicker">{kicker}</span>
+          {action && <Link href={action.href} className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">{action.label} →</Link>}
+        </div>
       </div>
       {children}
     </section>
   );
 }
 
-function Empty({ message }: { message: string }) {
-  return <div className="premium-empty">{message}</div>;
+function Empty({ icon, title, description, action }: { icon: string; title: string; description: string; action?: { label: string; href: string } }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d={icon} /></svg>
+      </div>
+      <h3 className="mb-1 text-sm font-semibold text-[var(--text)]">{title}</h3>
+      <p className="mb-4 max-w-xs text-xs text-[var(--text-tertiary)]">{description}</p>
+      {action && <Link href={action.href} className="premium-action text-xs">{action.label}</Link>}
+    </div>
+  );
 }
