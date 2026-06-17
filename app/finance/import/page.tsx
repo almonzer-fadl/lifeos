@@ -61,7 +61,7 @@ export default function ImportPage() {
   const inputClass = "w-full border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Data Pipeline</div><h1 className="premium-title">Import</h1><p className="premium-subtitle">CSV bank statement import with duplicate detection</p></div>
 
       <section className="premium-panel animate-fade-in">

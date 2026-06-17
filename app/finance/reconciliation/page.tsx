@@ -63,7 +63,7 @@ export default function ReconciliationPage() {
   const inputClass = "w-full border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Audit Workspace</div><h1 className="premium-title">Reconciliation</h1><p className="premium-subtitle">Match your ledger to bank statements</p></div>
 
       <section className="premium-panel animate-fade-in">

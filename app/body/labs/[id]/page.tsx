@@ -12,7 +12,7 @@ export default async function LabDetailPage({ params }: { params: Promise<{ id: 
   if (!lab) notFound();
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="flex items-center gap-2"><Link href="/body/labs" className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg></Link><div className="premium-kicker">Lab Detail</div></div>
         <h1 className="premium-title">{lab.testName}</h1>

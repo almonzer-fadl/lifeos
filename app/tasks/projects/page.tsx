@@ -13,7 +13,7 @@ export default async function ProjectsPage() {
   });
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Workspaces</div><h1 className="premium-title">Projects</h1><p className="premium-subtitle">{Object.keys(grouped).length} groups · {tasks.length} tasks</p></div>
       {Object.keys(grouped).length === 0 ? (
         <section className="premium-panel animate-fade-in"><p className="py-10 text-center text-sm text-[var(--text-tertiary)]">No tasks yet. Create tasks and assign them to projects.</p></section>

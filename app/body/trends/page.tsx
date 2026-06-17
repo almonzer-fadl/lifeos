@@ -9,7 +9,7 @@ export default async function BodyTrendsPage() {
   const last = measurements[measurements.length - 1];
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Long View</div><h1 className="premium-title">Body Trends</h1><p className="premium-subtitle">{measurements.length} measurements tracked</p></div>
       {measurements.length > 0 ? (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

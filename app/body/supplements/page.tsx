@@ -10,7 +10,7 @@ export default async function SupplementsPage() {
   const todayLogs = logs.filter((l) => new Date(l.date).getTime() === today.getTime());
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Stack</div><h1 className="premium-title">Supplements</h1><p className="premium-subtitle">{logs.length} logs · {todayLogs.length} today</p></div>
 
       <section className="premium-panel animate-fade-in">

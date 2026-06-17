@@ -9,7 +9,7 @@ export default async function BodyPage() {
   const latest = measurements[0];
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Composition Desk</div>
         <h1 className="premium-title">Body Command</h1>

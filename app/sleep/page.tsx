@@ -17,7 +17,7 @@ export default async function SleepPage() {
   const avgQuality = sessions.length > 0 ? sessions.reduce((s, x) => s + (x.quality || 0), 0) / sessions.length : 0;
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Recovery Metrics</div>
         <h1 className="premium-title">Sleep Command</h1>

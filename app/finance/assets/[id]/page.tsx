@@ -18,7 +18,7 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
   const pnlPct = asset.purchaseValue > 0 ? ((asset.currentValue - asset.purchaseValue) / asset.purchaseValue) * 100 : 0;
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2"><Link href="/finance/assets" className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg></Link><span className="rounded border border-[rgba(215,181,109,0.24)] bg-[rgba(215,181,109,0.08)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--accent)]">{asset.type}</span></div>

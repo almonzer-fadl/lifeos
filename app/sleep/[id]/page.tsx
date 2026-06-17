@@ -17,7 +17,7 @@ export default async function SleepDetailPage({ params }: { params: Promise<{ id
   const wakeTime = format(new Date(session.endTime), "HH:mm");
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="flex items-center gap-2">
           <Link href="/sleep" className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">

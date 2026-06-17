@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function MeasurementsPage() {
   const measurements = await db.bodyMeasurement.findMany({ orderBy: { date: "desc" }, take: 50 });
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">History</div><h1 className="premium-title">Measurements</h1><p className="premium-subtitle">{measurements.length} records</p></div>
       <section className="premium-panel animate-fade-in">
         {measurements.length === 0 ? (

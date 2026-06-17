@@ -37,7 +37,7 @@ export default function NewRecurringPage() {
   }
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Schedule</div>
         <h1 className="premium-title">Add Recurring</h1>

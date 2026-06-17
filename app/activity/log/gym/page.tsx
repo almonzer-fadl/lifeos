@@ -2,7 +2,7 @@ import { WorkoutLogger } from "@/components/modules/activity/workout-logger";
 
 export default function LogGymPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Session</div>
         <h1 className="premium-title">Log Gym Workout</h1>

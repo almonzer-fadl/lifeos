@@ -37,7 +37,7 @@ export default async function ActivityPage() {
   }, 0);
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Performance Desk</div>
         <h1 className="premium-title">Activity Feed</h1>

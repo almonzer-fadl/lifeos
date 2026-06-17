@@ -27,7 +27,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
     const pace = activity.distance && dur ? (dur * 60) / (activity.distance / 1000) : null;
 
     return (
-      <div className="premium-page">
+      <div className="premium-page animate-fade-in">
         <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default async function ActivityDetailPage({ params }: { params: Promise<{
 
   if (workout) {
     return (
-      <div className="premium-page">
+      <div className="premium-page animate-fade-in">
         <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2">

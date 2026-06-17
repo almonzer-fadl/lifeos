@@ -12,7 +12,7 @@ export default async function GoalsPage() {
   const goals = await db.financialGoal.findMany({ orderBy: { status: "asc" }, include: { account: true } });
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Capital Objectives</div><h1 className="premium-title">Goals</h1><p className="premium-subtitle">{goals.length} financial targets</p></div>
       {goals.length === 0 ? (
         <section className="premium-panel animate-fade-in"><div className="flex flex-col items-center justify-center py-16 px-4 text-center"><div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><h3 className="mb-1 text-sm font-semibold text-[var(--text)]">No goals yet</h3><p className="mb-4 max-w-xs text-xs text-[var(--text-tertiary)]">Set savings targets and track your progress.</p><Link href="/finance/goals/new" className="premium-action">Set Goal</Link></div></section>

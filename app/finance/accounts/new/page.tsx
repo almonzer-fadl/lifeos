@@ -50,7 +50,7 @@ export default function NewAccountPage() {
   }
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Entry</div>
         <h1 className="premium-title">Create Account</h1>

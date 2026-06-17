@@ -26,7 +26,7 @@ export default function NewHabitPage() {
   }
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">New Practice</div><h1 className="premium-title">Create Habit</h1><p className="premium-subtitle">Build consistency with daily tracking</p></div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <section className="premium-panel animate-fade-in">

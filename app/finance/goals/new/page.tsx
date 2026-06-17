@@ -35,7 +35,7 @@ export default function NewGoalPage() {
   }
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Target</div>
         <h1 className="premium-title">Set Goal</h1>

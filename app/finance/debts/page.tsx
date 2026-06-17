@@ -94,10 +94,10 @@ export default function DebtsPage() {
     setPlan(plans);
   }
 
-  if (loading) return <div className="premium-page"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-40 w-full rounded-lg" /></div>;
+  if (loading) return <div className="premium-page animate-fade-in"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-40 w-full rounded-lg" /></div>;
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Liability Command</div><h1 className="premium-title">Debt Planner</h1><p className="premium-subtitle">{debts.length} liabilities · Snowball & Avalanche strategies</p></div>
 
       {debts.length === 0 ? (

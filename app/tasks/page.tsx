@@ -15,7 +15,7 @@ export default async function TasksPage() {
   const done = tasks.filter((t) => t.status === "done");
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Task Command</div>
         <h1 className="premium-title">Tasks</h1>

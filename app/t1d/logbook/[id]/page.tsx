@@ -15,7 +15,7 @@ export default async function LogbookEntryPage({ params }: { params: Promise<{ i
   const statusColor = reading.value < 70 ? "var(--rose)" : reading.value > 180 ? "var(--amber)" : "var(--emerald)";
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="flex items-center gap-2">
           <Link href="/t1d/logbook" className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]">

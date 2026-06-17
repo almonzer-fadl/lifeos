@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { subDays } from "date-fns";
 import { Fab } from "@/components/ui/fab";
+import { AIDashboardWidget } from "@/components/modules/ai/insights-widget";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,7 @@ export default async function HomePage() {
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">{new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" }).format(now)}</div>
         <h1 className="premium-title">{greeting}</h1>
@@ -51,6 +52,8 @@ export default async function HomePage() {
         <Widget label="Accounts" value={`${accounts.length}`} tone="neutral" href="/finance/accounts" />
         <Widget label="Income 30D" value={`+${income.toFixed(0)}`} tone="positive" href="/finance" />
       </div>
+
+      <AIDashboardWidget />
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {pendingTasks > 0 && (

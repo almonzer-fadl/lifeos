@@ -13,7 +13,7 @@ export default async function AssetsPage() {
   const totalCost = assets.reduce((s, a) => s + a.purchaseValue, 0);
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div><div className="premium-kicker">Capital Holdings</div><h1 className="premium-title">Assets</h1><p className="premium-subtitle">{assets.length} holdings tracked</p></div>
         <div className="text-right"><div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Total Value</div><div className="font-mono text-2xl font-semibold text-[var(--accent)]">{s$(totalValue)}</div><div className="text-[10px] text-[var(--text-tertiary)]">Gain {s$(totalValue - totalCost)}</div></div>

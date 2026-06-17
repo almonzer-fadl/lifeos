@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function LogPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Session</div>
         <h1 className="premium-title">Log Activity</h1>

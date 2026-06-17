@@ -1,6 +1,6 @@
 export default function T1DSettingsPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Configuration</div>
         <h1 className="premium-title">T1D Settings</h1>

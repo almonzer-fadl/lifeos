@@ -1,6 +1,6 @@
 export default function SettingsPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">System Desk</div>
         <h1 className="premium-title">Settings Command</h1>
