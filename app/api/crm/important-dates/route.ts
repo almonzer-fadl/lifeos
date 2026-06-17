@@ -8,7 +8,7 @@ interface ImportantDate {
 
 export async function GET() {
   const contacts = await db.contact.findMany({
-    where: { importantDates: { not: null }, isActive: true },
+    where: { isActive: true },
     select: { id: true, fullName: true, importantDates: true },
   });
 
@@ -22,7 +22,7 @@ export async function GET() {
   }[] = [];
 
   for (const c of contacts) {
-    if (!c.importantDates) continue;
+    if (!c.importantDates || !Array.isArray(c.importantDates)) continue;
     const dates = c.importantDates as unknown as ImportantDate[];
     for (const d of dates) {
       const date = new Date(d.date);
