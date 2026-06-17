@@ -534,3 +534,39 @@ model CalendarEvent {
   @@index([startTime])
   @@index([externalId])
 }
+
+// ─── System ───────────────────────────────────────────────────
+
+model Insight {
+  id         String   @id @default(uuid())
+  type       String   // glucose, sleep, habit, finance, task, activity, prayer, custom
+  urgency    String   // high, medium, low
+  headline   String
+  body       String
+  href       String?  // link to relevant module page
+  icon       String?
+  sourceData Json?    // snapshot of the data that generated this insight
+  dismissed  Boolean  @default(false)
+  actedOn    Boolean  @default(false)
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([urgency])
+  @@index([dismissed])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  body      String
+  href      String?  // deep-link to relevant module page
+  read      Boolean  @default(false)
+  pushed    Boolean  @default(false) // sent to browser via push/service worker
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([pushed])
+  @@index([createdAt])
+}

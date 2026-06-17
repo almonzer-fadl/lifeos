@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { subDays } from "date-fns";
-import { centsToDollars } from "@/lib/money";
+import { runInsightPipeline } from "@/lib/insights";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const sevenDaysAgo = subDays(new Date(), 7);
     const thirtyDaysAgo = subDays(new Date(), 30);
 
-    // Gather all relevant context
     const [
       habits,
       habitLogs,
@@ -33,13 +32,11 @@ export async function GET(request: NextRequest) {
       db.activity.findMany({ where: { startTime: { gte: thirtyDaysAgo } }, orderBy: { startTime: "desc" }, take: 20 }),
     ]);
 
-    // Build context for AI
     const context = {
       habits: habits.map((h) => ({
         name: h.name,
         completed: h.logs.filter((l) => l.completed).length,
         total: h.logs.length,
-        streak: h.logs.filter((l) => l.completed).length, // simplifed
       })),
       taskCount: tasks.length,
       tasks: tasks.slice(0, 5).map((t) => ({ title: t.title, priority: t.priority, project: t.project?.name })),
@@ -56,7 +53,6 @@ export async function GET(request: NextRequest) {
         lowCount: glucoseReadings.filter((r) => r.value < 70).length,
       } : null,
       finance: {
-        cashBalance: accounts.filter((a) => !a.isDebt).reduce((s, a) => s + a.initialBalance, 0),
         income30d: transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0),
         expenses30d: transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0),
       },
@@ -69,7 +65,13 @@ export async function GET(request: NextRequest) {
       journalMoods: journalEntries.map((j) => ({ date: j.date.toISOString().slice(0, 10), mood: j.mood })),
     };
 
-    return NextResponse.json({ context });
+    // Run insight pipeline — generates and persists insights
+    const insightResult = await runInsightPipeline(context);
+
+    return NextResponse.json({
+      context,
+      insightsGenerated: insightResult.persisted,
+    });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
