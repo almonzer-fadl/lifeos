@@ -12,7 +12,7 @@ export interface ContactCardData {
   lastContactedAt: string | null;
   nextFollowUpAt: string | null;
   location: string | null;
-  group: { name: string; color: string | null } | null;
+  group: { id: string; name: string; color: string | null } | null;
   _count: { interactions: number };
 }
 

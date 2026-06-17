@@ -5,7 +5,7 @@ import { CrmClient } from "./crm-client";
 export const dynamic = "force-dynamic";
 
 export default async function CrmPage() {
-  const [contacts, groups, birthdays] = await Promise.all([
+  const [rawContacts, groups, birthdays] = await Promise.all([
     db.contact.findMany({
       where: { isActive: true },
       orderBy: [{ isKeyPerson: "desc" }, { fullName: "asc" }],
@@ -36,6 +36,12 @@ export default async function CrmPage() {
     })
     .filter((c): c is NonNullable<typeof c> => c !== null && c.daysUntil <= 60)
     .sort((a, b) => a.daysUntil - b.daysUntil);
+
+  const contacts = rawContacts.map((c) => ({
+    ...c,
+    lastContactedAt: c.lastContactedAt?.toISOString() ?? null,
+    nextFollowUpAt: c.nextFollowUpAt?.toISOString() ?? null,
+  }));
 
   return (
     <div className="premium-page animate-fade-in">

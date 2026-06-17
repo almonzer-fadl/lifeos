@@ -23,27 +23,15 @@ interface GraphData {
 }
 
 const FOLDER_COLORS: Record<string, string> = {
-  "LifeOS": "#c8a85b",
-  "Project Genesis": "#689dc8",
-  "Project Zenith": "#a08ef5",
-  "Project Origin": "#e85460",
-  "Project Axone": "#3ec488",
-  "Marketing": "#d4952a",
-  "Gari": "#d58b45",
-  "Cheet Sheets": "#8298e8",
-  "Archive": "#586573",
+  "LifeOS": "#8c6d2d", // Refined Bronze-Gold
+  "Project Genesis": "#4a4f54", // Obsidian Blue
+  "Project Zenith": "#8c6d2d",
+  "Project Origin": "#4a4f54",
+  "Archive": "#989ea4",
 };
 
 function folderColor(folder: string): string {
-  return FOLDER_COLORS[folder] || "#586573";
-}
-
-// Hex to RGB for glow effects
-function hexToRgb(hex: string): [number, number, number] {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b];
+  return FOLDER_COLORS[folder] || "#989ea4";
 }
 
 export function ObsidianGraph() {
@@ -56,7 +44,6 @@ export function ObsidianGraph() {
   const [selectedNode, setSelectedNode] = useState<GraphNodeData | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const animRef = useRef<number>(0);
-  const particlesRef = useRef<Array<{ x: number; y: number; vx: number; vy: number; life: number }>>([]);
 
   // Node physics state (mutable for animation)
   const nodeState = useRef<Map<string, { x: number; y: number; vx: number; vy: number; size: number; color: string }>>(new Map());
@@ -80,35 +67,26 @@ export function ObsidianGraph() {
       ? data.nodes.filter(n => n.folder === selectedFolder)
       : data.nodes;
 
-    // Place nodes in a spiral
+    // Place nodes in a gentle spiral
     const cx = w / 2;
     const cy = h / 2;
     const sorted = [...folderNodes].sort((a, b) => b.links - a.links);
 
     sorted.forEach((n, i) => {
-      const angle = (i / sorted.length) * Math.PI * 6;
-      const radius = 40 + (i / sorted.length) * Math.min(w, h) * 0.38;
+      const angle = (i / sorted.length) * Math.PI * 4;
+      const radius = 20 + (i / sorted.length) * Math.min(w, h) * 0.35;
       const x = cx + Math.cos(angle) * radius;
       const y = cy + Math.sin(angle) * radius;
       const color = folderColor(n.folder);
-      const size = Math.max(3, Math.min(n.size * 2.2, 22));
+      const size = Math.max(2, Math.min(n.size * 1.5, 14));
 
       nodeMap.set(n.id, {
         x, y, vx: 0, vy: 0, size, color,
       });
     });
-
-    // Initialize particles
-    particlesRef.current = Array.from({ length: 60 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      life: Math.random(),
-    }));
   }, [data, selectedFolder]);
 
-  // Animation loop (stored in ref to avoid declaration-order issues)
+  // Animation loop
   const animateRef = useRef<() => void>(() => {});
 
   animateRef.current = useCallback(() => {
@@ -121,8 +99,6 @@ export function ObsidianGraph() {
     const h = containerRef.current.clientHeight;
     canvas.width = w * devicePixelRatio;
     canvas.height = h * devicePixelRatio;
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
     ctx.scale(devicePixelRatio, devicePixelRatio);
 
     const nodeMap = nodeState.current;
@@ -133,27 +109,27 @@ export function ObsidianGraph() {
     const nodeIds = new Set(folderNodes.map(n => n.id));
     const edges = data.edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
 
-    // Physics step
+    // Quiet Physics step
     for (const [id, node] of nodes) {
-      // Center gravity
-      node.vx += (w / 2 - node.x) * 0.0003;
-      node.vy += (h / 2 - node.y) * 0.0003;
+      // Gentle center gravity
+      node.vx += (w / 2 - node.x) * 0.00015;
+      node.vy += (h / 2 - node.y) * 0.00015;
 
-      // Node repulsion
+      // Soft node repulsion
       for (const [id2, n2] of nodes) {
         if (id === id2) continue;
         const dx = node.x - n2.x;
         const dy = node.y - n2.y;
         const dist = Math.sqrt(dx * dx + dy * dy) + 1;
-        const minDist = (node.size + n2.size) + 20;
+        const minDist = (node.size + n2.size) + 40;
         if (dist < minDist) {
-          const force = (minDist - dist) / dist * 0.05;
+          const force = (minDist - dist) / dist * 0.015;
           node.vx += dx * force;
           node.vy += dy * force;
         }
       }
 
-      // Edge attraction
+      // Elegant edge attraction
       for (const edge of edges) {
         if (edge.source === id || edge.target === id) {
           const otherId = edge.source === id ? edge.target : edge.source;
@@ -162,78 +138,42 @@ export function ObsidianGraph() {
             const dx = other.x - node.x;
             const dy = other.y - node.y;
             const dist = Math.sqrt(dx * dx + dy * dy) + 1;
-            const targetDist = 80;
-            const force = (dist - targetDist) / dist * 0.001;
+            const targetDist = 100;
+            const force = (dist - targetDist) / dist * 0.0005;
             node.vx += dx * force;
             node.vy += dy * force;
           }
         }
       }
 
-      // Damping
-      node.vx *= 0.92;
-      node.vy *= 0.92;
+      // High damping for silk-like movement
+      node.vx *= 0.85;
+      node.vy *= 0.85;
 
-      // Bounds
-      node.x = Math.max(node.size, Math.min(w - node.size, node.x));
-      node.y = Math.max(node.size, Math.min(h - node.size, node.y));
-    }
-
-    // Apply velocities
-    for (const [, node] of nodes) {
       node.x += node.vx;
       node.y += node.vy;
     }
 
-    // Clear with deep space background
-    ctx.fillStyle = "#080a0c";
+    // Clear with luminous Ivory background
+    ctx.fillStyle = "#fcfbf7";
     ctx.fillRect(0, 0, w, h);
 
-    // Draw background particles (dust) — copy to local to avoid mutating ref
-    ctx.save();
-    const particles = particlesRef.current;
-    for (const p of particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y < 0) p.y = h;
-      if (p.y > h) p.y = 0;
-      p.life += 0.002;
-      if (p.life > 1) p.life = 0;
+    // Draw background texture gradient
+    const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/1.2);
+    grad.addColorStop(0, "rgba(255,255,255,0)");
+    grad.addColorStop(1, "rgba(140, 109, 45, 0.03)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
 
-      const alpha = Math.sin(p.life * Math.PI) * 0.3;
-      ctx.fillStyle = `rgba(200, 168, 91, ${alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 1, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // Draw edges with glow
+    // Draw delicate edges (hairline)
     ctx.save();
+    ctx.lineWidth = 0.4;
     for (const edge of edges) {
       const source = nodeMap.get(edge.source);
       const target = nodeMap.get(edge.target);
       if (!source || !target) continue;
 
-      const gradient = ctx.createLinearGradient(source.x, source.y, target.x, target.y);
-      const sRgb = hexToRgb(source.color);
-      const tRgb = hexToRgb(target.color);
-      gradient.addColorStop(0, `rgba(${sRgb[0]},${sRgb[1]},${sRgb[2]},0.5)`);
-      gradient.addColorStop(0.5, `rgba(200,168,91,0.15)`);
-      gradient.addColorStop(1, `rgba(${tRgb[0]},${tRgb[1]},${tRgb[2]},0.5)`);
-
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(source.x, source.y);
-      ctx.lineTo(target.x, target.y);
-      ctx.stroke();
-
-      // Glow line
-      ctx.strokeStyle = `rgba(200,168,91,0.08)`;
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(20, 22, 24, 0.06)";
       ctx.beginPath();
       ctx.moveTo(source.x, source.y);
       ctx.lineTo(target.x, target.y);
@@ -243,45 +183,31 @@ export function ObsidianGraph() {
 
     // Draw nodes
     for (const [id, node] of nodes) {
-      const [r, g, b] = hexToRgb(node.color);
-      const pulse = 1 + Math.sin(Date.now() * 0.002 + id.charCodeAt(0)) * 0.15;
-
-      // Outer glow
-      const glow = ctx.createRadialGradient(node.x, node.y, node.size * 0.5, node.x, node.y, node.size * 2.5);
-      glow.addColorStop(0, `rgba(${r},${g},${b},0.35)`);
-      glow.addColorStop(0.5, `rgba(${r},${g},${b},0.08)`);
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
+      const isHovered = hoveredNode?.id === id;
+      const isSelected = selectedNode?.id === id;
+      
+      // Node body - solid and clean
+      ctx.fillStyle = isHovered || isSelected ? "var(--accent)" : node.color;
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.size * 2.5, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, isHovered ? node.size + 2 : node.size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Node body
-      const bodyGrad = ctx.createRadialGradient(
-        node.x - node.size * 0.2, node.y - node.size * 0.2, 0,
-        node.x, node.y, node.size * pulse
-      );
-      bodyGrad.addColorStop(0, `rgba(${Math.min(r + 60, 255)},${Math.min(g + 60, 255)},${Math.min(b + 60, 255)},1)`);
-      bodyGrad.addColorStop(0.7, `rgba(${r},${g},${b},0.9)`);
-      bodyGrad.addColorStop(1, `rgba(${r},${g},${b},0.5)`);
+      // Delicate stroke
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-      ctx.fillStyle = bodyGrad;
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, node.size * pulse, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Label for larger nodes
-      if (node.size > 7) {
-        ctx.fillStyle = "#e6eaf0";
-        ctx.font = `${Math.max(8, node.size * 0.7)}px var(--font-sans), system-ui, sans-serif`;
+      // Serif Label for curated nodes
+      if (node.size > 5 || isHovered) {
+        ctx.fillStyle = isHovered ? "var(--text)" : "var(--text-tertiary)";
+        ctx.font = `${isHovered ? "italic " : ""}11px var(--font-serif), serif`;
         ctx.textAlign = "center";
-        ctx.fillText(id, node.x, node.y + node.size + 12);
+        ctx.fillText(id, node.x, node.y + node.size + 16);
       }
     }
 
     animRef.current = requestAnimationFrame(animateRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, selectedFolder]);
+  }, [data, selectedFolder, hoveredNode, selectedNode]);
 
   useEffect(() => {
     if (data) {
@@ -304,7 +230,7 @@ export function ObsidianGraph() {
       for (const [id, node] of nodeMap) {
         const dx = node.x - mx;
         const dy = node.y - my;
-        if (Math.sqrt(dx * dx + dy * dy) < node.size * 1.8) return id;
+        if (Math.sqrt(dx * dx + dy * dy) < node.size + 10) return id;
       }
       return null;
     };
@@ -330,7 +256,7 @@ export function ObsidianGraph() {
         if (hovered && folderNodes) {
           const node = folderNodes.find(n => n.id === hovered);
           setHoveredNode(node || null);
-          canvas.style.cursor = "grab";
+          canvas.style.cursor = "default";
         } else {
           setHoveredNode(null);
           canvas.style.cursor = "default";
@@ -346,13 +272,11 @@ export function ObsidianGraph() {
       if (id) {
         isDragging = true;
         draggedId = id;
-        canvas.style.cursor = "grabbing";
       }
     };
 
     const onMouseUp = (e: MouseEvent) => {
       if (!isDragging) {
-        // Click — select
         const rect = canvas.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
@@ -366,7 +290,6 @@ export function ObsidianGraph() {
       }
       isDragging = false;
       draggedId = null;
-      if (canvas) canvas.style.cursor = "default";
     };
 
     canvas.addEventListener("mousemove", onMouseMove);
@@ -390,22 +313,15 @@ export function ObsidianGraph() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[420px]">
-        <div className="flex flex-col items-center gap-4">
-          <motion.div
-            className="h-16 w-16 rounded-full border-2 border-[var(--accent)]/30 border-t-[var(--accent)]"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          />
-          <p className="text-xs text-[var(--text-tertiary)]">Mapping your knowledge graph…</p>
-        </div>
+      <div className="flex items-center justify-center h-[500px]">
+        <p className="font-serif italic text-sm text-[var(--text-tertiary)]">Visualizing intellectual connections…</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-[420px]">
+      <div className="flex items-center justify-center h-[500px]">
         <p className="text-sm text-[var(--rose)]">{error}</p>
       </div>
     );
@@ -413,32 +329,27 @@ export function ObsidianGraph() {
 
   return (
     <div className="relative">
-      {/* Folder filter */}
-      <div className="mb-3 flex flex-wrap items-center gap-1.5">
+      {/* Domain filter */}
+      <div className="mb-6 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setSelectedFolder(null)}
-          className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide transition-all ${
+          className={`rounded-full px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] transition-all ${
             !selectedFolder
-              ? "bg-[var(--surface-hover)] text-[var(--text)] border border-[var(--border-strong)]"
+              ? "bg-[var(--text)] text-[var(--bg)] shadow-md"
               : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
           }`}
         >
-          All ({data?.nodes.length || 0})
+          All Domains
         </button>
         {folders.map(f => (
           <button
             key={f}
             onClick={() => setSelectedFolder(f)}
-            className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide transition-all hover:opacity-90"
-            style={{
-              backgroundColor: folderColor(f) + "22",
-              color: folderColor(f),
-              border: `1px solid ${folderColor(f)}44`,
-              ...(selectedFolder === f ? {
-                backgroundColor: folderColor(f) + "33",
-                border: `1px solid ${folderColor(f)}88`,
-              } : {}),
-            }}
+            className={`rounded-full px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] transition-all ${
+              selectedFolder === f
+                ? "bg-[var(--accent)] text-white shadow-md"
+                : "bg-white text-[var(--text-tertiary)] shadow-sm hover:shadow-md"
+            }`}
           >
             {f}
           </button>
@@ -448,69 +359,46 @@ export function ObsidianGraph() {
       {/* Graph canvas */}
       <div
         ref={containerRef}
-        className="relative w-full rounded-lg border border-[var(--border)] overflow-hidden"
+        className="relative w-full overflow-hidden rounded-[32px] bg-[#fcfbf7] shadow-inner"
         style={{
-          minHeight: "420px",
-          height: "min(520px, 65vh)",
-          background: "radial-gradient(ellipse at center, #0a0d12 0%, #080a0c 70%)",
+          minHeight: "500px",
+          height: "65vh",
         }}
       >
         <canvas ref={canvasRef} className="w-full h-full" />
-
-        {/* Hover tooltip */}
-        {hoveredNode && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-4 left-4 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)]/95 backdrop-blur-md px-3 py-2 shadow-[var(--shadow-modal)] pointer-events-none"
-          >
-            <div className="text-xs font-semibold text-[var(--text)]">{hoveredNode.name}</div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] text-[var(--text-tertiary)]">{hoveredNode.folder}</span>
-              {hoveredNode.links > 0 && (
-                <span className="text-[10px] text-[var(--accent)]">{hoveredNode.links} connections</span>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Drag hint */}
-        <div className="absolute top-3 right-3 text-[9px] text-[var(--text-tertiary)]/50 pointer-events-none">
-          drag to explore
-        </div>
       </div>
 
       {/* Selected node detail */}
       {selectedNode && (
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] p-4"
+          className="mt-8 rounded-[32px] bg-white p-8 shadow-xl border border-[var(--border-light)]"
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-6">
             <div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-3 w-3 rounded-full"
                   style={{ backgroundColor: folderColor(selectedNode.folder) }}
                 />
-                <h3 className="text-sm font-semibold text-[var(--text)]">{selectedNode.name}</h3>
+                <h3 className="font-serif text-2xl text-[var(--text)]">{selectedNode.name}</h3>
               </div>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">
-                {selectedNode.folder} · {selectedNode.links} connections
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-tertiary)] mt-2">
+                Sector: {selectedNode.folder} · {selectedNode.links} Intellectual Links
               </p>
             </div>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] text-sm"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--text-tertiary)] transition-colors hover:text-[var(--text)]"
             >
               ✕
             </button>
           </div>
           {selectedNode.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1">
+            <div className="mt-6 flex flex-wrap gap-2">
               {selectedNode.tags.map(t => (
-                <span key={t} className="rounded-full bg-[var(--surface-hover)] px-2 py-0.5 text-[9px] text-[var(--text-tertiary)]">
+                <span key={t} className="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">
                   #{t}
                 </span>
               ))}
@@ -518,10 +406,6 @@ export function ObsidianGraph() {
           )}
         </motion.div>
       )}
-
-      <div className="mt-2 text-[9px] text-[var(--text-tertiary)] text-center">
-        {data ? data.nodes.length : 0} notes · {data ? data.edges.length : 0} connections · drag nodes · hover for detail
-      </div>
     </div>
   );
 }
