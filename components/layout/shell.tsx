@@ -56,80 +56,84 @@ function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <Link
       href={item.href}
-      className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+      className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ${
         active
-          ? "border-[var(--border-strong)] bg-[var(--surface-hover)] text-[var(--text)]"
-          : "border-transparent text-[var(--text-tertiary)] hover:border-[var(--border)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+          ? "bg-[var(--accent-soft)] text-[var(--text)] shadow-[0_1px_0_rgba(255,255,255,0.05)_inset]"
+          : "text-[var(--text-tertiary)] hover:bg-[rgba(255,255,255,0.03)] hover:text-[var(--text-secondary)]"
       }`}
     >
-      <SvgIcon d={item.icon} className="h-[18px] w-[18px] shrink-0" />
-      <span>{item.label}</span>
+      <SvgIcon d={item.icon} className={`h-[18px] w-[18px] shrink-0 transition-colors ${active ? "text-[var(--accent)]" : "text-[var(--text-tertiary)] group-hover:text-[var(--accent)]"}`} />
+      <span className={`font-medium tracking-wide ${active ? "font-semibold" : ""}`}>{item.label}</span>
     </Link>
   );
 }
 
 const mobileTabs: NavItem[] = [
   mainNav[0],
-  healthNav[0], // T1D — most critical
+  healthNav[0], // T1D
   healthNav[1], // Activity
-  lifeNav[0],   // Finance
-  { label: "More", href: "/tasks", icon: "M4 6h16M4 12h16M4 18h16" },
+  lifeNav[1],   // Finance
+  { label: "Menu", href: "/settings", icon: "M4 6h16M4 12h16M4 18h16" },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)]">
+    <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent-soft)]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface-deep)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
-        <Link href="/" className="flex items-center gap-3 rounded-lg border border-[var(--border-light)] bg-[rgba(255,255,255,0.02)] px-3 py-2 hover:border-[var(--border)] hover:bg-[var(--surface-hover)]">
-          <Image src="/lifeos-logo.png" alt="Life OS" width={28} height={28} className="rounded-md" unoptimized />
+      <aside className="hidden lg:flex h-dvh w-72 shrink-0 flex-col gap-8 overflow-y-auto border-r border-[var(--border-light)] bg-[var(--bg)] px-6 py-10">
+        <Link href="/" className="group flex items-center gap-4 px-2">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--surface-raised)] border border-[var(--border)] shadow-lg transition-transform group-hover:scale-105">
+            <Image src="/lifeos-logo.png" alt="Life OS" width={24} height={24} className="rounded-md opacity-90" unoptimized />
+          </div>
           <div className="min-w-0">
-            <span className="block text-sm font-semibold tracking-tight text-[var(--text)]">Life OS</span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Private Terminal</span>
+            <span className="block font-serif text-lg leading-tight text-[var(--text)]">Life OS</span>
+            <span className="block text-[9px] font-semibold uppercase tracking-[0.3em] text-[var(--accent)] opacity-80">Private Office</span>
           </div>
         </Link>
 
-        <nav className="flex flex-col gap-0.5">
-          {mainNav.map((item) => (
-            <SidebarItem key={item.href} item={item} active={pathname === item.href} />
-          ))}
-        </nav>
+        <div className="flex flex-col gap-8">
+          <nav className="flex flex-col gap-1">
+            {mainNav.map((item) => (
+              <SidebarItem key={item.href} item={item} active={pathname === item.href} />
+            ))}
+          </nav>
 
-        <div className="mx-3 h-px bg-[var(--border-light)]" />
-
-        <nav className="flex flex-col gap-0.5">
-          <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
-            Health
+          <div className="space-y-3">
+            <div className="px-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-60">
+              Wellness
+            </div>
+            <nav className="flex flex-col gap-1">
+              {healthNav.map((item) => (
+                <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
+              ))}
+            </nav>
           </div>
-          {healthNav.map((item) => (
-            <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
-          ))}
-        </nav>
 
-        <div className="mx-3 h-px bg-[var(--border-light)]" />
-
-        <nav className="flex flex-col gap-0.5">
-          <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
-            Life
+          <div className="space-y-3">
+            <div className="px-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-60">
+              Management
+            </div>
+            <nav className="flex flex-col gap-1">
+              {lifeNav.map((item) => (
+                <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
+              ))}
+            </nav>
           </div>
-          {lifeNav.map((item) => (
-            <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
-          ))}
-        </nav>
+        </div>
 
         <div className="mt-auto">
           <SidebarItem
-            item={{ label: "Settings", href: "/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" }}
+            item={{ label: "Preferences", href: "/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" }}
             active={pathname === "/settings"}
           />
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)]">
-        <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8" suppressHydrationWarning>
+      <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)] scroll-smooth">
+        <div className="mx-auto w-full pb-[6rem] lg:pb-12" suppressHydrationWarning>
           <PullToRefresh>
             <PageTransition>{children}</PageTransition>
           </PullToRefresh>
@@ -139,8 +143,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <CommandPalette />
 
       {/* Mobile bottom nav */}
-      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--surface-deep)]/0.96 shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
-        <div className="flex h-16 items-center justify-around px-1">
+      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border-light)] bg-[var(--bg)]/0.8 backdrop-blur-2xl lg:hidden">
+        <div className="flex h-16 items-center justify-around px-2">
           {mobileTabs.map((item) => (
             <MobileTab
               key={item.href}
