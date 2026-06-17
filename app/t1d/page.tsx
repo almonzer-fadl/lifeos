@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { T1DStats } from "@/components/modules/t1d/stats-bar";
+import { T1DStatsBar } from "@/components/modules/t1d/stats-bar";
 import { GlucoseChart } from "@/components/modules/t1d/glucose-chart";
 import { Fab } from "@/components/ui/fab";
 import { format, subDays } from "date-fns";
@@ -21,19 +21,16 @@ export default async function T1DPage() {
   });
 
   const chartReadings = [...readings].reverse().map((r) => ({ ...r, timestamp: r.timestamp.toISOString() }));
-  const glucoseValues = readings.map((r) => r.value);
-  const latestGlucose = readings.length > 0 ? readings[0].value : null;
-  const totalInsulin = insulin.reduce((s, d) => s + d.units, 0);
 
   return (
     <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Metabolic Control</div>
         <h1 className="premium-title">Glucose Command</h1>
-        <p className="premium-subtitle">Blood glucose, insulin, and time-in-range monitoring</p>
+        <p className="premium-subtitle">Blood glucose, insulin, bolus calculator, and time-in-range</p>
       </div>
 
-      <T1DStats readings={glucoseValues} latestGlucose={latestGlucose} totalInsulin={totalInsulin} />
+      <T1DStatsBar />
       <GlucoseChart readings={chartReadings} />
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
