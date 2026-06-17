@@ -10,6 +10,7 @@ import projects from "./projects";
 import habits from "./habits";
 import journalTemplates from "./journal-templates";
 import timeBlocks from "./time-blocks";
+import { COURSES, LANGUAGES } from "./courses";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
@@ -110,6 +111,32 @@ async function seed() {
     console.log(`  ✓ ${count} time blocks seeded`);
   } else {
     console.log(`  - ${existingBlocks} time blocks already exist, skipping`);
+  }
+
+  // Courses
+  const existingCourses = await db.course.count();
+  if (existingCourses === 0) {
+    let count = 0;
+    for (const c of COURSES) {
+      await db.course.create({ data: c });
+      count++;
+    }
+    console.log(`  ✓ ${count} courses seeded`);
+  } else {
+    console.log(`  - ${existingCourses} courses already exist, skipping`);
+  }
+
+  // Languages
+  const existingLanguages = await db.languageProgress.count();
+  if (existingLanguages === 0) {
+    let count = 0;
+    for (const l of LANGUAGES) {
+      await db.languageProgress.create({ data: l });
+      count++;
+    }
+    console.log(`  ✓ ${count} languages seeded`);
+  } else {
+    console.log(`  - ${existingLanguages} languages already exist, skipping`);
   }
 
   console.log("Done.");
