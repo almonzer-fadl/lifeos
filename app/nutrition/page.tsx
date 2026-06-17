@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
+import { FrequentFoods } from "@/components/modules/nutrition/frequent-foods";
+import { WaterTracker } from "@/components/modules/nutrition/water-tracker";
 
 export const dynamic = "force-dynamic";
 
 export default async function NutritionPage() {
-  const today = subDays(new Date(), 0);
   const [entries, waterEntries] = await Promise.all([
     db.foodDiaryEntry.findMany({ where: { date: { gte: subDays(new Date(), 1) } }, orderBy: { createdAt: "desc" }, take: 30, include: { food: true } }),
     db.waterLog.findMany({ where: { date: { gte: subDays(new Date(), 1) } }, orderBy: { createdAt: "desc" }, take: 20 }),
@@ -24,21 +25,20 @@ export default async function NutritionPage() {
     <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Fuel Desk</div>
-        <h1 className="premium-title">Nutrition Diary</h1>
-        <p className="premium-subtitle">Today's intake</p>
+        <h1 className="premium-title">Nutrition</h1>
+        <p className="premium-subtitle">Track intake, carbs, and glucose response</p>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 animate-stagger">
         <div className="premium-stat"><div className="premium-label">Calories</div><div className="premium-value">{calories}</div><div className="text-xs text-[var(--text-tertiary)]">kcal</div></div>
-        <div className="premium-stat"><div className="premium-label">Protein</div><div className="premium-value text-[var(--sky)]">{protein}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
-        <div className="premium-stat"><div className="premium-label">Carbs</div><div className="premium-value text-[var(--amber)]">{carbs}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
-        <div className="premium-stat"><div className="premium-label">Fat</div><div className="premium-value text-[var(--rose)]">{fat}<span className="text-sm font-normal text-[var(--text-tertiary)]">g</span></div></div>
+        <div className="premium-stat"><div className="premium-label">Carbs</div><div className="premium-value text-[var(--amber)]">{carbs}<span className="text-sm font-normal text-[var(--text-tertiary)]"> g</span></div></div>
+        <div className="premium-stat"><div className="premium-label">Protein</div><div className="premium-value text-[var(--sky)]">{protein}<span className="text-sm font-normal text-[var(--text-tertiary)]"> g</span></div></div>
+        <div className="premium-stat"><div className="premium-label">Fat</div><div className="premium-value text-[var(--rose)]">{fat}<span className="text-sm font-normal text-[var(--text-tertiary)]"> g</span></div></div>
       </div>
 
-      <div className="premium-stat flex items-center justify-between">
-        <div><div className="premium-label">Water</div><div className="premium-value text-[var(--sky)]">{(totalWater / 1000).toFixed(1)}<span className="text-sm font-normal text-[var(--text-tertiary)]">L</span></div></div>
-        <Link href="/nutrition/log" className="premium-action text-xs">+ Log →</Link>
-      </div>
+      <WaterTracker />
+
+      <FrequentFoods />
 
       <Section title="Today's Meals" kicker={String(entries.length)} action={{ label: "Log Food", href: "/nutrition/log" }}>
         {entries.length === 0 ? (
@@ -54,8 +54,13 @@ export default async function NutritionPage() {
                 <div className="space-y-1">
                   {items.map((e) => (
                     <div key={e.id} className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 bg-[var(--surface)] border border-[var(--border-light)]">
-                      <div className="min-w-0"><div className="text-sm font-medium text-[var(--text)]">{(e as any).food?.name || "Food"}</div><div className="text-xs text-[var(--text-tertiary)]">{e.servings ? `${e.servings} serving` : ""}</div></div>
-                      <span className="shrink-0 font-mono text-sm text-[var(--text-secondary)]">{(e as any).food?.calories ? `${(e as any).food.calories * e.servings} kcal` : "—"}</span>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-[var(--text)]">{(e as any).food?.name || "Food"}</div>
+                        <div className="text-xs text-[var(--text-tertiary)]">
+                          {e.servings ? `${e.servings} serving` : ""}{e.carbEstimate ? ` · ${e.carbEstimate}g carbs` : (e as any).food?.carbs ? ` · ${(e as any).food.carbs * e.servings}g carbs` : ""}{e.bolusTaken ? ` · ${e.bolusTaken}u bolus` : ""}
+                        </div>
+                      </div>
+                      <span className="shrink-0 font-mono text-sm text-[var(--text-secondary)]">{(e as any).food?.calories ? `${Math.round((e as any).food.calories * e.servings)} kcal` : "—"}</span>
                     </div>
                   ))}
                 </div>

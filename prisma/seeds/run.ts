@@ -9,6 +9,7 @@ import contacts from "./contacts";
 import projects from "./projects";
 import habits from "./habits";
 import journalTemplates from "./journal-templates";
+import timeBlocks from "./time-blocks";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
@@ -96,6 +97,19 @@ async function seed() {
     console.log(`  ✓ ${count} journal templates seeded`);
   } else {
     console.log(`  - ${existingTemplates} journal templates already exist, skipping`);
+  }
+
+  // Time blocks
+  const existingBlocks = await db.timeBlockTemplate.count();
+  if (existingBlocks === 0) {
+    let count = 0;
+    for (const b of timeBlocks) {
+      await db.timeBlockTemplate.create({ data: b });
+      count++;
+    }
+    console.log(`  ✓ ${count} time blocks seeded`);
+  } else {
+    console.log(`  - ${existingBlocks} time blocks already exist, skipping`);
   }
 
   console.log("Done.");

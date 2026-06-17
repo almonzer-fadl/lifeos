@@ -91,60 +91,73 @@ body::after {
   overflow: hidden;
 }
 
-/* Typography Path */
+/* Premium Typography Path */
 .premium-page {
-  padding: 2rem;
+  padding: 1rem; /* Reduced for mobile */
   display: flex;
   flex-direction: column;
-  gap: 4rem;
-  max-width: 1600px;
+  gap: 1.5rem; /* Tighter on mobile */
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 .premium-header {
-  padding: 8rem 4rem 4rem;
+  padding: 3rem 1rem 1.5rem; /* Significantly reduced for mobile */
   text-align: left;
 }
 
 .premium-kicker {
   font-family: var(--font-sans);
   color: var(--accent);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.5em;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .premium-title {
   font-family: var(--font-serif), serif;
   color: var(--text);
-  font-size: 4.5rem;
+  font-size: clamp(2.25rem, 8vw, 3.5rem); /* Fluid sizing */
   font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .premium-subtitle {
   color: var(--text-secondary);
-  font-size: 1.15rem;
-  margin-top: 2rem;
+  font-size: 0.9375rem;
+  margin-top: 1rem;
   font-weight: 400;
   max-width: 550px;
-  line-height: 1.7;
+  line-height: 1.5;
   font-style: italic;
   opacity: 0.8;
 }
 
-/* Panelling */
+/* The 'Masterpiece' Panels */
 .premium-panel {
   background: var(--surface);
   border: none;
   border-radius: var(--radius-lg);
-  padding: 4rem;
+  padding: 1.5rem; /* Compact for mobile */
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: var(--shadow-card);
 }
+
+@media (min-width: 768px) {
+  .premium-page { padding: 1.5rem; gap: 2.5rem; }
+  .premium-header { padding: 4rem 2rem 2rem; }
+  .premium-panel { padding: 3rem; }
+  .premium-title { line-height: 1; }
+  .premium-subtitle { font-size: 1.1rem; margin-top: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .premium-header { padding: 6rem 3rem 3rem; }
+}
+
 
 .premium-panel:hover {
   box-shadow: var(--shadow-card-hover);

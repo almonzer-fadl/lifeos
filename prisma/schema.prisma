@@ -631,16 +631,23 @@ model JournalEntry {
 }
 
 model CalendarEvent {
-  id          String   @id @default(uuid())
-  externalId  String?  // CalDAV UID
-  title       String
-  description String?
-  startTime   DateTime
-  endTime     DateTime
-  location    String?
-  source      String   @default("manual") // manual, caldav
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  externalId          String?  // CalDAV UID
+  title               String
+  description         String?
+  startTime           DateTime
+  endTime             DateTime
+  location            String?
+  source              String   @default("manual") // manual, caldav
+  isRecurringParent   Boolean  @default(false)
+  recurringRule       String?  // RRULE string
+  isPrayerTime        Boolean  @default(false)
+  isTimeBlock         Boolean  @default(false)
+  timeBlockTemplateId String?
+  prayerName          String?  // Fajr, Dhuhr, Asr, Maghrib, Isha
+  hijriDate           String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@index([startTime])
   @@index([externalId])
@@ -1102,6 +1109,37 @@ model JournalTemplate {
   prompts   Json
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+// ─── Calendar (Phase 2) ───────────────────────────────────────────
+
+model TimeBlockTemplate {
+  id         String   @id @default(uuid())
+  name       String
+  startTime  String   // HH:mm
+  endTime    String   // HH:mm
+  daysOfWeek String   // "1,2,3,4,5" (0=Sun)
+  color      String?
+  type       String   @default("fixed") // fixed, prayer, variable
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model BlockCompliance {
+  id             String    @id @default(uuid())
+  date           DateTime
+  blockName      String
+  scheduledStart DateTime
+  scheduledEnd   DateTime
+  actualStart    DateTime?
+  actualEnd      DateTime?
+  compliance     Float?
+  activity       String?
+  notes          String?
+
+  @@unique([date, blockName])
+  @@index([date])
 }
 
 // ─── Activity (Phase 1) ────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
 import { DeleteButton } from "@/components/ui/delete-button";
 import { Fab } from "@/components/ui/fab";
+import { PRBoard, RaceCountdown } from "@/components/modules/activity/pr-board";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,9 @@ export default async function ActivityPage() {
         <h1 className="premium-title">Activity Feed</h1>
         <p className="premium-subtitle">Running, cycling, swimming, strength — weekly load</p>
       </div>
+
+      <RaceCountdown />
+      <PRBoard />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-stagger">
         <Stat l="Sessions (7d)" v={`${activities.length}`} />
