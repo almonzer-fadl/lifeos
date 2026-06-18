@@ -13,7 +13,7 @@ export function Fab({ href, icon, label }: FabProps) {
     <Link
       href={href}
       aria-label={label || "Add"}
-      className="fixed bottom-20 right-4 z-[51] lg:bottom-8 lg:right-8 w-14 h-14 rounded-2xl bg-[linear-gradient(180deg,rgba(220,193,122,0.24),rgba(220,193,122,0.12))] border border-[rgba(220,193,122,0.4)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+      className="fixed bottom-20 right-4 z-[51] lg:bottom-8 lg:right-8 w-14 h-14 rounded-2xl bg-[var(--surface)] border border-[var(--border-strong)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center justify-center transition-all hover:border-[var(--accent)] hover:scale-105 active:scale-95"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -61,19 +61,22 @@ export function LabResultForm() {
     e.preventDefault();
     if (!testName || !value) return;
     setSaving(true);
-    await fetch("/api/health/lab-results", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        testName, value: parseFloat(value), unit: unit || null,
-        refRangeLow: refLow ? parseFloat(refLow) : null,
-        refRangeHigh: refHigh ? parseFloat(refHigh) : null,
-        date: new Date().toISOString(),
-      }),
-    });
-    setTestName(""); setValue(""); setUnit(""); setRefLow(""); setRefHigh("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/health/lab-results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          testName, value: parseFloat(value), unit: unit || null,
+          refRangeLow: refLow ? parseFloat(refLow) : null,
+          refRangeHigh: refHigh ? parseFloat(refHigh) : null,
+          date: new Date().toISOString(),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Lab result logged");
+      router.push("/body/labs");
+      router.refresh();
+    } catch { toast.error("Failed to log lab result"); } finally { setSaving(false); }
   }
 
   return (

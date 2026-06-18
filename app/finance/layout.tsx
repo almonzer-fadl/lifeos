@@ -49,7 +49,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
                 href={item.href}
                 className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all ${
                   active
-                    ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                    ? "bg-[var(--surface-hover)] text-[var(--text)]"
                     : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"
                 }`}
               >
