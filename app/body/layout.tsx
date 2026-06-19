@@ -31,7 +31,7 @@ export default function BodyLayout({ children }: { children: React.ReactNode }) 
   const fab = getFab(pathname);
   return (
     <PageTransition>
-      <div className="sticky top-0 z-30 border-b border-[var(--border)] bg-[rgba(3,4,5,0.92)] backdrop-blur-xl">
+      <div className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)/0.92] backdrop-blur-xl">
         <div className="flex items-center gap-0.5 overflow-x-auto px-3 py-2 scrollbar-none sm:px-4 lg:px-6">
           {subNav.map((item) => {
             const active = item.href === "/body" ? pathname === "/body" : pathname.startsWith(item.href);

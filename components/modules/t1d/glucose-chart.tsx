@@ -27,39 +27,39 @@ export function GlucoseChart({ readings }: { readings: Reading[] }) {
     <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#202935" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
           <XAxis
             dataKey="time"
-            stroke="#66717f"
-            tick={{ fill: "#a5afbb", fontSize: 10 }}
+            stroke="var(--text-tertiary)"
+            tick={{ fill: "var(--text-secondary)", fontSize: 10 }}
             interval={Math.max(0, Math.floor(data.length / 5) - 1)}
-            axisLine={{ stroke: "#202935" }}
+            axisLine={{ stroke: "var(--border)" }}
           />
           <YAxis
-            stroke="#66717f"
-            tick={{ fill: "#a5afbb", fontSize: 10 }}
+            stroke="var(--text-tertiary)"
+            tick={{ fill: "var(--text-secondary)", fontSize: 10 }}
             domain={[40, 300]}
             ticks={[40, 70, 120, 180, 240, 300]}
-            axisLine={{ stroke: "#202935" }}
+            axisLine={{ stroke: "var(--border)" }}
           />
           <Tooltip
             contentStyle={{
-              background: "#0f141a",
-              border: "1px solid #202935",
+              background: "var(--surface-raised)",
+              border: "1px solid var(--border)",
               borderRadius: "8px",
               fontSize: "12px",
-              color: "#f2f4f5",
+              color: "var(--text)",
               boxShadow: "0 22px 70px rgba(0,0,0,0.34)",
             }}
-            labelStyle={{ color: "#a5afbb" }}
+            labelStyle={{ color: "var(--text-secondary)" }}
             formatter={(value) => [`${value} mg/dL`, "Glucose"]}
           />
-          <ReferenceLine y={70} stroke="#ff5f6d" strokeDasharray="4 4" />
-          <ReferenceLine y={180} stroke="#d99a2b" strokeDasharray="4 4" />
+          <ReferenceLine y={70} stroke="var(--rose)" strokeDasharray="4 4" />
+          <ReferenceLine y={180} stroke="var(--amber)" strokeDasharray="4 4" />
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#42d392"
+            stroke="var(--emerald)"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 4, fill: "#42d392", stroke: "#090c10", strokeWidth: 2 }}

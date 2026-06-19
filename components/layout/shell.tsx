@@ -129,7 +129,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[rgba(3,4,5,0.94)] shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
+      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--bg)/0.94] shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
         <div className="flex h-16 items-center justify-around px-1">
           {mobileTabs.map((item) => (
             <MobileTab

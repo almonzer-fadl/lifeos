@@ -113,7 +113,7 @@ export function HabitCard({ habit }: { habit: Habit }) {
     <>
     <div className={`flex items-center gap-3 rounded-lg border p-4 transition-all ${isDone ? "border-[rgba(66,211,146,0.3)] bg-[var(--emerald-soft)]" : "border-[var(--border)] bg-[var(--surface-raised)] shadow-[var(--shadow-card)]"} ${busy ? "opacity-50" : ""}`}>
       <button onClick={toggle} disabled={busy} className={`h-7 w-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? "bg-[var(--emerald)] border-[var(--emerald)]" : "border-[var(--border-strong)] hover:border-[var(--emerald)]"}`}>
-        {isDone && <svg className="h-4 w-4 text-[#020304]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+        {isDone && <svg className="h-4 w-4 text-[var(--bg)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </button>
       <div className="flex-1 min-w-0">
         <div className={`text-sm font-semibold ${isDone ? "text-[var(--emerald)]" : "text-[var(--text)]"}`}>{habit.name}</div>

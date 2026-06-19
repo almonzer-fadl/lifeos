@@ -30,7 +30,7 @@ export function GlucoseForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col sm:flex-row gap-2.5">
-        <div className="flex items-center gap-2 flex-1 bg-[#06080b] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
+        <div className="flex items-center gap-2 flex-1 bg-[var(--bg)] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
           <input
             type="number"
             value={value}
@@ -87,7 +87,7 @@ export function InsulinForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2.5">
-      <div className="flex items-center gap-2 bg-[#06080b] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
+      <div className="flex items-center gap-2 bg-[var(--bg)] rounded-lg border border-[var(--border)] px-3 py-2 focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all">
         <input
           type="number"
           value={units}

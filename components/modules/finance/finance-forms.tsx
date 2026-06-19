@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 type Account = { id: string; name: string; currency: string; type: string };
 type Tab = "account" | "asset" | "goal" | "recurring";
 
-const inputClass = "w-full border-[var(--border)] bg-[#080b0e] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
+const inputClass = "w-full border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder:text-[var(--text-tertiary)]";
 const submitClass = "w-full rounded-lg border border-[rgba(215,181,109,0.34)] bg-[rgba(215,181,109,0.14)] px-3 py-2.5 text-sm font-semibold text-[var(--accent)] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] transition-all hover:border-[rgba(215,181,109,0.55)] hover:bg-[rgba(215,181,109,0.2)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-35";
 
 export function FinanceForms({ accounts, currencies }: { accounts: Account[]; currencies: string[] }) {
@@ -14,7 +14,7 @@ export function FinanceForms({ accounts, currencies }: { accounts: Account[]; cu
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[#07090b] p-1 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[var(--bg)] p-1 sm:grid-cols-4">
         {(["account", "asset", "goal", "recurring"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${tab === t ? "bg-[var(--accent-soft)] text-[var(--accent)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)]"}`}>
             {t}
@@ -72,7 +72,7 @@ function AccountForm({ currencies }: { currencies: string[] }) {
         <F label="Name"><input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Account name" className={inputClass} required /></F>
         <F label="Currency"><select value={currency} onChange={(e) => setCurrency(e.target.value)} className={inputClass}>{["USD", "EUR", "TRY", "MYR", "SAR", "GBP"].map((c) => <option key={c} value={c}>{c}</option>)}</select></F>
         <F label="Balance"><input type="number" value={initialBalance} onChange={(e) => setInitialBalance(e.target.value)} step="0.01" className={inputClass} /></F>
-        <F label="Type"><div className="rounded-lg border border-[var(--border)] bg-[#080b0e] px-3 py-2 text-sm capitalize text-[var(--text-secondary)]">{type}</div></F>
+        <F label="Type"><div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm capitalize text-[var(--text-secondary)]">{type}</div></F>
       </div>
       {isDebt && (
         <div className="grid grid-cols-1 gap-2 rounded-lg border border-[rgba(255,95,109,0.22)] bg-[var(--rose-soft)] p-3 sm:grid-cols-2">
@@ -185,7 +185,7 @@ function RecurringForm({ accounts, currencies }: { accounts: Account[]; currenci
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[#07090b] p-1">
+      <div className="grid grid-cols-2 gap-1 rounded-lg border border-[var(--border-light)] bg-[var(--bg)] p-1">
         <button type="button" onClick={() => setType("expense")} className={`rounded-md py-2 text-xs font-semibold uppercase tracking-wide transition-all ${type === "expense" ? "bg-[var(--rose-soft)] text-[var(--rose)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)]"}`}>Bill</button>
         <button type="button" onClick={() => setType("income")} className={`rounded-md py-2 text-xs font-semibold uppercase tracking-wide transition-all ${type === "income" ? "bg-[var(--emerald-soft)] text-[var(--emerald)]" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-hover)]"}`}>Income</button>
       </div>
@@ -205,7 +205,7 @@ function SegmentedOptions({ options, value, onChange, tone = "default" }: { opti
   return (
     <div className="flex flex-wrap gap-1">
       {options.map((option) => (
-        <button key={option} type="button" onClick={() => onChange(option)} className={`rounded-md border px-2.5 py-1.5 text-[11px] font-semibold capitalize transition-all ${value === option ? tone === "gold" ? "border-[rgba(215,181,109,0.35)] bg-[var(--accent-soft)] text-[var(--accent)]" : "border-[rgba(115,167,216,0.34)] bg-[var(--sky-soft)] text-[var(--sky)]" : "border-[var(--border-light)] bg-[#080b0e] text-[var(--text-tertiary)] hover:border-[var(--border)] hover:text-[var(--text-secondary)]"}`}>
+        <button key={option} type="button" onClick={() => onChange(option)} className={`rounded-md border px-2.5 py-1.5 text-[11px] font-semibold capitalize transition-all ${value === option ? tone === "gold" ? "border-[rgba(215,181,109,0.35)] bg-[var(--accent-soft)] text-[var(--accent)]" : "border-[rgba(115,167,216,0.34)] bg-[var(--sky-soft)] text-[var(--sky)]" : "border-[var(--border-light)] bg-[var(--bg)] text-[var(--text-tertiary)] hover:border-[var(--border)] hover:text-[var(--text-secondary)]"}`}>
           {option}
         </button>
       ))}

@@ -12,46 +12,46 @@
 }
 
 :root {
-  --bg: #020304;
-  --surface: #090c10;
-  --surface-raised: #0f141a;
-  --surface-hover: #171d25;
-  --surface-elite: #111821;
-  --border: #202935;
-  --border-light: #151b23;
-  --border-strong: #3a4656;
-  --text: #f2f4f5;
-  --text-secondary: #a5afbb;
-  --text-tertiary: #66717f;
-  --accent: #dcc17a;
-  --accent-soft: rgba(215, 181, 109, 0.12);
-  --accent-hover: #e3c987;
-  --ring: #d7b56d;
+  --bg: #080a0c;
+  --surface: #0e1217;
+  --surface-raised: #141a22;
+  --surface-hover: #1a212a;
+  --surface-elite: #161e28;
+  --border: #1e2730;
+  --border-light: #171e26;
+  --border-strong: #2d3843;
+  --text: #e8ecf1;
+  --text-secondary: #959fad;
+  --text-tertiary: #5b6878;
+  --accent: #c8a85b;
+  --accent-soft: rgba(200, 168, 91, 0.1);
+  --accent-hover: #d6b76a;
+  --ring: #c8a85b;
 
-  --amber: #d99a2b;
-  --amber-soft: rgba(217, 154, 43, 0.12);
-  --rose: #ff5f6d;
-  --rose-soft: rgba(255, 95, 109, 0.12);
-  --emerald: #42d392;
-  --emerald-soft: rgba(66, 211, 146, 0.12);
-  --sky: #73a7d8;
-  --sky-soft: rgba(115, 167, 216, 0.12);
-  --violet: #a58bff;
-  --violet-soft: rgba(165, 139, 255, 0.12);
+  --amber: #d4952a;
+  --amber-soft: rgba(212, 149, 42, 0.1);
+  --rose: #e85460;
+  --rose-soft: rgba(232, 84, 96, 0.1);
+  --emerald: #3ec488;
+  --emerald-soft: rgba(62, 196, 136, 0.1);
+  --sky: #689dc8;
+  --sky-soft: rgba(104, 157, 200, 0.1);
+  --violet: #a08ef5;
+  --violet-soft: rgba(160, 142, 245, 0.1);
   --orange: #d58b45;
-  --orange-soft: rgba(213, 139, 69, 0.12);
-  --indigo: #8ea0ff;
-  --indigo-soft: rgba(142, 160, 255, 0.12);
+  --orange-soft: rgba(213, 139, 69, 0.1);
+  --indigo: #8298e8;
+  --indigo-soft: rgba(130, 152, 232, 0.1);
 
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.045) inset, 0 22px 70px rgba(0, 0, 0, 0.34);
-  --shadow-card-hover: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 28px 88px rgba(0, 0, 0, 0.42);
-  --shadow-modal: 0 30px 90px rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-card-hover: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 72px rgba(0, 0, 0, 0.55);
+  --shadow-modal: 0 28px 80px rgba(0, 0, 0, 0.6);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --hairline: rgba(255, 255, 255, 0.075);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --hairline: rgba(255, 255, 255, 0.06);
 }
 
 * {
@@ -159,7 +159,7 @@ body {
 
 /* Input, select, textarea */
 input, select, textarea {
-  background: #06080b;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.75rem;
