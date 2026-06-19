@@ -76,7 +76,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+      <aside className="hidden lg:flex h-dvh w-64 shrink-0 flex-col gap-5 overflow-y-auto border-r border-[var(--border)] bg-[var(--surface-deep)] px-3 py-4 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
         <Link href="/" className="flex items-center gap-3 rounded-lg border border-[var(--border-light)] bg-[rgba(255,255,255,0.02)] px-3 py-2 hover:border-[var(--border)] hover:bg-[var(--surface-hover)]">
           <Image src="/lifeos-logo.png" alt="Life OS" width={28} height={28} className="rounded-md" unoptimized />
           <div className="min-w-0">
@@ -129,7 +129,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--bg)/0.94] shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
+      <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--surface-deep)]/0.96 shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">
         <div className="flex h-16 items-center justify-around px-1">
           {mobileTabs.map((item) => (
             <MobileTab
