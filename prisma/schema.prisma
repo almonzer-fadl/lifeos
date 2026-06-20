@@ -398,13 +398,17 @@ model Transaction {
   status            String   @default("pending") // pending, cleared, reconciled
   isTransfer        Boolean  @default(false)
   transferAccountId String?
+  parentTransactionId String? // for split transactions
   account           Account  @relation("TransactionAccount", fields: [accountId], references: [id])
   category          Category? @relation(fields: [categoryId], references: [id])
+  parentTransaction Transaction? @relation("SplitChildren", fields: [parentTransactionId], references: [id])
+  childTransactions Transaction[] @relation("SplitChildren")
 
   @@index([date])
   @@index([accountId])
   @@index([categoryId])
   @@index([status])
+  @@index([parentTransactionId])
 }
 
 model Budget {
