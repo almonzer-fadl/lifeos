@@ -414,7 +414,11 @@ button:disabled {
   justify-content: center;
   min-height: 2.5rem;
   padding: 0.55rem 0.9rem;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.12s ease;
+}
+
+.premium-action:active {
+  transform: scale(0.97);
 }
 
 .premium-action:hover {

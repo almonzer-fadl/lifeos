@@ -69,7 +69,7 @@ export default async function AccountRegisterPage({ params }: { params: Promise<
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] text-left text-sm">
               <thead><tr className="border-b border-[var(--border)]"><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Date</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Description</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Category</th><th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Amount</th><th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Balance</th><th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">Status</th></tr></thead>
-              <tbody>
+              <tbody className="animate-stagger">
                 {txWithBalance.map((t) => (
                   <tr key={t.id} className="border-b border-[var(--border-light)] transition-colors hover:bg-[var(--surface-hover)]">
                     <td className="px-3 py-2.5 text-xs text-[var(--text-tertiary)] whitespace-nowrap">{format(new Date(t.date), "MMM d")}</td>
