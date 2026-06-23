@@ -37,14 +37,21 @@ export function CreateTaskForm() {
     e.preventDefault();
     if (!title.trim()) return;
     setSaving(true);
-    await fetch("/api/productivity/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, priority }),
-    });
-    setTitle("");
-    setSaving(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/productivity/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, priority }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Task created");
+      setTitle("");
+      router.refresh();
+    } catch {
+      toast.error("Failed to create task");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -90,13 +97,19 @@ export function TaskCard({
     const next = NEXT_STATUS[task.status];
     if (!next) return;
     setBusy(true);
-    await fetch("/api/productivity/tasks", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: task.id, status: next }),
-    });
-    setBusy(false);
-    router.refresh();
+    try {
+      const res = await fetch("/api/productivity/tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: task.id, status: next }),
+      });
+      if (!res.ok) throw new Error();
+      router.refresh();
+    } catch {
+      toast.error("Failed to move task");
+    } finally {
+      setBusy(false);
+    }
   }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

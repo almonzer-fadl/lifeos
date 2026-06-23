@@ -55,6 +55,8 @@ export default function ReconciliationPage() {
       toast.success("Reconciliation complete");
       router.refresh();
       setData(null);
+    } else {
+      toast.error("Failed to complete reconciliation");
     }
   }
 

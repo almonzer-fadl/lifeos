@@ -37,7 +37,6 @@ export function NutritionForm() {
       if (!res.ok) throw new Error();
       toast.success("Food logged");
       router.push("/nutrition");
-      router.refresh();
     } catch { toast.error("Failed to log food"); } finally { setSaving(false); }
   }
 

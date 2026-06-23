@@ -27,7 +27,6 @@ export default function NewGoalPage() {
       if (!res.ok) throw new Error();
       toast.success("Goal created");
       router.push("/finance/goals");
-      router.refresh();
     } catch {
       toast.error("Failed to create goal");
     } finally {

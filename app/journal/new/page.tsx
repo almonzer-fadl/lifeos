@@ -22,7 +22,6 @@ export default function NewJournalPage() {
       if (!res.ok) throw new Error();
       toast.success("Entry saved");
       router.push("/journal");
-      router.refresh();
     } catch { toast.error("Failed to save entry"); } finally { setSaving(false); }
   }
 

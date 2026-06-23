@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { PageTransition } from "@/components/ui/page-transition";
 
 type NavItem = {
   label: string;
@@ -124,7 +125,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)]">
         <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </div>
       </main>
 

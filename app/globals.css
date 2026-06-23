@@ -70,67 +70,7 @@ body {
   line-height: 1.5;
 }
 
-/* Legacy light-class compatibility while the app finishes migrating to the premium dark system. */
-.bg-white,
-.bg-stone-50,
-.bg-stone-100,
-.bg-zinc-50 {
-  background-color: var(--surface-raised) !important;
-}
 
-.hover\:bg-stone-50:hover,
-.hover\:bg-stone-50\/50:hover,
-.hover\:bg-stone-100:hover,
-.hover\:bg-stone-100\/50:hover {
-  background-color: var(--surface-hover) !important;
-}
-
-.text-stone-900,
-.text-stone-800,
-.text-zinc-900 {
-  color: var(--text) !important;
-}
-
-.text-stone-700,
-.text-stone-600,
-.text-zinc-700,
-.text-zinc-600 {
-  color: var(--text-secondary) !important;
-}
-
-.text-stone-500,
-.text-stone-400,
-.text-stone-300,
-.text-zinc-500 {
-  color: var(--text-tertiary) !important;
-}
-
-.border-stone-200,
-.border-stone-300 {
-  border-color: var(--border) !important;
-}
-
-.bg-teal-600,
-.bg-sky-600,
-.bg-violet-600,
-.bg-emerald-600,
-.bg-amber-600,
-.bg-orange-600,
-.bg-cyan-600 {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text) !important;
-}
-
-.hover\:bg-teal-700:hover,
-.hover\:bg-sky-700:hover,
-.hover\:bg-violet-700:hover,
-.hover\:bg-emerald-700:hover,
-.hover\:bg-amber-700:hover,
-.hover\:bg-orange-700:hover,
-.hover\:bg-cyan-700:hover {
-  background: var(--surface-hover) !important;
-}
 
 @supports (padding: env(safe-area-inset-bottom)) {
   body {
