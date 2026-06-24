@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
 import { DeleteButton } from "@/components/ui/delete-button";
+import { Fab } from "@/components/ui/fab";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +108,7 @@ export default async function ActivityPage() {
           </div>
         )}
       </Section>
+      <Fab href="/activity/log" icon="M12 6v6m0 0v6m0-6h6m-6 0H6" label="Log Activity" />
     </div>
   );
 }
