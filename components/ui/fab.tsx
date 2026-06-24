@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRespectMotion } from "@/lib/motion";
 
 interface FabProps {
   href: string;
@@ -10,12 +11,14 @@ interface FabProps {
 }
 
 export function Fab({ href, icon, label }: FabProps) {
+  const { spring } = useRespectMotion();
+
   return (
     <motion.div
       className="fixed bottom-20 right-4 z-[51] lg:bottom-8 lg:right-8"
       whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.94 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      transition={spring}
     >
       <Link
         href={href}
