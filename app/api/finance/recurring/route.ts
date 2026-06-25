@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput } from "@/lib/money";
-
-const VALID_FREQUENCIES = ["daily", "weekly", "monthly", "yearly"];
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 function computeNextDate(from: Date, frequency: string, count: number): Date {
   const d = new Date(from);
   switch (frequency) {
     case "daily": d.setDate(d.getDate() + count); break;
     case "weekly": d.setDate(d.getDate() + 7 * count); break;
+    case "biweekly": d.setDate(d.getDate() + 14 * count); break;
     case "monthly": d.setMonth(d.getMonth() + count); break;
+    case "quarterly": d.setMonth(d.getMonth() + 3 * count); break;
     case "yearly": d.setFullYear(d.getFullYear() + count); break;
   }
   return d;
@@ -22,18 +24,17 @@ export async function GET() {
     include: { account: true, category: true },
   });
 
-  // Compute monthly outflow
   const monthlyOutflow = items
     .filter((r) => r.type === "expense")
     .reduce((s, r) => {
       if (r.frequency === "monthly") return s + r.amount;
       if (r.frequency === "yearly") return s + r.amount / 12;
       if (r.frequency === "weekly") return s + (r.amount * 52) / 12;
+      if (r.frequency === "biweekly") return s + (r.amount * 26) / 12;
       if (r.frequency === "daily") return s + (r.amount * 30) / r.frequencyCount;
       return s + (r.amount * 30) / r.frequencyCount;
     }, 0);
 
-  // Cashflow forecast: next 30 days
   const forecast: { date: string; income: number; expense: number; balance: number }[] = [];
   let runningBalance = 0;
   const now = new Date();
@@ -62,31 +63,22 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (!body.description || typeof body.description !== "string" || body.description.trim().length === 0) {
-    return NextResponse.json({ error: "Description is required" }, { status: 400 });
-  }
-  if (!body.accountId) {
-    return NextResponse.json({ error: "Account is required" }, { status: 400 });
-  }
-  if (body.amount == null || isNaN(parseFloat(body.amount)) || parseFloat(body.amount) <= 0) {
-    return NextResponse.json({ error: "Valid amount is required" }, { status: 400 });
-  }
-  if (body.frequency && !VALID_FREQUENCIES.includes(body.frequency)) {
-    return NextResponse.json({ error: `Invalid frequency. Must be one of: ${VALID_FREQUENCIES.join(", ")}` }, { status: 400 });
-  }
+  const validation = validateBody(schemas.recurring, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
 
-  const startDate = body.startDate ? new Date(body.startDate) : new Date();
-  const nextDate = computeNextDate(startDate, body.frequency || "monthly", 1);
+  const startDate = new Date(validation.data.startDate);
+  const nextDate = computeNextDate(startDate, validation.data.frequency, 1);
 
   const item = await db.recurringTransaction.create({
     data: {
-      type: body.type === "income" ? "income" : "expense",
+      type: validation.data.type,
       amount: parseMoneyInput(body.amount),
-      currency: body.currency || "USD",
-      accountId: body.accountId,
-      categoryId: body.categoryId || null,
-      description: body.description.trim(),
-      frequency: body.frequency || "monthly",
+      currency: validation.data.currency,
+      accountId: validation.data.accountId,
+      categoryId: validation.data.categoryId,
+      description: validation.data.description,
+      frequency: validation.data.frequency,
       frequencyCount: body.frequencyCount || 1,
       startDate,
       endDate: body.endDate ? new Date(body.endDate) : null,
@@ -111,7 +103,6 @@ export async function PATCH(request: NextRequest) {
   return NextResponse.json(item);
 }
 
-// Advance to next occurrence
 export async function PUT(request: NextRequest) {
   const body = await request.json();
   if (!body.id) return NextResponse.json({ error: "id is required" }, { status: 400 });

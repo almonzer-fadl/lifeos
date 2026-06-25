@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput, parseOptionalMoneyInput } from "@/lib/money";
-
-const VALID_TYPES = ["checking", "savings", "cash", "credit", "investment", "crypto", "loan", "mortgage"];
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET() {
   const accounts = await db.account.findMany({
@@ -15,27 +15,21 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (!body.name || typeof body.name !== "string" || body.name.trim().length === 0) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
-  }
-  if (body.type && !VALID_TYPES.includes(body.type)) {
-    return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(", ")}` }, { status: 400 });
-  }
-  if (body.paymentDueDay != null && (body.paymentDueDay < 1 || body.paymentDueDay > 31)) {
-    return NextResponse.json({ error: "Payment due day must be between 1 and 31" }, { status: 400 });
-  }
+  const validation = validateBody(schemas.account, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
 
   const account = await db.account.create({
     data: {
-      name: body.name.trim(),
-      currency: body.currency || "USD",
-      type: body.type || "checking",
+      name: validation.data.name,
+      currency: validation.data.currency,
+      type: validation.data.type,
       initialBalance: parseMoneyInput(body.initialBalance || "0"),
-      isDebt: body.isDebt === true,
-      interestRate: body.interestRate ? parseFloat(body.interestRate) : null,
-      minimumPayment: parseOptionalMoneyInput(body.minimumPayment),
-      creditLimit: parseOptionalMoneyInput(body.creditLimit),
-      paymentDueDay: body.paymentDueDay ? parseInt(body.paymentDueDay) : null,
+      isDebt: validation.data.isDebt,
+      interestRate: validation.data.interestRate,
+      minimumPayment: validation.data.minimumPayment,
+      creditLimit: validation.data.creditLimit,
+      paymentDueDay: validation.data.paymentDueDay,
       payoffTarget: body.payoffTarget ? new Date(body.payoffTarget) : null,
       notes: body.notes || null,
     },

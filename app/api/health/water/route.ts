@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -21,8 +23,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.water, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const log = await db.waterLog.create({
-    data: { amountMl: body.amountMl, date: body.date ? new Date(body.date) : new Date() },
+    data: { amountMl: validation.data.amountMl, date: body.date ? new Date(body.date) : new Date() },
   });
 
   return NextResponse.json(log, { status: 201 });

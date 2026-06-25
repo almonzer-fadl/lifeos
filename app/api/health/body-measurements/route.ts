@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,19 +18,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.bodyMeasurement, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const measurement = await db.bodyMeasurement.create({
     data: {
       date: body.date ? new Date(body.date) : new Date(),
-      weight: body.weight || null,
-      bodyFatPct: body.bodyFatPct || null,
-      waist: body.waist || null,
-      chest: body.chest || null,
+      weight: validation.data.weight,
+      bodyFatPct: validation.data.bodyFatPct,
+      waist: validation.data.waist,
+      chest: validation.data.chest,
       bicepLeft: body.bicepLeft || null,
       bicepRight: body.bicepRight || null,
       thighLeft: body.thighLeft || null,
       thighRight: body.thighRight || null,
       neck: body.neck || null,
-      notes: body.notes || null,
+      notes: validation.data.notes,
     },
   });
 

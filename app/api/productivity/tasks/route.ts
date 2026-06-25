@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,14 +26,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.task, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const task = await db.task.create({
     data: {
-      title: body.title,
-      description: body.description || null,
-      dueDate: body.dueDate ? new Date(body.dueDate) : null,
-      priority: body.priority || "medium",
-      status: body.status || "todo",
-      projectId: body.projectId || null,
+      title: validation.data.title,
+      description: validation.data.description,
+      dueDate: validation.data.dueDate ? new Date(validation.data.dueDate) : null,
+      priority: validation.data.priority || "medium",
+      status: validation.data.status || "todo",
+      projectId: validation.data.projectId,
       tags: body.tags || null,
     },
     include: { project: true },

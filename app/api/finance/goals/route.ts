@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput } from "@/lib/money";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET() {
   const goals = await db.financialGoal.findMany({
@@ -13,21 +15,18 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (!body.name || typeof body.name !== "string" || body.name.trim().length === 0) {
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
-  }
-  if (body.targetAmount == null || isNaN(parseFloat(body.targetAmount)) || parseFloat(body.targetAmount) <= 0) {
-    return NextResponse.json({ error: "Valid target amount is required" }, { status: 400 });
-  }
+  const validation = validateBody(schemas.goal, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
 
   const goal = await db.financialGoal.create({
     data: {
-      name: body.name.trim(),
-      targetAmount: parseMoneyInput(body.targetAmount),
-      currentAmount: body.currentAmount != null ? parseMoneyInput(body.currentAmount) : 0,
-      currency: body.currency || "USD",
+      name: validation.data.name,
+      targetAmount: validation.data.targetAmount,
+      currentAmount: validation.data.currentAmount,
+      currency: validation.data.currency,
       targetDate: body.targetDate ? new Date(body.targetDate) : null,
-      accountId: body.accountId || null,
+      accountId: validation.data.accountId,
       notes: body.notes || null,
     },
   });

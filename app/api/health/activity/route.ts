@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -29,17 +31,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.activity, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const activity = await db.activity.create({
     data: {
-      type: body.type,
-      startTime: body.startTime ? new Date(body.startTime) : new Date(),
-      endTime: body.endTime ? new Date(body.endTime) : null,
-      distance: body.distance || null,
+      type: validation.data.type,
+      startTime: validation.data.startTime ? new Date(validation.data.startTime) : new Date(),
+      endTime: validation.data.endTime ? new Date(validation.data.endTime) : null,
+      distance: validation.data.distance,
       elevationGain: body.elevationGain || null,
-      heartRateAvg: body.heartRateAvg || null,
+      heartRateAvg: validation.data.heartRateAvg,
       heartRateMax: body.heartRateMax || null,
       calories: body.calories || null,
-      notes: body.notes || null,
+      notes: validation.data.notes,
       source: body.source || "manual",
       externalId: body.externalId || null,
     },

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -27,12 +29,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+  const validation = validateBody(schemas.sleep, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
+
   const session = await db.sleepSession.create({
     data: {
-      startTime: new Date(body.startTime),
-      endTime: new Date(body.endTime),
-      quality: body.quality || null,
-      notes: body.notes || null,
+      startTime: new Date(validation.data.startTime),
+      endTime: new Date(validation.data.endTime),
+      quality: validation.data.quality,
+      notes: validation.data.notes,
       source: body.source || "manual",
     },
   });

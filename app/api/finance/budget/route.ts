@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { parseMoneyInput } from "@/lib/money";
+import { schemas } from "@/lib/validate";
+import { validateBody } from "@/lib/api-utils";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const monthStr = searchParams.get("month"); // YYYY-MM format
+  const monthStr = searchParams.get("month");
 
   if (!monthStr || !/^\d{4}-\d{2}$/.test(monthStr)) {
     return NextResponse.json({ error: "month is required (YYYY-MM)" }, { status: 400 });
@@ -14,7 +16,7 @@ export async function GET(request: NextRequest) {
   const monthStart = new Date(year, mon - 1, 1);
   const monthEnd = new Date(year, mon, 0, 23, 59, 59);
 
-  const [budgetItems, transactions, categories, accounts] = await Promise.all([
+  const [budgetItems, transactions, categories] = await Promise.all([
     db.budget.findMany({
       where: { month: monthStart },
       include: { category: true },
@@ -24,15 +26,12 @@ export async function GET(request: NextRequest) {
       include: { category: true },
     }),
     db.category.findMany({ orderBy: { name: "asc" } }),
-    db.account.findMany({ where: { isActive: true } }),
   ]);
 
-  // Monthly income (all income transactions this month)
   const monthlyIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((s, t) => s + t.amount, 0);
 
-  // Activity per category (actual spending)
   const activity: Record<string, number> = {};
   transactions
     .filter((t) => t.type === "expense" && t.categoryId)
@@ -40,7 +39,6 @@ export async function GET(request: NextRequest) {
       activity[t.categoryId!] = (activity[t.categoryId!] || 0) + t.amount;
     });
 
-  // Build envelope rows for expense categories
   const envelopes = categories
     .filter((c) => c.type === "expense")
     .map((c) => {
@@ -76,21 +74,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (!body.categoryId || !body.month) {
-    return NextResponse.json({ error: "categoryId and month are required" }, { status: 400 });
-  }
+  const validation = validateBody(schemas.budget, body);
+  if (validation.error) return validation.error;
+  if (!validation.data) return NextResponse.json({ error: "Validation failed" }, { status: 400 });
 
-  const monthStart = new Date(body.month + "-01");
+  const monthStart = new Date(validation.data.month + "-01");
 
   const budget = await db.budget.upsert({
-    where: { categoryId_month: { categoryId: body.categoryId, month: monthStart } },
+    where: { categoryId_month: { categoryId: validation.data.categoryId, month: monthStart } },
     create: {
-      categoryId: body.categoryId,
+      categoryId: validation.data.categoryId,
       month: monthStart,
-      amount: parseMoneyInput(body.amount || "0"),
+      amount: validation.data.amount,
     },
     update: {
-      amount: parseMoneyInput(body.amount || "0"),
+      amount: validation.data.amount,
     },
     include: { category: true },
   });
