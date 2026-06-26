@@ -1,104 +1,75 @@
-# Design Plan
+# Design — 6/10 → 10/10
 
-Visual design system for Life OS. Dark-only, institutional terminal aesthetic.
+## Current state
+- Dark-only premium terminal aesthetic, consistent across the app
+- Design tokens as CSS custom properties in `:root`
+- `premium-*` class naming convention (panel, stat, row, chip, action, table, etc.)
+- Geist Sans + Geist Mono via `next/font`
+- Custom scrollbar, selection colors, input/select/textarea base styles
+- Motion respects `prefers-reduced-motion`
+- Spring presets in `lib/motion.ts`, FAB + PageTransition use them
+- Semantic color system: emerald=positive, rose=negative, amber=warning, sky=info
 
-## Design tokens
+## What blocks 10/10
 
-Already defined in `app/globals.css` `:root`. Ship what's there — no new colors needed.
+### 1. No micro-interactions on interactive elements
+Buttons have `active:scale-[0.97]` which is CSS, not spring physics. Cards and rows have no hover transition depth.
+- Add `motion.button` with `whileTap={{ scale: 0.97 }}` spring to all primary buttons
+- Card hover: subtle `translateY(-1px)` + shadow increase via framer-motion
+- Row hover: background transition with 150ms duration (already have this via CSS)
+- Toggle/checkbox: spring bounce on state change
 
-```
---bg, --surface, --surface-raised, --surface-hover, --surface-elite,
---surface-deep, --surface-alt
---border, --border-light, --border-strong
---text, --text-secondary, --text-tertiary
---accent (gold #c8a85b), --accent-soft, --accent-hover
---amber, --rose, --emerald, --sky, --violet, --orange, --indigo (semantic)
---shadow-card, --shadow-card-hover, --shadow-modal
---radius-sm (6), --radius-md (10), --radius-lg (14), --radius-xl (18)
-```
+### 2. No staggered list entry animations
+The `animate-stagger` CSS class exists but is barely used. Lists should cascade in with 40ms delays.
+- Apply `animate-stagger` to every list: transaction ledger, habit grid, task kanban columns, journal timeline, activity feed
+- Animate each row: `initial={{ opacity: 0, y: 8 }}` → `animate={{ opacity: 1, y: 0 }}`
+- Works with the existing CSS stagger — just add `className="animate-stagger"` to the container
 
-## Typography
+### 3. No celebration/confirmation animations
+Creating something feels anti-climactic — just a toast. Premium apps make you feel good about completing actions.
+- Habit completion: checkmark spring-bounces in
+- Task moving to "done": card pulses emerald and fades slightly
+- Goal reaching 100%: progress bar pulses gold
+- Transaction added: the amount in the register animates in (odometer roll)
 
-- Sans: Geist Sans (400–700) via `next/font/google`
-- Mono: Geist Mono (400–500) for numbers, amounts, codes
-- All financial figures: `font-mono tabular-nums`
-- Hierarchy: 10px overlines → 13px body → 15px subhead → 20px titles
-- No font sizes above 24px in content
+### 4. No skeleton-to-content transition
+Skeletons appear then disappear abruptly. There's no morph from skeleton to real content.
+- Wrap skeleton + content in `AnimatePresence`
+- Skeleton exits with `opacity: 0, scale: 0.98`
+- Content enters with `opacity: 0 → 1, y: 4 → 0`
+- Creates a seamless "data arriving" feel
 
-## Spacing scale
+### 5. No number-counting animation for stats
+The `odometer.tsx` component exists but is only used on the net worth number. Every stat should animate in.
+- Apply `Odometer` to all stat values on dashboards: income, expenses, account balances, glucose avg, sleep hours, habit streaks
+- Duration: 600ms for small numbers, 1000ms for large numbers
+- Spring-based easing via `useSpring`
 
-```
-4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64
-```
-Use the scale. No arbitrary values.
+### 6. No chart animations
+The T1D glucose chart uses recharts but has no entry animation. Health dashboards feel static.
+- Animate chart lines drawing in (stroke-dasharray trick or recharts animation prop)
+- Bar charts: bars grow from 0 height with stagger
+- This applies to: glucose chart (T1D), any future spending/trend charts
 
-## Component conventions
+### 7. Inconsistent border-radius usage
+Some cards use `rounded-lg` (10px), some use `rounded-md` (6px), forms use no radius. Radii should be systematic.
+- `var(--radius-sm)` = 6px: inputs, buttons, chips
+- `var(--radius-md)` = 10px: cards, panels, stat tiles
+- `var(--radius-lg)` = 14px: sheets, modals, FAB
+- Audit every component — replace hardcoded `rounded-*` with the token value
 
-### Cards
-- `premium-panel` class: `bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] p-4`
-- Hover: add `shadow-[var(--shadow-card-hover)]` and `border-[var(--border-strong)]`
-- Never use `bg-white`, `bg-gray-*`, or Tailwind color classes — override in CSS already exists
+### 8. No dark mode persistence or flash prevention
+The app is dark-only but there's no loading state that matches. On slow connections, there's a white flash before CSS loads.
+- Add `<script>` in `<head>` that sets `document.documentElement.style.background = '#080a0c'` before any render
+- Or use `color-scheme: dark` meta tag (already have theme-color meta, just add this)
+- This is 1 line: `<meta name="color-scheme" content="dark" />`
 
-### Buttons
-- Primary: `bg-[var(--accent)] text-black font-semibold rounded-lg px-4 py-2`
-- Secondary: `border border-[var(--border)] text-[var(--text)] rounded-lg px-4 py-2`
-- Danger: `bg-[var(--rose-soft)] text-[var(--rose)] border border-[var(--rose)]/20`
-- Ghost: `text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-hover)]`
-- All: `transition-all duration-150` minimum
-
-### Inputs
-- `bg-[var(--surface-deep)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm`
-- Focus: `border-[var(--accent)] ring-1 ring-[var(--ring)]`
-- Placeholder: `text-[var(--text-tertiary)]`
-- Labels: `text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]`
-
-### Tables
-- `premium-table` class: full width, `border-collapse`
-- Header: `text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] border-b border-[var(--border)]`
-- Row: `border-b border-[var(--border-light)] hover:bg-[var(--surface-hover)]`
-- Cell: `px-4 py-2.5 text-sm`
-
-### Semantic colors (non-negotiable)
-- Positive (gains, credits, in-range): `var(--emerald)`
-- Negative (losses, debits, out-of-range): `var(--rose)`
-- Warning (pending, borderline): `var(--amber)`
-- Info (neutral, secondary): `var(--sky)`
-- Never swap these. Red = bad, green = good, everywhere.
-
-## Motion
-
-Library: `framer-motion` (already installed, `lib/motion.ts` has `useRespectMotion`).
-
-### Spring presets
-```
-snappy:  { stiffness: 500, damping: 30 }   // buttons, toggles
-smooth:  { stiffness: 300, damping: 28 }   // cards, sheets, modals
-bouncy:  { stiffness: 250, damping: 22 }   // celebration, emphasis
-heavy:   { stiffness: 150, damping: 20 }   // page transitions
-```
-
-### Where to animate
-- Page transitions: `AnimatePresence` with fade+slideUp on route change
-- List items: stagger children by 40ms on mount
-- FAB: spring scale on press, rotate 45° when sheet open
-- Sheets/modals: scale from 0.95 + fade
-- Odometer: `useSpring` for number roll (already built)
-- Progress rings: SVG stroke-dashoffset spring
-
-### Where NOT to animate
-- Table rows, body text, static labels, dense data grids
-- Any element inside `prefers-reduced-motion` (use `useRespectMotion`)
-
-## PWA / mobile
-
-- `viewport-fit: cover` for notched phones
-- Bottom nav: `safe-area-bottom` padding
-- Content: `pb-[5.25rem]` to clear bottom nav
-- Touch targets: minimum 44×44px for interactive elements on mobile
-- No hover-dependent UI on mobile
-
-## What to fix now
-
-1. Remove the Tailwind `!important` override block in globals.css — it's a brittle hack. Every `bg-white`/`bg-gray-*` class in existing components should be replaced with `premium-*` classes directly.
-2. No hardcoded hex values in components — use CSS variables only.
-3. No light mode escape hatches. The app is dark-only. Don't add `dark:` prefix hacks.
+## Priority order
+1. Staggered list animations (biggest visual impact, mostly adding className)
+2. Micro-interactions on buttons/cards (responsiveness feel)
+3. Skeleton-to-content transition (loading polish)
+4. Odometer on all stats (dashboard polish)
+5. Celebration animations on completion actions (emotional design)
+6. Dark mode flash prevention (1 line fix)
+7. Consistent border-radius audit (systematic polish)
+8. Chart animations (nice-to-have)
