@@ -44,7 +44,7 @@ function Column({ title, color, count, children }: { title: string; color: strin
         <h2 className="text-sm font-semibold text-[var(--text)]">{title}</h2>
         <span className="rounded border border-[var(--border-light)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-tertiary)]">{count}</span>
       </div>
-      <div className="p-2 space-y-2 min-h-[100px]">{children}</div>
+      <div className="p-2 space-y-2 min-h-[100px] animate-stagger">{children}</div>
     </section>
   );
 }
