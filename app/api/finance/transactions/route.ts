@@ -4,6 +4,9 @@ import { parseMoneyInput, dollarsToCents } from "@/lib/money";
 import { schemas } from "@/lib/validate";
 import { validateBody } from "@/lib/api-utils";
 import { logTransactionAudit } from "@/lib/audit";
+import { checkRateLimit } from "@/lib/api-middleware";
+import { logRequest } from "@/lib/logger";
+import { DEFAULTS } from "@/lib/rate-limit";
 
 const VALID_TYPES = ["income", "expense", "transfer"];
 const VALID_STATUSES = ["pending", "cleared", "reconciled"];
@@ -49,6 +52,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const start = Date.now();
+  const limit = checkRateLimit(request, DEFAULTS.MUTATION);
+  if (limit) return limit;
+
   const body = await request.json();
 
   // ---- TRANSFER: create paired entries ----
@@ -151,6 +158,12 @@ export async function POST(request: NextRequest) {
   }
 
   // ---- STANDARD transaction ----
+  // Idempotency check
+  if (body.idempotencyKey) {
+    const existing = await db.transaction.findUnique({ where: { idempotencyKey: body.idempotencyKey }, include: { account: true, category: true } });
+    if (existing) return NextResponse.json(existing, { status: 200 });
+  }
+
   const validation = validateBody(schemas.transaction, body);
   if (validation.error) return validation.error;
 
@@ -171,6 +184,7 @@ export async function POST(request: NextRequest) {
       notes: body.notes || null,
       isTransfer: validation.data.isTransfer,
       transferAccountId: validation.data.transferAccountId,
+      idempotencyKey: body.idempotencyKey || null,
     },
     include: { account: true, category: true },
   });

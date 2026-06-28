@@ -399,6 +399,7 @@ model Transaction {
   isTransfer        Boolean  @default(false)
   transferAccountId String?
   parentTransactionId String? // for split transactions
+  idempotencyKey    String?  // client-generated UUID for safe retries
   account           Account  @relation("TransactionAccount", fields: [accountId], references: [id])
   category          Category? @relation(fields: [categoryId], references: [id])
   parentTransaction Transaction? @relation("SplitChildren", fields: [parentTransactionId], references: [id])
@@ -410,6 +411,7 @@ model Transaction {
   @@index([categoryId])
   @@index([status])
   @@index([parentTransactionId])
+  @@unique([idempotencyKey])
 }
 
 model TransactionAudit {
