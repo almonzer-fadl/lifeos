@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function LabsPage() {
   const labs = await db.labResult.findMany({ orderBy: { date: "desc" }, take: 30 });
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Blood Work</div><h1 className="premium-title">Lab Results</h1><p className="premium-subtitle">{labs.length} results</p></div>
       <section className="premium-panel animate-fade-in">
         {labs.length === 0 ? (

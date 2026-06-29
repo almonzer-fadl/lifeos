@@ -21,7 +21,7 @@ export default async function NutritionPage() {
   entries.forEach((e) => { if (e.mealType) { if (!byMeal[e.mealType]) byMeal[e.mealType] = []; byMeal[e.mealType].push(e); } });
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Fuel Desk</div>
         <h1 className="premium-title">Nutrition Diary</h1>

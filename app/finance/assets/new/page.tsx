@@ -36,7 +36,7 @@ export default function NewAssetPage() {
   }
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Holding</div>
         <h1 className="premium-title">Add Asset</h1>

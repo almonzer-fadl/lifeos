@@ -63,6 +63,8 @@ export function GlucoseChart({ readings }: { readings: Reading[] }) {
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 4, fill: "#42d392", stroke: "#090c10", strokeWidth: 2 }}
+            animationDuration={800}
+            animationEasing="ease-out"
           />
         </LineChart>
       </ResponsiveContainer>

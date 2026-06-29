@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { PageTransition } from "@/components/ui/page-transition";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { CommandPalette } from "@/components/ui/command-palette";
 
 type NavItem = {
   label: string;
@@ -19,16 +20,19 @@ const mainNav: NavItem[] = [
 const healthNav: NavItem[] = [
   { label: "T1D", href: "/t1d", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
   { label: "Activity", href: "/activity", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+  { label: "Exercises", href: "/exercises", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
   { label: "Sleep", href: "/sleep", icon: "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" },
   { label: "Body", href: "/body", icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" },
   { label: "Nutrition", href: "/nutrition", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
 ];
 
 const lifeNav: NavItem[] = [
+  { label: "Calendar", href: "/calendar", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
   { label: "Finance", href: "/finance", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
   { label: "Tasks", href: "/tasks", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
   { label: "Habits", href: "/habits", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
   { label: "Journal", href: "/journal", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" },
+  { label: "Obsidian", href: "/obsidian", icon: "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" },
 ];
 
 function SvgIcon({ d, className }: { d: string; className?: string }) {
@@ -125,12 +129,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-[var(--bg)]">
-        <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8">
+        <div className="mx-auto w-full max-w-7xl pb-[5.25rem] lg:pb-8" suppressHydrationWarning>
           <PullToRefresh>
             <PageTransition>{children}</PageTransition>
           </PullToRefresh>
         </div>
       </main>
+
+      <CommandPalette />
 
       {/* Mobile bottom nav */}
       <nav className="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--surface-deep)]/0.96 shadow-[0_-18px_54px_rgba(0,0,0,0.58)] backdrop-blur-xl lg:hidden">

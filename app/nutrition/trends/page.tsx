@@ -22,7 +22,7 @@ export default async function NutritionTrendsPage() {
   const avgWater = Object.values(dailyWater).length > 0 ? Object.values(dailyWater).reduce((a, b) => a + b, 0) / Object.values(dailyWater).length : 0;
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Long View</div><h1 className="premium-title">Nutrition Trends</h1><p className="premium-subtitle">{Object.keys(dailyCals).length} days tracked</p></div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="premium-stat"><div className="premium-label">Avg Calories</div><div className="premium-value">{avgCals.toFixed(0)}<span className="text-sm font-normal text-[var(--text-tertiary)]"> kcal</span></div></div>

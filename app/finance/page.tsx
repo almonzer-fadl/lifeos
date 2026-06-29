@@ -62,7 +62,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
   const currencies = [...new Set<string>(accounts.map((a) => a.currency))];
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="premium-kicker">Private Ledger</div>

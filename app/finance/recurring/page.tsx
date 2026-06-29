@@ -49,14 +49,14 @@ export default function RecurringPage() {
     }
   }
 
-  if (loading) return <div className="premium-page"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-60 w-full rounded-lg" /></div>;
-  if (!data) return <div className="premium-page"><section className="premium-panel"><p className="py-8 text-center text-sm text-[var(--text-tertiary)]">Could not load data.</p></section></div>;
+  if (loading) return <div className="premium-page animate-fade-in"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-60 w-full rounded-lg" /></div>;
+  if (!data) return <div className="premium-page animate-fade-in"><section className="premium-panel"><p className="py-8 text-center text-sm text-[var(--text-tertiary)]">Could not load data.</p></section></div>;
 
   const upcoming = data.items.filter((r) => new Date(r.nextDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
   const later = data.items.filter((r) => new Date(r.nextDate) > new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div><div className="premium-kicker">Forward Obligations</div><h1 className="premium-title">Recurring Bills</h1><p className="premium-subtitle">{data.items.length} scheduled payments</p></div>
         <div className="text-right"><div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">Monthly Outflow</div><div className="font-mono text-2xl font-semibold text-[var(--amber)]">{s$(data.monthlyOutflow)}</div></div>

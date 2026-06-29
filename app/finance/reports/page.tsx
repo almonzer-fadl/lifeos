@@ -19,8 +19,8 @@ export default function ReportsPage() {
       .finally(() => setLoading(false));
   }, [months]);
 
-  if (loading) return <div className="premium-page"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-60 w-full rounded-lg mb-3" /><div className="skeleton h-40 w-full rounded-lg" /></div>;
-  if (!data) return <div className="premium-page"><section className="premium-panel"><p className="py-8 text-center text-sm text-[var(--text-tertiary)]">No data available.</p></section></div>;
+  if (loading) return <div className="premium-page animate-fade-in"><div className="skeleton h-20 w-full rounded-lg mb-3" /><div className="skeleton h-60 w-full rounded-lg mb-3" /><div className="skeleton h-40 w-full rounded-lg" /></div>;
+  if (!data) return <div className="premium-page animate-fade-in"><section className="premium-panel"><p className="py-8 text-center text-sm text-[var(--text-tertiary)]">No data available.</p></section></div>;
 
   const monthlySorted: [string, any][] = Object.entries(data.monthly).sort(([a], [b]) => a.localeCompare(b));
 
@@ -44,7 +44,7 @@ export default function ReportsPage() {
   const catColors = ["var(--rose)", "var(--amber)", "var(--sky)", "var(--violet)", "var(--orange)", "var(--indigo)", "var(--text-tertiary)", "var(--text-secondary)"];
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div><div className="premium-kicker">Analytics</div><h1 className="premium-title">Reports</h1><p className="premium-subtitle">Last {months} months</p></div>
         <select value={months} onChange={(e) => setMonths(parseInt(e.target.value))} className="border-[var(--border)] bg-[var(--bg)] text-[var(--text)] rounded-md px-3 py-1.5 text-sm">

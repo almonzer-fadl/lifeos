@@ -26,7 +26,7 @@ export default async function T1DPage() {
   const totalInsulin = insulin.reduce((s, d) => s + d.units, 0);
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Metabolic Control</div>
         <h1 className="premium-title">Glucose Command</h1>

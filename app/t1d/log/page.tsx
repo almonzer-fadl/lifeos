@@ -2,7 +2,7 @@ import { GlucoseForm } from "@/components/modules/t1d/glucose-form";
 
 export default function LogPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">New Reading</div>
         <h1 className="premium-title">Quick Log</h1>

@@ -3,7 +3,7 @@ import { WaterForm } from "@/components/modules/nutrition/water-form";
 
 export default function LogNutritionPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">New Entry</div><h1 className="premium-title">Log Food</h1><p className="premium-subtitle">Search and log what you ate</p></div>
       <section className="premium-panel animate-fade-in"><h2 className="premium-panel-title mb-4">Food Entry</h2><NutritionForm /></section>
       <Section title="Water" kicker="Hydration"><WaterForm /></Section>

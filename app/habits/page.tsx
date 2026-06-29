@@ -7,7 +7,7 @@ export default async function HabitsPage() {
   const habits = await db.habit.findMany({ orderBy: { createdAt: "asc" }, include: { logs: { where: { date: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } } } });
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Discipline Engine</div>
         <h1 className="premium-title">Habits</h1>

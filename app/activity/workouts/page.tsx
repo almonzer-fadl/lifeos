@@ -2,7 +2,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 
 export default function WorkoutsPage() {
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Templates</div>
         <h1 className="premium-title">Workouts</h1>

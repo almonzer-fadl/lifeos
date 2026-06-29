@@ -16,7 +16,7 @@ export default async function AccountsPage() {
   const totalDebt = accounts.filter((a) => a.isDebt).length;
 
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in"><div className="premium-kicker">Capital Registry</div><h1 className="premium-title">Accounts</h1><p className="premium-subtitle">{totalCash} cash accounts, {totalDebt} liabilities</p></div>
 
       {accounts.length === 0 ? (

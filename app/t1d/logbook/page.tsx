@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function LogbookPage() {
   const readings = await db.glucoseReading.findMany({ orderBy: { timestamp: "desc" }, take: 100 });
   return (
-    <div className="premium-page">
+    <div className="premium-page animate-fade-in">
       <div className="premium-header animate-fade-in">
         <div className="premium-kicker">Complete History</div>
         <h1 className="premium-title">Logbook</h1>
