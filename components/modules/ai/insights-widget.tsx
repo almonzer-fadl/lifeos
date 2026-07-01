@@ -29,12 +29,21 @@ export function AIDashboardWidget() {
 
     fetch("/api/insights?limit=10")
       .then((r) => r.json())
-      .then((data: Insight[]) => {
-        setInsights(data);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setInsights(data);
+        } else {
+          console.error("Insights API returned non-array data:", data);
+          setInsights([]);
+        }
         setLoading(false);
         setTimeout(() => setVisible(true), 100);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Failed to fetch insights:", err);
+        setInsights([]);
+        setLoading(false);
+      });
   }, []);
 
   const handleDismiss = async (id: string) => {
