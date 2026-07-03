@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0d0f",
+  themeColor: "#faf9f6",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -55,8 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/lifeos-logo.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="color-scheme" content="dark" />
-        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.style.backgroundColor='#0b0d0f'` }} />
+        <meta name="color-scheme" content="light" />
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.style.backgroundColor='#faf9f6'` }} />
       </head>
       <body className="min-h-dvh antialiased">
         <Shell>{children}</Shell>
