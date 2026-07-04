@@ -95,10 +95,18 @@ export function RunwayWidget() {
       {/* Runway ring */}
       <div className="flex items-center gap-4">
         <ProgressRing
-          progress={Math.min(Math.max(data.runwayMonths / 12, 0), 1)}
+          value={Math.min(data.runwayMonths, 12)}
+          max={12}
           size={80}
           strokeWidth={6}
-          className="flex-shrink-0"
+          showPercent={false}
+          colorVar={
+            data.cashflowPositive
+              ? "var(--emerald)"
+              : data.runwayMonths < 3
+                ? "var(--rose)"
+                : "var(--amber)"
+          }
         />
         <div>
           <div className="font-serif text-2xl font-normal leading-tight text-[var(--text)]">
