@@ -102,13 +102,13 @@ export function AIDashboardWidget() {
   };
 
   const urgencyGlow = {
-    high: "shadow-[inset_2px_0_8px_rgba(232,84,96,0.15)]",
-    medium: "shadow-[inset_2px_0_8px_rgba(212,149,42,0.12)]",
-    low: "shadow-[inset_2px_0_8px_rgba(104,157,200,0.1)]",
+    high: "shadow-[inset_2px_0_12px_rgba(211,47,47,0.05)]",
+    medium: "shadow-[inset_2px_0_12px_rgba(196,130,0,0.04)]",
+    low: "shadow-[inset_2px_0_12px_rgba(2,119,189,0.04)]",
   };
 
   return (
-    <section className="premium-panel overflow-hidden">
+    <section className="premium-panel overflow-hidden bg-white/40">
       <div className="flex items-center gap-2 mb-3">
         <motion.span
           className="text-lg"
@@ -117,7 +117,7 @@ export function AIDashboardWidget() {
         >
           🤖
         </motion.span>
-        <h2 className="text-sm font-semibold text-[var(--text)]">Your Assistant</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)] font-serif">Your Assistant</h2>
         <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
           {insights.length} insights
         </span>
@@ -133,7 +133,7 @@ export function AIDashboardWidget() {
               transition={{ delay: i * 0.08, duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <div
-                className={`relative block rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3.5 border-l-2 ${urgencyColors[insight.urgency]} ${urgencyGlow[insight.urgency]} transition-all hover:border-[var(--border)] hover:bg-[var(--surface-hover)] hover:translate-x-[2px] ${insight.actedOn ? "opacity-60" : ""}`}
+                className={`relative block rounded-2xl border border-[var(--border-light)] bg-white/60 p-4 border-l-4 ${urgencyColors[insight.urgency]} ${urgencyGlow[insight.urgency]} transition-all hover:border-[var(--border)] hover:bg-white/80 hover:translate-x-[2px] ${insight.actedOn ? "opacity-60" : ""}`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-base shrink-0 mt-0.5">{insight.icon || "💡"}</span>

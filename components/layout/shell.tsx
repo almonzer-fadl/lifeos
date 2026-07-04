@@ -84,12 +84,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex h-dvh w-72 shrink-0 flex-col gap-8 overflow-y-auto border-r border-[var(--border-light)] bg-[var(--bg)] px-6 py-10">
         <Link href="/" className="group flex items-center gap-4 px-2">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--surface-raised)] border border-[var(--border)] shadow-lg transition-transform group-hover:scale-105">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-[var(--border)] shadow-sm transition-transform group-hover:scale-105">
             <Image src="/lifeos-logo.png" alt="Life OS" width={24} height={24} className="rounded-md opacity-90" unoptimized />
           </div>
           <div className="min-w-0">
             <span className="block font-serif text-lg leading-tight text-[var(--text)]">Life OS</span>
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.3em] text-[var(--accent)] opacity-80">Private Office</span>
+            <span className="block text-[9px] font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Private Office</span>
           </div>
         </Link>
 
