@@ -251,6 +251,9 @@ model FoodItem {
   vitaminC           Float?            // mg
   vitaminD           Float?            // IU
   isSeeded           Boolean           @default(false)
+  netCarbs           Float?            // computed: carbs - fiber
+  isMalaysian        Boolean           @default(false)
+  isCommonFood       Boolean           @default(false) // frequently eaten by this user
   createdAt          DateTime          @default(now())
   diaryEntries       FoodDiaryEntry[]
 
@@ -259,14 +262,20 @@ model FoodItem {
 }
 
 model FoodDiaryEntry {
-  id        String   @id @default(uuid())
-  date      DateTime @default(now())
-  mealType  String   @default("snack") // breakfast, lunch, dinner, snack
-  foodId    String
-  servings  Float    @default(1)
-  grams     Float?   // override: actual grams consumed
-  createdAt DateTime @default(now())
-  food      FoodItem @relation(fields: [foodId], references: [id])
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  mealType        String   @default("snack") // breakfast, lunch, dinner, snack
+  foodId          String
+  servings        Float    @default(1)
+  grams           Float?   // override: actual grams consumed
+  carbEstimate    Float?   // user-estimated or auto-calculated carbs
+  bolusSuggested  Float?   // units suggested by bolus calculator
+  bolusTaken      Float?   // units actually taken
+  postMealGlucose Float?   // glucose reading 2h after meal (linked)
+  netCarbs        Float?   // computed from food
+  costEstimate    Int?     // approximate cost in cents
+  createdAt       DateTime @default(now())
+  food            FoodItem @relation(fields: [foodId], references: [id])
 
   @@index([date])
   @@index([foodId])
@@ -422,6 +431,7 @@ model Transaction {
   parentTransaction Transaction? @relation("SplitChildren", fields: [parentTransactionId], references: [id])
   childTransactions Transaction[] @relation("SplitChildren")
   invoice           Invoice?  @relation(fields: [invoiceId], references: [id])
+  contact           Contact?  @relation(fields: [contactId], references: [id])
   audits            TransactionAudit[]
 
   @@index([date])
@@ -611,6 +621,7 @@ model Invoice {
   lineItems     InvoiceLineItem[]
   payments      PaymentReceived[]
   transactions  Transaction[]
+  client        Contact    @relation(fields: [clientId], references: [id])
 
   @@index([clientId])
   @@index([status])
@@ -745,3 +756,158 @@ model InjectionSite {
   @@index([usedAt])
   @@index([site])
 }
+
+// ─── Nutrition (Phase 1) ──────────────────────────────────────────
+
+model Recipe {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  servings     Float    @default(1)
+  prepTime     Int?     // minutes
+  cookTime     Int?     // minutes
+  instructions String?  // markdown
+  notes        String?
+  isMalaysian  Boolean  @default(false)
+  totalCalories Float?  // computed from ingredients
+  totalCarbs   Float?
+  totalProtein Float?
+  totalFat     Float?
+  totalFiber   Float?
+  netCarbs     Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ingredients  RecipeIngredient[]
+
+  @@index([name])
+}
+
+model RecipeIngredient {
+  id        String  @id @default(uuid())
+  recipeId  String
+  foodId    String? // optional — can use custom name
+  name      String  // "chicken breast" if no foodId
+  amount    Float
+  unit      String  // g, ml, cup, tbsp, piece
+  recipe    Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+}
+
+model FrequentFood {
+  id              String   @id @default(uuid())
+  foodId          String
+  personalName    String?  // "Mom's nasi lemak"
+  typicalCarbs    Float?   // user's estimate for typical serving
+  typicalServing  Float?   // grams
+  typicalGlucose  Float?   // avg post-meal glucose (computed)
+  useCount        Int      @default(0)
+  lastUsedAt      DateTime?
+  notes           String?
+
+  @@unique([foodId])
+}
+
+model FoodCost {
+  id           String   @id @default(uuid())
+  foodId       String?
+  foodName     String   // "Chicken breast"
+  store        String?  // "NSK", "Mydin"
+  price        Int      // cents (MYR)
+  quantity     Float
+  unit         String   // kg, pack, piece
+  pricePerUnit Float?   // computed: price / quantity
+  date         DateTime @default(now())
+  notes        String?
+
+  @@index([foodId])
+  @@index([date])
+}
+
+model FastingSession {
+  id              String   @id @default(uuid())
+  date            DateTime
+  type            String   @default("ramadan") // ramadan, intermittent, voluntary_sunnah
+  startTime       DateTime // suhoor end / fajr
+  endTime         DateTime // iftar / maghrib
+  duration        Float?   // computed: hours fasted
+  preFastMealId   String?  // FK to FoodDiaryEntry (suhoor)
+  postFastMealId  String?  // FK to FoodDiaryEntry (iftar)
+  preFastGlucose  Float?
+  postFastGlucose Float?
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+  @@index([type])
+}
+
+// ─── CRM ───────────────────────────────────────────────────────
+
+model Contact {
+  id                 String   @id @default(uuid())
+  firstName          String
+  lastName           String?
+  fullName           String
+  type               String   // family, partner, friend, client, mentor, colleague, acquaintance
+  subType            String?  // girlfriend, father, client_leads, client_active, university_lecturer
+  groupId            String?
+  birthday           DateTime?
+  birthYear          Int?
+  nationality        String?
+  location           String?
+  languages          String?
+  email              String?
+  phone              String?
+  whatsapp           String?
+  telegram           String?
+  socialLinks        Json?
+  bio                String?
+  preferences        String?
+  importantDates     Json?
+  relationshipHealth String?  // strong, good, needs_attention, strained, dormant
+  lastContactedAt    DateTime?
+  nextFollowUpAt     DateTime?
+  followUpFrequency  String?  // daily, weekly, biweekly, monthly, quarterly
+  isKeyPerson        Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  interactions       Interaction[]
+  invoices           Invoice[]
+  transactions       Transaction[]
+  group              ContactGroup? @relation(fields: [groupId], references: [id])
+
+  @@index([type])
+  @@index([relationshipHealth])
+  @@index([nextFollowUpAt])
+  @@index([isKeyPerson])
+}
+
+model Interaction {
+  id          String   @id @default(uuid())
+  contactId   String
+  date        DateTime @default(now())
+  type        String   // call, message, meeting, email, video_call, in_person
+  direction   String   // outgoing, incoming
+  platform    String?  // whatsapp, telegram, phone, zoom, in_person
+  summary     String
+  actionItems String?
+  mood        String?  // positive, neutral, negative
+  duration    Int?     // minutes
+  tags        String?
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([date])
+}
+
+model ContactGroup {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  color     String?
+  icon      String?
+  sortOrder Int       @default(0)
+  contacts  Contact[]
+}
+

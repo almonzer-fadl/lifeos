@@ -81,41 +81,41 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh bg-[var(--bg)] text-[var(--text)] selection:bg-[var(--accent-soft)]">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex h-dvh w-72 shrink-0 flex-col gap-8 overflow-y-auto border-r border-[var(--border-light)] bg-[var(--bg)] px-6 py-10">
-        <Link href="/" className="group flex items-center gap-4 px-2">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-[var(--border)] shadow-sm transition-transform group-hover:scale-105">
-            <Image src="/lifeos-logo.png" alt="Life OS" width={24} height={24} className="rounded-md opacity-90" unoptimized />
+      {/* Desktop Navigation - Integrated & Borderless */}
+      <aside className="hidden lg:flex h-dvh w-80 shrink-0 flex-col gap-12 overflow-y-auto bg-[var(--bg)] px-10 py-16">
+        <Link href="/" className="group flex items-center gap-5">
+          <div className="relative flex h-12 w-12 items-center justify-center rounded-[20px] bg-white shadow-md transition-all group-hover:scale-105 group-hover:shadow-lg">
+            <Image src="/lifeos-logo.png" alt="Life OS" width={28} height={28} className="rounded-md opacity-90" unoptimized />
           </div>
           <div className="min-w-0">
-            <span className="block font-serif text-lg leading-tight text-[var(--text)]">Life OS</span>
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.3em] text-[var(--accent)]">Private Office</span>
+            <span className="block font-serif text-2xl leading-tight text-[var(--text)]">Life OS</span>
+            <span className="block text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--accent)] opacity-60">Estate Office</span>
           </div>
         </Link>
 
-        <div className="flex flex-col gap-8">
-          <nav className="flex flex-col gap-1">
+        <div className="flex flex-col gap-12">
+          <nav className="flex flex-col gap-2">
             {mainNav.map((item) => (
               <SidebarItem key={item.href} item={item} active={pathname === item.href} />
             ))}
           </nav>
 
-          <div className="space-y-3">
-            <div className="px-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-60">
+          <div className="space-y-4">
+            <div className="px-5 text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--text-tertiary)] opacity-40">
               Wellness
             </div>
-            <nav className="flex flex-col gap-1">
+            <nav className="flex flex-col gap-2">
               {healthNav.map((item) => (
                 <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
               ))}
             </nav>
           </div>
 
-          <div className="space-y-3">
-            <div className="px-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-60">
-              Management
+          <div className="space-y-4">
+            <div className="px-5 text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--text-tertiary)] opacity-40">
+              Estate
             </div>
-            <nav className="flex flex-col gap-1">
+            <nav className="flex flex-col gap-2">
               {lifeNav.map((item) => (
                 <SidebarItem key={item.href} item={item} active={pathname.startsWith(item.href)} />
               ))}

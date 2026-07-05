@@ -13,44 +13,48 @@
 }
 
 :root {
-  /* The Ivory Ledger Palette - Elite Light */
-  --bg: #faf9f6; /* Warm Ivory / Bone */
-  --surface: rgba(255, 255, 255, 0.7);
-  --surface-raised: rgba(255, 255, 255, 0.9);
-  --surface-hover: rgba(255, 255, 255, 1);
-  --surface-deep: #f1f0ea;
+  /* The Commissioned Masterpiece - Bespoke Light */
+  --bg: #fcfbf7; /* Slightly brighter, more luminous Ivory */
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-hover: #ffffff;
+  --surface-deep: #f8f7f0;
   
-  --border: rgba(0, 0, 0, 0.06);
-  --border-light: rgba(0, 0, 0, 0.03);
-  --border-strong: rgba(0, 0, 0, 0.12);
+  --border: rgba(0, 0, 0, 0.02);
+  --border-light: rgba(0, 0, 0, 0.01);
+  --border-strong: rgba(0, 0, 0, 0.04);
   
-  --text: #1a1c1e; /* Obsidian Blue-Black */
-  --text-secondary: #585e66;
-  --text-tertiary: #8a9199;
+  --text: #141618; /* Denser obsidian */
+  --text-secondary: #4a4f54;
+  --text-tertiary: #989ea4;
   
-  --accent: #b08d44; /* Antique Gold (slightly darker for contrast on light) */
-  --accent-soft: rgba(176, 141, 68, 0.08);
-  --accent-hover: #8e7135;
-  --ring: #b08d44;
+  --accent: #8c6d2d; /* Refined Bronze-Gold */
+  --accent-soft: rgba(140, 109, 45, 0.05);
+  --accent-hover: #6b5424;
+  --ring: #8c6d2d;
 
-  /* Refined Semantic Colors for Light Theme */
-  --amber: #c48200;
-  --rose: #d32f2f;
-  --emerald: #1b5e20;
-  --sky: #0277bd;
-  
-  /* Soft Luxury Shadows (Light Mode) */
-  --shadow-card: 0 4px 20px -1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
-  --shadow-card-hover: 0 12px 40px -4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.03);
-  --shadow-modal: 0 32px 64px -12px rgba(0, 0, 0, 0.15);
+  /* Material Shadows - 5 Layers for 'The Best' Depth */
+  --shadow-card: 
+    0 1px 2px rgba(0,0,0,0.01),
+    0 4px 8px rgba(0,0,0,0.01),
+    0 12px 24px rgba(0,0,0,0.02),
+    0 24px 48px rgba(0,0,0,0.02),
+    0 0 0 1px rgba(0,0,0,0.01);
+    
+  --shadow-card-hover: 
+    0 2px 4px rgba(0,0,0,0.01),
+    0 8px 16px rgba(0,0,0,0.02),
+    0 24px 48px rgba(0,0,0,0.03),
+    0 48px 96px rgba(0,0,0,0.04),
+    0 0 0 1px rgba(0,0,0,0.015);
 
-  /* Geometry */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  
-  --glass-blur: blur(30px);
+  --shadow-modal: 0 60px 120px rgba(0, 0, 0, 0.1);
+
+  /* Geometry - Refined Softness */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 40px;
+  --radius-xl: 64px;
 }
 
 * {
@@ -59,28 +63,167 @@
 
 body {
   background: var(--bg);
-  /* The Ivory Ledger Illumination */
+  /* Atmospheric Lighting - Light Leaks */
   background-image: 
-    radial-gradient(at 0% 0%, rgba(176, 141, 68, 0.03) 0px, transparent 40%),
-    radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.01) 0px, transparent 40%);
+    radial-gradient(at 0% 0%, rgba(140, 109, 45, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(41, 128, 185, 0.03) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(140, 109, 45, 0.02) 0px, transparent 50%);
   color: var(--text);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
-/* Luxury Noise Overlay (Light Mode) */
+/* Bespoke Micro-Texture */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.02;
-  filter: contrast(150%) brightness(100%);
+  opacity: 0.025;
+  filter: contrast(110%) brightness(110%);
   pointer-events: none;
   z-index: 9999;
+}
+
+/* Material Depth - Internal Soft Glow */
+.premium-panel, .premium-stat {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-panel::before, .premium-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 70%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Premium Typography Path */
+.premium-page {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem; /* Massive spacing for 'Wealthy' feel */
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.premium-header {
+  padding: 8rem 4rem 4rem;
+  text-align: left;
+}
+
+.premium-kicker {
+  font-family: var(--font-sans);
+  color: var(--accent);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5em; /* Extreme spacing */
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.premium-title {
+  font-family: var(--font-serif), serif;
+  color: var(--text);
+  font-size: 4.5rem; /* Heroic scale */
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.premium-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  font-weight: 400;
+  max-width: 550px;
+  line-height: 1.7;
+  font-style: italic; /* Sophisticated flair */
+  opacity: 0.8;
+}
+
+/* The 'Masterpiece' Panels */
+.premium-panel {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 4rem; /* Expansive internal space */
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-card);
+}
+
+.premium-stat {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 2.5rem;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-card);
+}
+
+.premium-stat:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.premium-label {
+  color: var(--text-tertiary);
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+
+.premium-value {
+  color: var(--text);
+  font-size: 2.75rem;
+  font-weight: 400;
+  line-height: 1;
+  margin-top: 1rem;
+  font-family: var(--font-serif), serif;
+}
+
+/* Bespoke Pill - The 'Concierge' Trigger */
+.premium-action {
+  background: var(--text);
+  border-radius: 9999px;
+  color: var(--bg);
+  padding: 0 2.5rem;
+  height: 3.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.premium-action:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 1024px) {
+  .premium-title { font-size: 3rem; }
+  .premium-header { padding: 4rem 2rem 2rem; }
+  .premium-panel { padding: 2rem; }
+}
+
+/* Navigation Overrides */
+.sidebar-item-active {
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+}
+
+@media (min-width: 1024px) {
+  .premium-header {
+    padding: 6rem 3rem 3rem;
+  }
 }
 
 /* Luxury Noise Overlay */
