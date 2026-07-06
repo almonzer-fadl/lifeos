@@ -58,21 +58,29 @@ model BasalRate {
 // ─── Activity ──────────────────────────────────────────────────────
 
 model Activity {
-  id             String   @id @default(uuid())
-  type           String   // run, swim, bike, walk, hike, other
-  startTime      DateTime
-  endTime        DateTime?
-  distance       Float?   // meters
-  elevationGain  Float?   // meters
-  heartRateAvg   Int?
-  heartRateMax   Int?
-  calories       Int?
-  notes          String?
-  source         String   @default("manual") // manual, strava, apple_health
-  externalId     String?  // Strava activity ID
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  splits         ActivitySplit[]
+  id                String   @id @default(uuid())
+  type              String   // run, swim, bike, walk, hike, other
+  startTime         DateTime
+  endTime           DateTime?
+  distance          Float?   // meters
+  elevationGain     Float?   // meters
+  heartRateAvg      Int?
+  heartRateMax      Int?
+  calories          Int?
+  notes             String?
+  source            String   @default("manual") // manual, strava, apple_health
+  externalId        String?  // Strava activity ID
+  trainingBlockId   String?  // FK to TrainingBlock
+  raceId            String?  // FK to Race
+  isRace            Boolean  @default(false)
+  perceivedExertion Int?     // RPE 1-10
+  routeData         Json?    // GPS coordinates
+  trainingLoadScore Float?   // computed: duration * intensity
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  splits            ActivitySplit[]
+  trainingBlock     TrainingBlock? @relation(fields: [trainingBlockId], references: [id])
+  race              Race?          @relation(fields: [raceId], references: [id])
 
   @@index([startTime])
   @@index([type])
@@ -104,16 +112,20 @@ model GymWorkout {
 }
 
 model GymSet {
-  id          String     @id @default(uuid())
-  workoutId   String
-  exerciseId  String
-  setNumber   Int
-  weight      Float?     // kg
-  reps        Int?
-  rpe         Float?     // 1-10
-  notes       String?
-  workout     GymWorkout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
-  exercise    Exercise   @relation(fields: [exerciseId], references: [id])
+  id            String     @id @default(uuid())
+  workoutId     String
+  exerciseId    String
+  setNumber     Int
+  weight        Float?     // kg
+  reps          Int?
+  rpe           Float?     // 1-10
+  notes         String?
+  isWarmup      Boolean    @default(false)
+  restSeconds   Int?       // rest after this set
+  isBodyweight  Boolean    @default(false)
+  bodyweightKg  Float?     // user's weight for weighted calisthenics
+  workout       GymWorkout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise      Exercise   @relation(fields: [exerciseId], references: [id])
 
   @@index([workoutId])
   @@index([exerciseId])
