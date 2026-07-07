@@ -5,6 +5,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import exercises from "./exercises";
 import foods from "./sample-foods";
+import contacts from "./contacts";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
@@ -42,9 +43,18 @@ async function seed() {
     console.log(`  - ${existingFoods} food items already exist, skipping`);
   }
 
-  // Lab reference ranges are just docs — user adds results manually
-  // But we could seed them as a catalog if there was a LabReference table
-  // For now, lab ranges live in prisma/seeds/lab-ranges.ts for reference
+  // Contacts (CRM seed data)
+  const existingContacts = await db.contact.count();
+  if (existingContacts === 0) {
+    let count = 0;
+    for (const c of contacts) {
+      await db.contact.create({ data: c });
+      count++;
+    }
+    console.log(`  ✓ ${count} contacts seeded`);
+  } else {
+    console.log(`  - ${existingContacts} contacts already exist`);
+  }
 
   console.log("Done.");
 }
