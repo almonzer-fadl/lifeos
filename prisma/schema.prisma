@@ -510,14 +510,42 @@ model Task {
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  status      String   @default("active") // active, completed, archived
-  color       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tasks       Task[]
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  type            String   @default("saas") // agency, saas, internal_tool, client_app, personal_vision
+  status          String   @default("active") // ideation, building, launched, active, maintenance, paused, completed, archived
+  revenueModel    String?  // project_based, retainer, subscription, commission, none
+  mrr             Int      @default(0)
+  arr             Int      @default(0)
+  totalRevenue    Int      @default(0)
+  pipelineStages  Json?
+  activeDeals     Int      @default(0)
+  dealsWon        Int      @default(0)
+  dealValue       Int      @default(0)
+  stack           String?
+  repoUrl         String?
+  deployUrl       String?
+  port            Int?
+  startedAt       DateTime?
+  launchedAt      DateTime?
+  completedAt     DateTime?
+  estimatedEffort String?
+  priority        Int      @default(3)
+  nextAction      String?
+  weeklyGoal      String?
+  color           String?
+  icon            String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tasks           Task[]
+  invoices        Invoice[]
+  milestones      ProjectMilestone[]
+  mrrSnapshots    MRRSnapshot[]
+
+  @@index([status])
+  @@index([priority])
 }
 
 model Habit {
@@ -634,6 +662,7 @@ model Invoice {
   payments      PaymentReceived[]
   transactions  Transaction[]
   client        Contact    @relation(fields: [clientId], references: [id])
+  project       Project?   @relation(fields: [projectId], references: [id])
 
   @@index([clientId])
   @@index([status])
@@ -921,5 +950,102 @@ model ContactGroup {
   icon      String?
   sortOrder Int       @default(0)
   contacts  Contact[]
+}
+
+// ─── Projects ──────────────────────────────────────────────────
+
+model ProjectMilestone {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  description String?
+  targetDate  DateTime?
+  achievedAt  DateTime?
+  status      String   @default("pending") // pending, achieved, missed
+  sortOrder   Int      @default(0)
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model MRRSnapshot {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  projectId String
+  mrr       Int
+  notes     String?
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, date])
+}
+
+// ─── Activity (Phase 1) ────────────────────────────────────────────
+
+model PersonalRecord {
+  id           String   @id @default(uuid())
+  activityType String   // run, swim, bike, pull_ups, dips, push_ups, squat, deadlift, bench
+  distance     Float?   // for distance-based records: 5000 for 5K
+  metric       String   // "time", "reps", "weight", "distance"
+  value        Float    // seconds for time, reps count, kg for weight
+  unit         String   // "seconds", "reps", "kg", "meters"
+  achievedAt   DateTime
+  activityId   String?  // FK to Activity (for verified records)
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  @@unique([activityType, distance, metric])
+  @@index([activityType])
+}
+
+model TrainingBlock {
+  id            String   @id @default(uuid())
+  name          String   // "KL Marathon Prep", "Base Building"
+  type          String   // macro_cycle, meso_cycle, micro_cycle
+  goal          String?  // "Sub-4 marathon"
+  startDate     DateTime
+  endDate       DateTime
+  status        String   @default("planned") // planned, active, completed, abandoned
+  notes         String?
+  parentBlockId String?  // self-ref for nested blocks
+  createdAt     DateTime @default(now())
+  activities    Activity[]
+
+  @@index([startDate])
+  @@index([status])
+}
+
+model Race {
+  id              String   @id @default(uuid())
+  name            String   // "KL Standard Chartered Marathon"
+  raceType        String   // marathon, half_marathon, ultra_50k, ironman_703, ironman_full
+  distance        Float?   // meters
+  date            DateTime
+  location        String?
+  targetTime      Int?     // target in seconds
+  targetPace      Float?   // seconds per km
+  status          String   @default("upcoming") // upcoming, completed, dns, dnf
+  actualTime      Int?     // actual finish time in seconds
+  notes           String?
+  trainingBlockId String?  // FK to TrainingBlock
+  activityId      String?  // FK to Activity (the race itself)
+  createdAt       DateTime @default(now())
+  activities      Activity[]
+
+  @@index([date])
+  @@index([status])
+}
+
+model ExerciseProgression {
+  id              String   @id @default(uuid())
+  exerciseName    String   // "Pull-up", "Dip", "Push-up"
+  progressionStep String   // "band_assisted", "negative_only", "full_range", "weighted_5kg"
+  currentReps     Int      // max reps at this step
+  targetReps      Int      // target before advancing
+  achievedAt      DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([exerciseName, progressionStep])
 }
 

@@ -29,69 +29,87 @@ export default async function ObsidianPage() {
 
   return (
     <div className="premium-page animate-fade-in">
-      <div className="premium-header animate-fade-in">
-        <div className="premium-kicker">Knowledge Graph</div>
-        <h1 className="premium-title">Obsidian Vault</h1>
-        <p className="premium-subtitle">
+      <div className="premium-header">
+        <div className="premium-kicker">Knowledge Network</div>
+        <h1 className="premium-title">The Archive</h1>
+        <p className="premium-subtitle italic">
           {count > 0
-            ? `${count} notes across ${folders.length} folders`
-            : "Vault not connected — set OBSIDIAN_VAULT_PATH"}
+            ? `Your intellectual estate currently contains ${count} curated notes across ${folders.length} sectors.`
+            : "Vault not connected — established path required."}
         </p>
       </div>
 
       {count > 0 ? (
         <>
-          <section className="premium-panel animate-fade-in overflow-hidden p-3">
-            <ObsidianGraph />
+          <section className="premium-panel overflow-hidden shadow-2xl p-8">
+            <div className="mb-8 border-b border-[var(--border-light)] pb-6">
+              <h2 className="text-xl font-serif text-[var(--text)]">Intellectual Graph</h2>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Visualizing connection and density</p>
+            </div>
+            <div className="h-[500px] w-full bg-[var(--bg)] rounded-[32px] overflow-hidden">
+              <ObsidianGraph />
+            </div>
           </section>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <section className="premium-panel animate-fade-in">
-              <h2 className="text-sm font-semibold text-[var(--text)] mb-3">Recent Notes</h2>
-              <div className="space-y-1 animate-stagger">
-                {notes.slice(0, 15).map((n) => (
-                  <div
-                    key={n.path}
-                    className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--surface-hover)]"
-                  >
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-medium text-[var(--text)]">{n.name}</div>
-                      <div className="text-xs text-[var(--text-tertiary)]">
-                        {n.folder} · {n.links} links
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <section className="space-y-8">
+                <div>
+                  <h2 className="text-xl font-serif text-[var(--text)]">Recent Manuscripts</h2>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Latest modifications</p>
+                </div>
+                <div className="space-y-1">
+                  {notes.slice(0, 10).map((n) => (
+                    <div
+                      key={n.path}
+                      className="group flex items-center justify-between gap-6 rounded-2xl p-4 transition-all hover:bg-white hover:shadow-lg"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-[var(--text)]">{n.name}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mt-1">
+                          {n.folder} · {n.links} References
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {n.tags.slice(0, 2).map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-[var(--accent)]"
+                          >
+                            {t}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {n.tags.slice(0, 3).map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full bg-[var(--surface-hover)] px-2 py-0.5 text-[9px] text-[var(--text-tertiary)]"
-                        >
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+                  ))}
+                </div>
+              </section>
+            </div>
 
-            <section className="premium-panel animate-fade-in">
-              <h2 className="text-sm font-semibold text-[var(--text)] mb-3">Folders</h2>
-              <div className="grid grid-cols-2 gap-2 animate-stagger">
-                {folders.map((f) => {
-                  const count = notes.filter((n) => n.folder === f).length;
-                  return (
-                    <div
-                      key={f}
-                      className="rounded-lg border border-[var(--border-light)] bg-[var(--surface-raised)] p-3 hover:border-[var(--border)] transition-colors"
-                    >
-                      <div className="text-sm font-medium text-[var(--text)]">{f}</div>
-                      <div className="mt-1 text-xs text-[var(--text-tertiary)]">{count} notes</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+            <div className="lg:col-span-5">
+              <section className="space-y-8">
+                <div>
+                  <h2 className="text-xl font-serif text-[var(--text)]">Sectors</h2>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Vault organization</p>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                  {folders.slice(0, 8).map((f) => {
+                    const folderCount = notes.filter((n) => n.folder === f).length;
+                    return (
+                      <div
+                        key={f}
+                        className="rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-[var(--text)] tracking-wide">{f}</span>
+                          <span className="font-serif text-lg text-[var(--accent)]">{folderCount}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
           </div>
         </>
       ) : (

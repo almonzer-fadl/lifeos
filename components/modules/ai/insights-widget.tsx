@@ -109,56 +109,54 @@ export function AIDashboardWidget() {
 
   return (
     <section className="premium-panel overflow-hidden bg-white/40">
-      <div className="flex items-center gap-2 mb-3">
-        <motion.span
-          className="text-lg"
-          animate={{ rotate: [0, 5, -5, 0] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
-        >
-          🤖
-        </motion.span>
-        <h2 className="text-sm font-semibold text-[var(--text)] font-serif">Your Assistant</h2>
-        <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
-          {insights.length} insights
-        </span>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--text)] text-[var(--bg)] shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.364-6.364l-.707-.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21V5a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-[var(--text)]">Private Assistant</h2>
+          <p className="text-[9px] font-medium uppercase tracking-[0.1em] text-[var(--text-tertiary)]">{insights.length} active intelligence points</p>
+        </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <AnimatePresence>
           {insights.map((insight, i) => (
             <motion.div
               key={insight.id}
-              initial={{ opacity: 0, x: -12, height: 0 }}
-              animate={visible ? { opacity: 1, x: 0, height: "auto" } : {}}
-              transition={{ delay: i * 0.08, duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={visible ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               <div
-                className={`relative block rounded-2xl border border-[var(--border-light)] bg-white/60 p-4 border-l-4 ${urgencyColors[insight.urgency]} ${urgencyGlow[insight.urgency]} transition-all hover:border-[var(--border)] hover:bg-white/80 hover:translate-x-[2px] ${insight.actedOn ? "opacity-60" : ""}`}
+                className={`relative block rounded-[24px] border border-transparent bg-white/60 p-6 transition-all hover:bg-white hover:shadow-xl ${insight.actedOn ? "opacity-40" : ""}`}
               >
-                <div className="flex items-start gap-3">
-                  <span className="text-base shrink-0 mt-0.5">{insight.icon || "💡"}</span>
+                <div className="flex items-start gap-5">
+                  <div className={`mt-1 flex h-2 w-2 rounded-full shrink-0 ${urgencyColors[insight.urgency].replace('border-l-', 'bg-')}`} />
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs font-semibold text-[var(--text)] leading-snug">
+                    <div className="text-sm font-serif text-[var(--text)] leading-tight">
                       {insight.headline}
                     </div>
-                    <p className="text-[11px] text-[var(--text-secondary)] mt-1 leading-relaxed line-clamp-3">
+                    <p className="text-[12px] text-[var(--text-secondary)] mt-2 leading-relaxed line-clamp-2">
                       {insight.body}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-4 mt-4">
                       {insight.href && (
                         <Link
                           href={insight.href}
-                          className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--accent)] hover:text-[var(--accent-hover)]"
+                          className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent)] hover:text-[var(--accent-hover)]"
                           onClick={() => handleActedOn(insight.id)}
                         >
-                          Take Action →
+                          Address →
                         </Link>
                       )}
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDismiss(insight.id); }}
-                        className="text-[10px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] ml-auto"
+                        className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] ml-auto"
                       >
-                        Dismiss
+                        Acknowledge
                       </button>
                     </div>
                   </div>
