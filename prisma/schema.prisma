@@ -148,15 +148,21 @@ model Exercise {
 // ─── Sleep ────────────────────────────────────────────────────────
 
 model SleepSession {
-  id        String   @id @default(uuid())
-  startTime DateTime
-  endTime   DateTime
-  quality   Int?     // 1-5
-  notes     String?
-  source    String   @default("manual") // manual, apple_health, oura
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  stages    SleepStage[]
+  id              String   @id @default(uuid())
+  startTime       DateTime
+  endTime         DateTime
+  quality         Int?     // 1-5
+  notes           String?
+  source          String   @default("manual") // manual, apple_health, oura
+  latency         Int?     // minutes to fall asleep
+  restingHR       Int?     // resting heart rate
+  hrv             Float?   // heart rate variability
+  compliance      Float?   // 0-1 protocol compliance score
+  trainingLoadDay Float?   // training load from that day
+  nextDayGlucose  Float?   // avg glucose next day
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  stages          SleepStage[]
 
   @@index([startTime])
 }
@@ -175,19 +181,25 @@ model SleepStage {
 // ─── Body Metrics ─────────────────────────────────────────────────
 
 model BodyMeasurement {
-  id         String   @id @default(uuid())
-  date       DateTime @default(now())
-  weight     Float?   // kg
-  bodyFatPct Float?
-  waist      Float?   // cm
-  chest      Float?
-  bicepLeft  Float?
-  bicepRight Float?
-  thighLeft  Float?
-  thighRight Float?
-  neck       Float?
-  notes      String?
-  createdAt  DateTime @default(now())
+  id                   String   @id @default(uuid())
+  date                 DateTime @default(now())
+  weight               Float?   // kg
+  bodyFatPct           Float?
+  waist                Float?   // cm
+  chest                Float?
+  bicepLeft            Float?
+  bicepRight           Float?
+  thighLeft            Float?
+  thighRight           Float?
+  neck                 Float?
+  notes                String?
+  bloodPressureSystolic  Int?
+  bloodPressureDiastolic Int?
+  photoPath            String?
+  muscleMass           Float?
+  boneMass             Float?
+  waterWeight          Float?
+  createdAt            DateTime @default(now())
 
   @@index([date])
 }
@@ -202,7 +214,10 @@ model LabResult {
   refRangeHigh    Float?
   labName         String?
   notes           String?
-  attachmentPath  String?  // local file path
+  attachmentPath  String?
+  panelGroup      String?  // "Thyroid", "CBC", "Lipid", "HbA1c"
+  panelOrder      Int?     // display order within panel
+  isAbnormal      Boolean? // computed: value outside refRange
   createdAt       DateTime @default(now())
 
   @@index([date])
@@ -549,28 +564,37 @@ model Project {
 }
 
 model Habit {
-  id             String   @id @default(uuid())
-  name           String
-  frequency      String   @default("daily") // daily, weekly, monthly
-  frequencyCount Int      @default(1) // how many times per period
-  timeOfDay      String?  // morning, afternoon, evening, anytime
-  category       String?
-  color          String?
-  createdAt      DateTime @default(now())
-  logs           HabitLog[]
+  id               String       @id @default(uuid())
+  name             String
+  frequency        String       @default("daily") // daily, weekly, monthly
+  frequencyCount   Int          @default(1) // how many times per period
+  targetCount      Int          @default(1) // completions per period
+  targetValue      Float?       // if measuring quantity: 15 (minutes), 5 (pages)
+  targetUnit       String?      // "minutes", "pages", "liters", "times"
+  timeOfDay        String?      // morning, afternoon, evening, anytime
+  isNonNegotiable  Boolean      @default(false)
+  streakOn         Boolean      @default(true)
+  category         String?
+  color            String?
+  createdAt        DateTime     @default(now())
+  logs             HabitLog[]
+  sessions         HabitSession[]
+  streak           HabitStreak?
 
   @@index([frequency])
 }
 
 model HabitLog {
-  id        String   @id @default(uuid())
-  habitId   String
-  date      DateTime @default(now())
-  completed Boolean  @default(true)
-  notes     String?
-  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  id          String    @id @default(uuid())
+  habitId     String
+  date        DateTime  @default(now())
+  completed   Boolean   @default(true)
+  completedAt DateTime? // actual time completed (for time-of-day compliance)
+  value       Float?    // for quantifiable habits: minutes, pages, liters
+  timeOfDay   String?   // morning, afternoon, evening, night (overrides habit default)
+  notes       String?
+  habit       Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
-  @@unique([habitId, date])
   @@index([habitId])
   @@index([date])
 }
@@ -979,6 +1003,31 @@ model MRRSnapshot {
   @@unique([projectId, date])
 }
 
+// ─── Habits (Phase 2) ────────────────────────────────────────────
+
+model HabitStreak {
+  id              String    @id @default(uuid())
+  habitId         String    @unique
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  lastCompletedAt DateTime?
+  updatedAt       DateTime  @updatedAt
+  habit           Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
+}
+
+model HabitSession {
+  id          String   @id @default(uuid())
+  habitId     String
+  date        DateTime @default(now())
+  completedAt DateTime @default(now())
+  timeOfDay   String?  // fajr, dhuhr, asr, maghrib, isha (for prayers)
+  value       Float?   // minutes, pages, reps
+  notes       String?
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@index([habitId, date])
+}
+
 // ─── Activity (Phase 1) ────────────────────────────────────────────
 
 model PersonalRecord {
@@ -1047,5 +1096,195 @@ model ExerciseProgression {
   updatedAt       DateTime @updatedAt
 
   @@unique([exerciseName, progressionStep])
+}
+
+// ─── Sleep (Phase 1) ───────────────────────────────────────────────
+
+model BedtimeRoutine {
+  id               String   @id @default(uuid())
+  date             DateTime @unique
+  screensOffAt     DateTime?
+  inBedAt          DateTime?
+  lightsOutAt      DateTime?
+  wakeAt           DateTime?
+  whiteNoiseOn     Boolean  @default(false)
+  preSleepActivity String?  // "reading", "stretching", "screens"
+  caffeinatedAfter DateTime?
+  lateMeal         Boolean  @default(false)
+  compliance       Float?   // computed 0-1
+  notes            String?
+  sleepSessionId   String?
+  createdAt        DateTime @default(now())
+
+  @@index([date])
+}
+
+model SleepDebt {
+  id                String   @id @default(uuid())
+  date              DateTime @unique
+  targetHours       Float    @default(8)
+  actualHours       Float
+  dailyDeficit      Float
+  cumulativeDeficit Float
+  createdAt         DateTime @default(now())
+
+  @@index([date])
+}
+
+// ─── Body Metrics (Phase 1) ─────────────────────────────────────────
+
+model HbA1cRecord {
+  id          String   @id @default(uuid())
+  date        DateTime
+  value       Float
+  method      String   @default("lab") // lab, estimated_from_readings
+  labResultId String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([date])
+}
+
+model ThyroidPanel {
+  id        String   @id @default(uuid())
+  date      DateTime
+  tsh       Float
+  ft3       Float?
+  ft4       Float?
+  labName   String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
+
+model SkinCondition {
+  id        String   @id @default(uuid())
+  date      DateTime
+  condition String   // eczema_flare, hyperpigmentation, dryness, acne
+  severity  Int      @default(3) // 1-5
+  location  String?
+  treatment String?
+  trigger   String?
+  photoPath String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+  @@index([condition])
+}
+
+model Medication {
+  id                String   @id @default(uuid())
+  name              String
+  type              String   // prescription, otc, insulin
+  dosage            String
+  frequency         String   // daily, twice_daily, as_needed
+  timeOfDay         String?  // morning, bedtime, before_meals
+  startDate         DateTime
+  endDate           DateTime?
+  prescribingDoctor String?
+  pharmacy          String?
+  cost              Int?     // cents per refill
+  refillReminder    Boolean  @default(false)
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  logs              MedicationLog[]
+
+  @@index([type])
+}
+
+model MedicationLog {
+  id           String     @id @default(uuid())
+  medicationId String
+  date         DateTime   @default(now())
+  taken        Boolean    @default(true)
+  time         DateTime?
+  dosage       String?
+  notes        String?
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@index([medicationId])
+  @@index([date])
+}
+
+// ─── Body Measurement (Phase 1 fields) ──────────────────────────────
+
+// Note: BodyMeasurement model already exists above — add fields via migration
+
+// ─── Prayer / Quran (Phase 1) ──────────────────────────────────────
+
+model PrayerLog {
+  id          String   @id @default(uuid())
+  date        DateTime
+  prayer      String   // fajr, dhuhr, asr, maghrib, isha
+  status      String   @default("on_time") // on_time, late, qadha, missed
+  prayedAt    DateTime?
+  scheduledAt DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@unique([date, prayer])
+  @@index([date])
+}
+
+model QuranProgress {
+  id              String   @id @default(uuid())
+  totalPages      Int      @default(604)
+  pagesMemorized  Int      @default(0)
+  currentSurah    String?
+  currentJuz      Int?
+  currentPage     Int?
+  targetDate      DateTime?
+  method          String?
+  teacher         String?
+  startedAt       DateTime
+  notes           String?
+  updatedAt       DateTime @updatedAt
+  sessions        QuranSession[]
+}
+
+model QuranSession {
+  id              String        @id @default(uuid())
+  quranProgressId String?
+  date            DateTime      @default(now())
+  type            String        // new_memorization, revision, recitation_to_teacher, tafsir
+  startPage       Int?
+  endPage         Int?
+  pagesMemorized  Float?
+  pagesRevised    Float?
+  duration        Int?          // minutes
+  quality         Int?          // 1-5
+  teacherVerified Boolean?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  progress        QuranProgress? @relation(fields: [quranProgressId], references: [id])
+
+  @@index([date])
+}
+
+model TafsirEntry {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  surah     String
+  ayahRange String   // "2:255" or "2:255-257"
+  notes     String   // markdown
+  source    String?  // "Ibn Kathir", "personal reflection"
+  createdAt DateTime @default(now())
+
+  @@index([date])
+  @@index([surah])
+}
+
+model DhikrLog {
+  id        String   @id @default(uuid())
+  date      DateTime
+  type      String   // morning_adhkar, evening_adhkar, after_salah, general
+  completed Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
 }
 

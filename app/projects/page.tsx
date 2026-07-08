@@ -45,7 +45,8 @@ export default async function ProjectsPage() {
   const activeNonVision = activeProjects.filter((p) => p.type !== "personal_vision");
   const nextActions = activeNonVision
     .filter((p) => p.nextAction)
-    .slice(0, 3);
+    .slice(0, 3)
+    .map((p) => ({ name: p.name, action: p.nextAction! }));
   const totalDealsWon = activeNonVision.reduce((s, p) => s + p.dealsWon, 0);
 
   return (
