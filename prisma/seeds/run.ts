@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import exercises from "./exercises";
 import foods from "./sample-foods";
 import contacts from "./contacts";
+import projects from "./projects";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
@@ -54,6 +55,19 @@ async function seed() {
     console.log(`  ✓ ${count} contacts seeded`);
   } else {
     console.log(`  - ${existingContacts} contacts already exist`);
+  }
+
+  // Projects
+  const existingProjects = await db.project.count();
+  if (existingProjects === 0) {
+    let count = 0;
+    for (const p of projects) {
+      await db.project.create({ data: p });
+      count++;
+    }
+    console.log(`  ✓ ${count} projects seeded`);
+  } else {
+    console.log(`  - ${existingProjects} projects already exist, skipping`);
   }
 
   console.log("Done.");
