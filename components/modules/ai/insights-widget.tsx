@@ -83,13 +83,17 @@ export function AIDashboardWidget() {
 
   if (!insights || insights.length === 0) {
     return (
-      <section className="premium-panel">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">🤖</span>
-          <h2 className="text-sm font-semibold text-[var(--text)]">Your Assistant</h2>
+      <section className="premium-panel bg-white/40">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--text)] text-[var(--bg)] shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.364-6.364l-.707-.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21V5a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-[var(--text)]">Private Assistant</h2>
         </div>
-        <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
-          Not enough data yet. I need a few days of logs — sleep, habits, glucose, or transactions — to give you meaningful insights. The more you track, the smarter I get.
+        <p className="text-sm font-serif italic text-[var(--text-secondary)] leading-relaxed max-w-md">
+          Not enough data yet. I require a few days of logs — sleep, habits, or transactions — to provide meaningful intelligence. The more you record, the more refined my assistance becomes.
         </p>
       </section>
     );

@@ -13,40 +13,38 @@
 }
 
 :root {
-  /* The Commissioned Masterpiece - Bespoke Light */
-  --bg: #fcfbf7; /* Slightly brighter, more luminous Ivory */
+  /* The Commissioned Masterpiece - Bespoke Light Foundation */
+  --bg: #fcfbf7; 
   --surface: #ffffff;
   --surface-raised: #ffffff;
   --surface-hover: #ffffff;
   --surface-deep: #f8f7f0;
   
-  --border: rgba(0, 0, 0, 0.02);
-  --border-light: rgba(0, 0, 0, 0.01);
-  --border-strong: rgba(0, 0, 0, 0.04);
+  --border: rgba(0, 0, 0, 0.015);
+  --border-light: rgba(0, 0, 0, 0.008);
+  --border-strong: rgba(0, 0, 0, 0.03);
   
-  --text: #141618; /* Denser obsidian */
+  --text: #141618; 
   --text-secondary: #4a4f54;
   --text-tertiary: #989ea4;
   
-  --accent: #8c6d2d; /* Refined Bronze-Gold */
+  --accent: #8c6d2d; 
   --accent-soft: rgba(140, 109, 45, 0.05);
   --accent-hover: #6b5424;
   --ring: #8c6d2d;
 
-  /* Material Shadows - 5 Layers for 'The Best' Depth */
+  /* Material Shadows - 5 Layers for Depth */
   --shadow-card: 
     0 1px 2px rgba(0,0,0,0.01),
     0 4px 8px rgba(0,0,0,0.01),
     0 12px 24px rgba(0,0,0,0.02),
-    0 24px 48px rgba(0,0,0,0.02),
-    0 0 0 1px rgba(0,0,0,0.01);
+    0 24px 48px rgba(0,0,0,0.02);
     
   --shadow-card-hover: 
     0 2px 4px rgba(0,0,0,0.01),
     0 8px 16px rgba(0,0,0,0.02),
     0 24px 48px rgba(0,0,0,0.03),
-    0 48px 96px rgba(0,0,0,0.04),
-    0 0 0 1px rgba(0,0,0,0.015);
+    0 48px 96px rgba(0,0,0,0.04);
 
   --shadow-modal: 0 60px 120px rgba(0, 0, 0, 0.1);
 
@@ -63,7 +61,7 @@
 
 body {
   background: var(--bg);
-  /* Atmospheric Lighting - Light Leaks */
+  /* Atmospheric Lighting - Refined */
   background-image: 
     radial-gradient(at 0% 0%, rgba(140, 109, 45, 0.04) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(41, 128, 185, 0.03) 0px, transparent 50%),
@@ -75,39 +73,30 @@ body {
   line-height: 1.8;
 }
 
-/* Bespoke Micro-Texture */
+/* Texture Overlay */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.025;
-  filter: contrast(110%) brightness(110%);
+  opacity: 0.02;
+  filter: contrast(110%);
   pointer-events: none;
   z-index: 9999;
 }
 
-/* Material Depth - Internal Soft Glow */
+/* Material Depth */
 .premium-panel, .premium-stat {
   position: relative;
   overflow: hidden;
 }
 
-.premium-panel::before, .premium-stat::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 70%);
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* Premium Typography Path */
+/* Typography Path */
 .premium-page {
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 4rem; /* Massive spacing for 'Wealthy' feel */
+  gap: 4rem;
   max-width: 1600px;
   margin: 0 auto;
 }
@@ -122,7 +111,7 @@ body::after {
   color: var(--accent);
   font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.5em; /* Extreme spacing */
+  letter-spacing: 0.5em;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
 }
@@ -130,7 +119,7 @@ body::after {
 .premium-title {
   font-family: var(--font-serif), serif;
   color: var(--text);
-  font-size: 4.5rem; /* Heroic scale */
+  font-size: 4.5rem;
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.04em;
@@ -143,21 +132,28 @@ body::after {
   font-weight: 400;
   max-width: 550px;
   line-height: 1.7;
-  font-style: italic; /* Sophisticated flair */
+  font-style: italic;
   opacity: 0.8;
 }
 
-/* The 'Masterpiece' Panels */
+/* Panelling */
 .premium-panel {
   background: var(--surface);
+  border: none;
   border-radius: var(--radius-lg);
-  padding: 4rem; /* Expansive internal space */
+  padding: 4rem;
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: var(--shadow-card);
 }
 
+.premium-panel:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px);
+}
+
 .premium-stat {
   background: var(--surface);
+  border: none;
   border-radius: var(--radius-md);
   padding: 2.5rem;
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -186,9 +182,10 @@ body::after {
   font-family: var(--font-serif), serif;
 }
 
-/* Bespoke Pill - The 'Concierge' Trigger */
+/* Bespoke Actions */
 .premium-action {
   background: var(--text);
+  border: none;
   border-radius: 9999px;
   color: var(--bg);
   padding: 0 2.5rem;
@@ -198,14 +195,40 @@ body::after {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
 .premium-action:hover {
   background: var(--accent);
   color: #fff;
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* Form Elements - High Precision */
+input, select, textarea {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.5rem;
+  color: var(--text);
+  font-size: 0.9375rem;
+  outline: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+  transform: translateY(-1px);
+}
+
+/* Interaction Overrides */
+.sidebar-item-active {
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 @media (max-width: 1024px) {
@@ -214,210 +237,13 @@ body::after {
   .premium-panel { padding: 2rem; }
 }
 
-/* Navigation Overrides */
-.sidebar-item-active {
-  background: var(--bg);
-  box-shadow: var(--shadow-card);
-}
-
-@media (min-width: 1024px) {
-  .premium-header {
-    padding: 6rem 3rem 3rem;
-  }
-}
-
-/* Luxury Noise Overlay */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 9999;
-}
-
 @supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  body { padding-bottom: env(safe-area-inset-bottom); }
 }
 
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
-/* Scrollbar Customisation */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-
-/* Input, select, textarea */
-input, select, textarea {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  color: var(--text);
-  font-size: 0.875rem;
-  outline: none;
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-  font-family: inherit;
-}
-
-input:focus, select:focus, textarea:focus {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
-}
-
-/* Premium Typography Utilities */
-.font-serif { font-family: var(--font-serif), serif; }
-.tracking-extrawide { letter-spacing: 0.35em; }
-
-/* Page Wrappers */
-.premium-page {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.premium-header {
-  padding: 2.5rem 1.5rem;
-  text-align: center;
-}
-
-.premium-kicker {
-  color: var(--accent);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-
-.premium-title {
-  font-family: var(--font-serif), serif;
-  color: var(--text);
-  font-size: 2.25rem;
-  font-weight: 400;
-  line-height: 1.1;
-  margin-top: 0.5rem;
-}
-
-.premium-subtitle {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  margin-top: 0.75rem;
-  font-weight: 400;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Luxury Panels (Smoked Glass) */
-.premium-panel {
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: var(--shadow-card);
-}
-
-.premium-panel:hover {
-  background: var(--surface-raised);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
-}
-
-/* Stats & Widgets */
-.premium-stat {
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  min-height: 6rem;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: var(--shadow-card);
-}
-
-.premium-stat:hover {
-  background: var(--surface-raised);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.premium-label {
-  color: var(--text-tertiary);
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-}
-
-.premium-value {
-  color: var(--text);
-  font-size: 1.75rem;
-  font-weight: 400;
-  line-height: 1.2;
-  margin-top: 0.5rem;
-}
-
-/* Buttons & Actions */
-.premium-action {
-  align-items: center;
-  background: transparent;
-  border: 1px solid var(--accent);
-  border-radius: 9999px; /* Pill shape is more luxury */
-  color: var(--accent);
-  display: inline-flex;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.5rem 1.5rem;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-  letter-spacing: 0.05em;
-}
-
-.premium-action:hover {
-  background: var(--accent-soft);
-  color: var(--text);
-  transform: translateY(-1px);
-}
-
-.premium-action:active {
-  transform: scale(0.98);
-}
-
-/* Animation utilities */
-@keyframes slowFloat {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-
-.animate-float {
-  animation: slowFloat 4s ease-in-out infinite;
-}
-
-/* Responsive Overrides */
-@media (min-width: 640px) {
-  .premium-page { padding: 2rem; }
-  .premium-title { font-size: 3rem; }
-}
-
-@media (min-width: 1024px) {
-  .premium-page { gap: 2rem; }
-}

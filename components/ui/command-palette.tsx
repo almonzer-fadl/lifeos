@@ -175,15 +175,15 @@ export function CommandPalette() {
 
           {/* Palette */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: -8 }}
+            initial={{ opacity: 0, scale: 0.98, y: -12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -8 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed left-1/2 top-[15%] z-[101] w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface-deep)] shadow-[0_28px_80px_rgba(0,0,0,0.6)]"
+            exit={{ opacity: 0, scale: 0.98, y: -12 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed left-1/2 top-[15%] z-[101] w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-[40px] bg-white/90 shadow-[var(--shadow-modal)] backdrop-blur-3xl"
           >
             {/* Search */}
-            <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex items-center gap-4 px-8 py-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -192,19 +192,19 @@ export function CommandPalette() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handlePaletteKeyDown}
-                placeholder={searchResults.length > 0 ? "Search everything..." : "Search commands or type to search..."}
-                className="flex-1 border-none bg-transparent p-0 text-sm text-[var(--text)] placeholder:text-[var(--text-tertiary)] focus:ring-0 focus:outline-none"
+                placeholder={searchResults.length > 0 ? "Searching your estate..." : "Inquire command..."}
+                className="flex-1 border-none bg-transparent p-0 text-lg font-serif italic text-[var(--text)] placeholder:text-[var(--text-tertiary)]/40 focus:ring-0 focus:outline-none"
               />
-              <kbd className="rounded border border-[var(--border)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-tertiary)]">esc</kbd>
+              <kbd className="rounded-full bg-[var(--bg)] px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-[var(--text-tertiary)]">esc</kbd>
             </div>
 
             {/* Results */}
-            <div className="max-h-[320px] overflow-y-auto py-2">
+            <div className="max-h-[480px] overflow-y-auto px-4 pb-4">
               {/* Global search results */}
               {searchResults.length > 0 && (
-                <div>
-                  <div className="px-4 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                    Search Results
+                <div className="mb-6">
+                  <div className="px-4 py-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--accent)] opacity-60">
+                    Estate Records
                   </div>
                   {searchResults.map((result, i) => {
                     const isSelected = i === selectedIndex;
@@ -213,18 +213,20 @@ export function CommandPalette() {
                       <button
                         key={result.id}
                         onClick={() => { router.push(result.href); setOpen(false); }}
-                        className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors ${
-                          isSelected ? "bg-[var(--surface-hover)]" : "hover:bg-[var(--surface-hover)]"
+                        className={`flex w-full items-center gap-5 rounded-2xl px-5 py-4 text-left transition-all ${
+                          isSelected ? "bg-[var(--bg)] shadow-sm scale-[1.02]" : "hover:bg-[var(--bg)]/50"
                         }`}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-                        </svg>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm text-[var(--text)] truncate">{result.title}</div>
-                          <div className="text-[10px] text-[var(--text-tertiary)] truncate">{result.subtitle}</div>
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${isSelected ? "bg-white text-[var(--accent)]" : "bg-[var(--bg)] text-[var(--text-tertiary)]"}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+                          </svg>
                         </div>
-                        <span className="shrink-0 rounded bg-[var(--surface)] border border-[var(--border-light)] px-1.5 py-0.5 text-[8px] font-semibold uppercase text-[var(--text-tertiary)]">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-[var(--text)] truncate">{result.title}</div>
+                          <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] truncate">{result.subtitle}</div>
+                        </div>
+                        <span className="shrink-0 font-serif italic text-xs text-[var(--accent)] opacity-60">
                           {result.type}
                         </span>
                       </button>
@@ -235,56 +237,56 @@ export function CommandPalette() {
 
               {/* Command navigation */}
               {searching && query.trim().length >= 2 && searchResults.length === 0 && (
-                <div className="px-4 py-3 text-[10px] text-[var(--text-tertiary)]">Searching…</div>
+                <div className="px-6 py-12 text-center font-serif italic text-sm text-[var(--text-tertiary)]">Consulting the archive…</div>
               )}
 
               {Object.entries(grouped).map(([section, commands]) => (
-                <div key={section}>
-                  <div className="px-4 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+                <div key={section} className="mb-4 last:mb-0">
+                  <div className="px-4 py-2 text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--text-tertiary)] opacity-40">
                     {section}
                   </div>
-                  {commands.map((cmd) => {
-                    const flatIndex = filtered.indexOf(cmd);
-                    // Offset: search results come before commands in selection order
-                    const isSelected = (flatIndex + searchResults.length) === selectedIndex;
-                    return (
-                      <button
-                        key={cmd.id}
-                        onClick={() => {
-                          router.push(cmd.href);
-                          setOpen(false);
-                        }}
-                        className={`flex w-full items-center gap-3 px-4 py-2 text-left transition-colors ${
-                          isSelected
-                            ? "bg-[var(--surface-hover)]"
-                            : "hover:bg-[var(--surface-hover)]"
-                        }`}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d={cmd.icon} />
-                        </svg>
-                        <span className="flex-1 text-sm text-[var(--text)]">{cmd.label}</span>
-                        <kbd className="rounded bg-[var(--surface)] border border-[var(--border)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--text-tertiary)]">
-                          {cmd.shortcut}
-                        </kbd>
-                      </button>
-                    );
-                  })}
+                  <div className="space-y-1">
+                    {commands.map((cmd) => {
+                      const flatIndex = filtered.indexOf(cmd);
+                      const isSelected = (flatIndex + searchResults.length) === selectedIndex;
+                      return (
+                        <button
+                          key={cmd.id}
+                          onClick={() => {
+                            router.push(cmd.href);
+                            setOpen(false);
+                          }}
+                          className={`flex w-full items-center gap-5 rounded-2xl px-5 py-3.5 text-left transition-all ${
+                            isSelected
+                              ? "bg-[var(--bg)] shadow-sm scale-[1.02]"
+                              : "hover:bg-[var(--bg)]/50"
+                          }`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[var(--text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d={cmd.icon} />
+                          </svg>
+                          <span className="flex-1 text-sm font-medium text-[var(--text)]">{cmd.label}</span>
+                          <kbd className="rounded-lg bg-white px-2.5 py-1 text-[9px] font-bold text-[var(--text-tertiary)] shadow-sm">
+                            {cmd.shortcut}
+                          </kbd>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
 
               {filtered.length === 0 && searchResults.length === 0 && !searching && (
-                <div className="px-4 py-8 text-center text-xs text-[var(--text-tertiary)]">
-                  No results found
+                <div className="px-6 py-16 text-center">
+                  <p className="font-serif italic text-lg text-[var(--text-tertiary)]/50">No records matching your inquiry.</p>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="border-t border-[var(--border)] px-4 py-2 flex items-center gap-4 text-[9px] text-[var(--text-tertiary)]">
-              <span>↑↓ Navigate</span>
-              <span>↵ Select</span>
-              <span>Esc Dismiss</span>
+            <div className="bg-[var(--bg)]/30 px-8 py-4 flex items-center gap-6 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--text-tertiary)] opacity-60">
+              <span className="flex items-center gap-2">↑↓ Navigate</span>
+              <span className="flex items-center gap-2">↵ Select</span>
             </div>
           </motion.div>
         </>
