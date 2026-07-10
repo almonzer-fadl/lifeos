@@ -8,6 +8,7 @@ import foods from "./sample-foods";
 import contacts from "./contacts";
 import projects from "./projects";
 import habits from "./habits";
+import journalTemplates from "./journal-templates";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const db = new PrismaClient({ adapter });
@@ -82,6 +83,19 @@ async function seed() {
     console.log(`  ✓ ${count} habits seeded`);
   } else {
     console.log(`  - ${existingHabits} habits already exist, skipping`);
+  }
+
+  // Journal templates
+  const existingTemplates = await db.journalTemplate.count();
+  if (existingTemplates === 0) {
+    let count = 0;
+    for (const t of journalTemplates) {
+      await db.journalTemplate.create({ data: t });
+      count++;
+    }
+    console.log(`  ✓ ${count} journal templates seeded`);
+  } else {
+    console.log(`  - ${existingTemplates} journal templates already exist, skipping`);
   }
 
   console.log("Done.");
