@@ -67,7 +67,7 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
         <div>
           <div className="premium-kicker">Confidential Ledger</div>
           <h1 className="premium-title">Financial Command</h1>
-          <p className="premium-subtitle">Comprehensive management of net worth, exposure, and capital flow.</p>
+          <p className="premium-subtitle">Comprehensive management of net worth and capital flow.</p>
         </div>
         <div className="flex gap-2">
           <MarketChip label="Currency" value={currencies[0] || "USD"} />
@@ -75,30 +75,30 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="premium-panel lg:col-span-7">
           <div className="mb-6 flex items-center justify-between">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Capital Position</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-tertiary)] opacity-60">Capital Position</div>
             <DateRangeSwitch />
           </div>
           <div className="flex flex-col gap-2">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Consolidated Net Worth</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-tertiary)] opacity-40">Consolidated Net Worth</div>
             <div className="flex items-baseline gap-3">
               <Odometer
                 value={$(netWorth)}
                 prefix={netWorth >= 0 ? "" : "-"}
-                className={`font-serif text-5xl font-normal leading-tight tracking-tight sm:text-6xl ${netWorth >= 0 ? "text-[var(--text)]" : "text-[var(--rose)]"}`}
+                className={`font-serif text-4xl sm:text-6xl font-normal leading-tight tracking-tight ${netWorth >= 0 ? "text-[var(--text)]" : "text-[var(--rose)]"}`}
               />
-              <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">{currencies[0] || "USD"}</span>
+              <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)] opacity-60">{currencies[0] || "USD"}</span>
             </div>
-            <div className="mt-2 flex items-center gap-2">
-              <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${income >= expenses ? "bg-[var(--emerald-soft)] text-[var(--emerald)]" : "bg-[var(--rose-soft)] text-[var(--rose)]"}`}>
+            <div className="mt-4 flex items-center gap-2">
+              <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${income >= expenses ? "bg-[var(--emerald)]/10 text-[var(--emerald)]" : "bg-[var(--rose)]/10 text-[var(--rose)]"}`}>
                 {income >= expenses ? "↑" : "↓"} {s$(Math.abs(income - expenses))}
               </div>
-              <span className="text-[10px] uppercase tracking-widest text-[var(--text-tertiary)]">Cashflow {rangeLabel}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-tertiary)] opacity-40">Flow {rangeLabel}</span>
             </div>
           </div>
-          <div className="mt-8 grid grid-cols-3 gap-3">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Exposure label="Cash" value={$(cashBalance)} tone="neutral" />
             <Exposure label="Assets" value={$(assetValue)} tone="gold" />
             <Exposure label="Liabilities" value={$(debtBalance)} tone="negative" prefix="-" />
@@ -113,16 +113,16 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
         </section>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Section title="Cash Accounts" kicker="Liquidity" action={{ label: "Manage", href: "/finance/accounts" }}>
           <div className="space-y-1">
             {accountsWithBalance.filter((a) => !a.isDebt).slice(0, 4).map((a) => (
-              <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-[rgba(255,255,255,0.03)]">
+              <Link key={a.id} href={`/finance/accounts/${a.id}`} className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 transition-all hover:bg-white hover:shadow-md">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-[var(--text)]">{a.name}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">{a.type}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mt-1">{a.type}</div>
                 </div>
-                <span className={`shrink-0 text-sm font-medium ${a.balanceCents >= 0 ? "text-[var(--text)]" : "text-[var(--rose)]"}`}>{f$(a.balanceCents)}</span>
+                <span className={`shrink-0 text-sm font-serif ${a.balanceCents >= 0 ? "text-[var(--text)]" : "text-[var(--rose)]"}`}>{f$(a.balanceCents)}</span>
               </Link>
             ))}
           </div>
@@ -131,12 +131,12 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
         <Section title="Upcoming Bills" kicker="Obligations" action={{ label: "View All", href: "/finance/recurring" }}>
           <div className="space-y-1">
             {upcomingBills.map((r) => (
-              <div key={r.id} className="flex items-center justify-between gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-[rgba(255,255,255,0.02)]">
+              <div key={r.id} className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 transition-all hover:bg-white hover:shadow-md">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-[var(--text)]">{r.description}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">Due {format(new Date(r.nextDate), "MMM d")}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mt-1">Due {format(new Date(r.nextDate), "MMM d")}</div>
                 </div>
-                <span className="shrink-0 text-sm font-medium text-[var(--amber)]">{s$(r.amount)}</span>
+                <span className="shrink-0 text-sm font-serif text-[var(--amber)]">{s$(r.amount)}</span>
               </div>
             ))}
           </div>
@@ -144,16 +144,16 @@ export default async function FinancePage({ searchParams }: { searchParams: Prom
       </div>
 
       <Section title="Recent Activity" kicker="Ledger" action={{ label: "Full Audit", href: "/finance/accounts" }}>
-        <div className="overflow-hidden rounded-2xl border border-[var(--border-light)]">
+        <div className="overflow-hidden rounded-[32px] bg-white p-2 shadow-lg">
           {allTransactions.slice(0, 8).map((t) => (
-            <div key={t.id} className="flex items-center gap-4 border-b border-[var(--border-light)] px-5 py-4 transition-colors last:border-b-0 hover:bg-[rgba(255,255,255,0.02)]">
+            <div key={t.id} className="flex items-center gap-4 border-b border-[var(--border-light)] px-4 sm:px-8 py-4 sm:py-5 transition-colors last:border-b-0 hover:bg-[var(--bg)]">
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-[var(--text)]">{t.description || t.category?.name || "Private Transaction"}</div>
-                <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">
+                <div className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mt-1">
                   {format(new Date(t.date), "MMMM d")}{t.account && ` · ${t.account.name}`}
                 </div>
               </div>
-              <span className={`whitespace-nowrap text-sm font-medium ${t.type === "income" ? "text-[var(--emerald)]" : t.type === "expense" ? "text-[var(--rose)]" : "text-[var(--text-tertiary)]"}`}>
+              <span className={`whitespace-nowrap text-sm font-serif ${t.type === "income" ? "text-[var(--emerald)]" : t.type === "expense" ? "text-[var(--rose)]" : "text-[var(--text-tertiary)]"}`}>
                 {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}{f$(t.amount)}
               </span>
             </div>

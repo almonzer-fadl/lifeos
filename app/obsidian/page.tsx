@@ -41,19 +41,19 @@ export default async function ObsidianPage() {
 
       {count > 0 ? (
         <>
-          <section className="premium-panel overflow-hidden shadow-2xl p-6">
-            <div className="mb-6 border-b border-[var(--border-light)] pb-4">
+          <section className="premium-panel overflow-hidden shadow-2xl p-4 sm:p-6">
+            <div className="mb-4 sm:mb-6 border-b border-[var(--border-light)] pb-4">
               <h2 className="text-xl font-serif text-[var(--text)]">Intellectual Graph</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Visualizing connection and density</p>
             </div>
-            <div className="h-[420px] w-full bg-[var(--bg)] rounded-[24px] overflow-hidden">
+            <div className="h-[320px] sm:h-[420px] w-full bg-[var(--bg)] rounded-[20px] sm:rounded-[24px] overflow-hidden">
               <ObsidianGraph />
             </div>
           </section>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <section className="space-y-6">
+              <section className="space-y-4 sm:space-y-6">
                 <div>
                   <h2 className="text-xl font-serif text-[var(--text)]">Recent Manuscripts</h2>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Latest modifications</p>
@@ -62,7 +62,7 @@ export default async function ObsidianPage() {
                   {notes.slice(0, 10).map((n) => (
                     <div
                       key={n.path}
-                      className="group flex items-center justify-between gap-6 rounded-2xl p-4 transition-all hover:bg-white hover:shadow-lg"
+                      className="group flex items-center justify-between gap-4 rounded-2xl p-3 sm:p-4 transition-all hover:bg-white hover:shadow-lg"
                     >
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium text-[var(--text)]">{n.name}</div>
@@ -71,10 +71,10 @@ export default async function ObsidianPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {n.tags.slice(0, 2).map((t) => (
+                        {n.tags.slice(0, 1).map((t) => (
                           <span
                             key={t}
-                            className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-[var(--accent)]"
+                            className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest text-[var(--accent)]"
                           >
                             {t}
                           </span>
@@ -87,18 +87,18 @@ export default async function ObsidianPage() {
             </div>
 
             <div className="lg:col-span-5">
-              <section className="space-y-6">
+              <section className="space-y-4 sm:space-y-6">
                 <div>
                   <h2 className="text-xl font-serif text-[var(--text)]">Sectors</h2>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Vault organization</p>
                 </div>
-                <div className="grid grid-cols-1 gap-2.5">
+                <div className="grid grid-cols-1 gap-2 sm:gap-2.5">
                   {folders.slice(0, 8).map((f) => {
                     const folderCount = notes.filter((n) => n.folder === f).length;
                     return (
                       <div
                         key={f}
-                        className="rounded-2xl bg-white p-5 shadow-sm transition-all hover:shadow-md"
+                        className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm transition-all hover:shadow-md"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-[var(--text)] tracking-wide">{f}</span>
