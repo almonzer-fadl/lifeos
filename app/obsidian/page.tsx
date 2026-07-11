@@ -41,19 +41,19 @@ export default async function ObsidianPage() {
 
       {count > 0 ? (
         <>
-          <section className="premium-panel overflow-hidden shadow-2xl p-8">
-            <div className="mb-8 border-b border-[var(--border-light)] pb-6">
+          <section className="premium-panel overflow-hidden shadow-2xl p-6">
+            <div className="mb-6 border-b border-[var(--border-light)] pb-4">
               <h2 className="text-xl font-serif text-[var(--text)]">Intellectual Graph</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Visualizing connection and density</p>
             </div>
-            <div className="h-[500px] w-full bg-[var(--bg)] rounded-[32px] overflow-hidden">
+            <div className="h-[420px] w-full bg-[var(--bg)] rounded-[24px] overflow-hidden">
               <ObsidianGraph />
             </div>
           </section>
 
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <section className="space-y-8">
+              <section className="space-y-6">
                 <div>
                   <h2 className="text-xl font-serif text-[var(--text)]">Recent Manuscripts</h2>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Latest modifications</p>
@@ -87,18 +87,18 @@ export default async function ObsidianPage() {
             </div>
 
             <div className="lg:col-span-5">
-              <section className="space-y-8">
+              <section className="space-y-6">
                 <div>
                   <h2 className="text-xl font-serif text-[var(--text)]">Sectors</h2>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Vault organization</p>
                 </div>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-2.5">
                   {folders.slice(0, 8).map((f) => {
                     const folderCount = notes.filter((n) => n.folder === f).length;
                     return (
                       <div
                         key={f}
-                        className="rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                        className="rounded-2xl bg-white p-5 shadow-sm transition-all hover:shadow-md"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-[var(--text)] tracking-wide">{f}</span>

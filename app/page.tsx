@@ -42,20 +42,20 @@ export default async function HomePage() {
         <p className="premium-subtitle">Your estate is currently operating within optimal parameters. Here is your daily summary.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 animate-stagger">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3 lg:grid-cols-4 animate-stagger">
         <Widget label="Consolidated Capital" value={cashBalance - debtBalance > 0 ? `+${(cashBalance - debtBalance).toFixed(0)}` : `${(cashBalance - debtBalance).toFixed(0)}`} tone={cashBalance >= debtBalance ? "positive" : "negative"} href="/finance" />
         <Widget label="Monthly Cashflow" value={income >= expenses ? `+${(income - expenses).toFixed(0)}` : `${(income - expenses).toFixed(0)}`} tone={income >= expenses ? "positive" : "negative"} href="/finance" />
         <Widget label="Discipline Streak" value={`${habitsDone}/${habits.length}`} tone={habitsDone === habits.length && habits.length > 0 ? "positive" : "neutral"} href="/habits" />
         <Widget label="Pending Actions" value={`${pendingTasks}`} tone={pendingTasks > 0 ? "amber" : "neutral"} href="/tasks" />
       </div>
 
-      <div className="my-8">
+      <div className="my-2 sm:my-6">
         <AIDashboardWidget />
       </div>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <section className="space-y-8">
+          <section className="space-y-6">
             <div>
               <h2 className="text-xl font-serif text-[var(--text)]">Daily Agenda</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Priority Tasks</p>
@@ -68,12 +68,12 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
-            <Link href="/tasks" className="premium-action text-xs">View Full Agenda</Link>
+            <Link href="/tasks" className="premium-action text-xs w-full sm:w-auto">View Full Agenda</Link>
           </section>
         </div>
 
         <div className="lg:col-span-8">
-          <section className="space-y-8">
+          <section className="space-y-6">
             <div className="flex items-end justify-between">
               <div>
                 <h2 className="text-xl font-serif text-[var(--text)]">Financial Ledger</h2>
@@ -81,9 +81,9 @@ export default async function HomePage() {
               </div>
               <Link href="/finance/accounts" className="text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] hover:underline">Full Audit →</Link>
             </div>
-            <div className="overflow-hidden rounded-[40px] bg-white p-2 shadow-lg">
+            <div className="overflow-hidden rounded-[32px] bg-white p-2 shadow-lg">
               {transactions.slice(0, 5).map((t) => (
-                <div key={t.id} className="flex items-center justify-between rounded-[32px] px-8 py-5 transition-colors hover:bg-[var(--bg)]">
+                <div key={t.id} className="flex items-center justify-between rounded-[24px] px-4 sm:px-8 py-4 sm:py-5 transition-colors hover:bg-[var(--bg)]">
                   <span className="truncate text-sm font-medium text-[var(--text-secondary)]">{t.description || t.category?.name || "Private Transaction"}</span>
                   <span className={`shrink-0 ml-4 text-sm font-serif ${t.type === "income" ? "text-[var(--emerald)]" : "text-[var(--rose)]"}`}>{t.type === "income" ? "+" : "-"}{t.amount.toFixed(0)}</span>
                 </div>

@@ -56,7 +56,7 @@ export default async function JournalPage() {
 
   return (
     <div className="premium-page animate-fade-in">
-      <div className="premium-header flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="premium-header flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="premium-kicker">Personal Chronicle</div>
           <h1 className="premium-title">{format(month, "MMMM yyyy")}</h1>
@@ -70,8 +70,8 @@ export default async function JournalPage() {
       </div>
 
       {/* Mini Calendar */}
-      <section className="premium-panel overflow-hidden p-8 shadow-xl">
-        <div className="grid grid-cols-7 mb-6 border-b border-[var(--border-light)] pb-4">
+      <section className="premium-panel overflow-hidden p-6 shadow-xl">
+        <div className="grid grid-cols-7 mb-4 border-b border-[var(--border-light)] pb-4">
           {weekDays.map(d => (
             <div key={d} className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--text-tertiary)]">
               {d}
@@ -90,7 +90,7 @@ export default async function JournalPage() {
               <Link
                 key={i}
                 href={hasEntry ? `/journal?date=${dayStr}` : "/journal/new"}
-                className={`relative flex aspect-square flex-col items-center justify-center rounded-2xl transition-all ${
+                className={`relative flex aspect-square flex-col items-center justify-center rounded-xl transition-all ${
                   current
                     ? "bg-[var(--text)] text-[var(--bg)] shadow-lg"
                     : "hover:bg-[var(--bg)]"
@@ -101,7 +101,7 @@ export default async function JournalPage() {
                 }`}>
                   {format(day, "d")}
                 </span>
-                <div className="absolute bottom-3 flex gap-1">
+                <div className="absolute bottom-2.5 flex gap-1">
                   {hasEntry && (
                     <span className={`h-1 w-1 rounded-full ${current ? "bg-[var(--bg)]" : "bg-[var(--accent)]"}`} />
                   )}
@@ -115,9 +115,9 @@ export default async function JournalPage() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <section className="space-y-8">
+          <section className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-serif text-[var(--text)]">Schedule</h2>
@@ -144,13 +144,13 @@ export default async function JournalPage() {
         </div>
 
         <div className="lg:col-span-8">
-          <section className="space-y-8">
+          <section className="space-y-6">
             <div>
               <h2 className="text-xl font-serif text-[var(--text)]">Recent Manuscripts</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mt-1">Personal entries</p>
             </div>
             {entries.length === 0 ? (
-              <div className="rounded-[40px] bg-white p-16 text-center shadow-lg">
+              <div className="rounded-[32px] bg-white p-12 text-center shadow-lg">
                 <div className="mb-6 flex justify-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--text-tertiary)]">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -167,9 +167,9 @@ export default async function JournalPage() {
                   <Link
                     key={e.id}
                     href={`/journal/${e.id}`}
-                    className="block rounded-[32px] bg-white p-8 transition-all hover:shadow-xl hover:-translate-y-1"
+                    className="block rounded-[24px] bg-white p-6 transition-all hover:shadow-xl hover:-translate-y-1"
                   >
-                    <div className="mb-4 flex items-center justify-between">
+                    <div className="mb-3 flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--accent)]">
                         {format(new Date(e.createdAt), "EEEE, MMMM d")}
                       </span>
@@ -183,7 +183,7 @@ export default async function JournalPage() {
                       {e.content}
                     </p>
                     {e.tags && (
-                      <div className="mt-6 flex flex-wrap gap-2">
+                      <div className="mt-5 flex flex-wrap gap-2">
                         {e.tags.split(",").map((t: string) => (
                           <span key={t} className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-tertiary)]">#{t.trim()}</span>
                         ))}
