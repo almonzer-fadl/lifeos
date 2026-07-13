@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { format, subDays } from "date-fns";
+import { SleepRoutineCheck } from "@/components/modules/sleep/routine-check";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,10 @@ export default async function SleepPage() {
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 animate-stagger">
         <div className="premium-stat"><div className="premium-label">Avg Duration</div><div className="premium-value">{avgDuration > 0 ? (avgDuration / 60).toFixed(1) : "--"}<span className="text-sm font-normal text-[var(--text-tertiary)]">h</span></div></div>
         <div className="premium-stat"><div className="premium-label">Avg Quality</div><div className="premium-value">{avgQuality > 0 ? avgQuality.toFixed(1) : "--"}<span className="text-sm font-normal text-[var(--text-tertiary)]">/5</span></div></div>
-        <div className="premium-stat"><div className="premium-label">Sessions</div><div className="premium-value">{sessions.length}</div><div className="text-xs text-[var(--text-tertiary)]">30 days</div></div>
+        <div className="premium-stat"><div className="premium-label">Sessions</div><div className="premium-value">{sessions.length}</div><div className="text-xs text-[var(--text-tertiary)]">30 days</div>        </div>
       </div>
+
+      <SleepRoutineCheck />
 
       <section className="premium-panel animate-fade-in">
         <div className="mb-3 flex items-center justify-between gap-3">

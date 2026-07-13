@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import { BodyDashboard } from "@/components/modules/body/body-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,8 @@ export default async function BodyPage() {
         <h1 className="premium-title">Body Command</h1>
         <p className="premium-subtitle">Weight, measurements, labs, and supplements</p>
       </div>
+
+      <BodyDashboard />
 
       {latest && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 animate-stagger">
