@@ -1245,6 +1245,48 @@ model LanguageSession {
   @@index([languageId, date])
 }
 
+// ─── Reading ──────────────────────────────────────────────────────
+
+model Book {
+  id          String     @id @default(uuid())
+  title       String
+  author      String
+  isbn        String?
+  coverUrl    String?
+  status      String     @default("to_read") // to_read, reading, completed, abandoned, re_reading
+  startedAt   DateTime?
+  completedAt DateTime?
+  rating      Int?
+  difficulty  Int?
+  summary     String?
+  keyQuote    String?
+  category    String?
+  format      String?
+  pageCount   Int?
+  currentPage Int?
+  actionItems String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  notes       BookNote[]
+
+  @@index([status])
+  @@index([category])
+}
+
+model BookNote {
+  id        String   @id @default(uuid())
+  bookId    String
+  chapter   String?
+  quote     String?
+  note      String
+  type      String   @default("highlight") // highlight, reflection, question, action_item
+  page      Int?
+  createdAt DateTime @default(now())
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+}
+
 // ─── Activity (Phase 1) ────────────────────────────────────────────
 
 model PersonalRecord {
